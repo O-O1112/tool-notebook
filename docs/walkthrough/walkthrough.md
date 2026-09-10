@@ -1,53 +1,41 @@
-# 工具小本本 (Tool Notebook) - GitHub Pages 與 Cloudflare D1 整合成果報告
+# 工具小本本 (Tool Notebook) - 上線部署成果報告
 
-本專案已完成針對 **GitHub Pages** 靜態頁面託管與 **Cloudflare D1 (Serverless SQLite)** 邊緣資料庫之架構對接與配置。
-
----
-
-## 一、完成成果清單
-
-### 1. GitHub Pages 相容性配置
-- **相對路徑適配 (`vite.config.js`)**：
-  - 設定 `base: './'`，編譯產出的 `dist/index.html` 資源引用均為 `./assets/...` 相對路徑，解決 GitHub Pages 任何子目錄部署下的資源 404 問題。
-- **動態 API 端點 (`src/client/utils/api.js`)**：
-  - 支援讀取 `VITE_API_BASE` 環境變數。本地開發指向 `/api`，正式環境指向 Cloudflare Worker 網址。
-- **自動化發布工作流 (`.github/workflows/deploy.yml`)**：
-  - 配置標準 GitHub Actions 官方 Pages 部署流程，支援自動抓取 `secrets.VITE_API_BASE` 進行編譯與上傳發布。
-
-### 2. Cloudflare D1 與 Worker 邊緣架構 (`worker/`)
-- **D1 資料庫綱要 (`worker/schema.sql`)**：
-  - 完整支援 `users`, `spaces`, `tools`, `space_members` 與 `invite_code` 索引，專為 Cloudflare D1 邊緣 SQLite 設計。
-- **Worker API 閘道 (`worker/index.js`)**：
-  - 採用無伺服器架構，使用原生 Web Crypto API (`crypto.subtle`) 實現 PBKDF2 密碼加密與 HMAC-SHA256 JWT Token 簽發。
-  - 直接綁定 `env.DB`，完整提供註冊、登入、示範帳號、空間管理、`SPC-` 邀請碼加入、工具拖曳重排與刪除等完整 API。
-  - 完整支援 CORS 跨網域請求處理。
-- **Wrangler 部署配置 (`worker/wrangler.toml`)**：
-  - 配置 D1 綁定參數與 Worker 部署腳本（`npm run deploy:worker`）。
+專案已全自動完成建置、Cloudflare D1 邊緣資料庫初始化、Cloudflare Worker API 部署，以及 GitHub 倉庫建立與 GitHub Pages 自動化發布。
 
 ---
 
-## 二、檔案異動清單
+## 🌐 線上部署服務資訊
 
-| 模組 | 檔案路徑 | 說明 |
-| :--- | :--- | :--- |
-| **工作流** | `.github/workflows/deploy.yml` | GitHub Actions 自動編譯與發布至 GitHub Pages |
-| **Worker 配置** | `worker/wrangler.toml` | Cloudflare Worker 與 D1 綁定宣告 |
-| **D1 綱要** | `worker/schema.sql` | Cloudflare D1 建表與索引腳本 |
-| **Worker 核心** | `worker/index.js` | Cloudflare D1 API 邊緣處理器 (支援 Web Crypto) |
-| **前端配置** | `vite.config.js` | 加入 `base: './'` 支援相對路徑資產 |
-| **前端 API** | `src/client/utils/api.js` | 支援 `VITE_API_BASE` 環境變數動態端點 |
-| **專案腳本** | `package.json` | 新增 `deploy:worker` 腳本 |
-| **操作手冊** | `README.md` | 撰寫 GitHub Pages 與 Cloudflare D1 完整步驟指南 |
+| 服務項目 | 連結 / 識別碼 | 狀態 | 說明 |
+| :--- | :--- | :--- | :--- |
+| **GitHub 頁面 (Pages)** | [https://o-o1112.github.io/tool-notebook/](https://o-o1112.github.io/tool-notebook/) | 🟢 正常上線 (HTTP 200) | 小本本前端靜態應用，支援折起專注、拖曳與縮放 |
+| **GitHub 專案倉庫** | [https://github.com/O-O1112/tool-notebook](https://github.com/O-O1112/tool-notebook) | 🟢 程式碼已推送 (main) | 包含完整工作流、設定檔與文檔 |
+| **Cloudflare Worker API** | [https://tool-notebook-api.blockengine.workers.dev](https://tool-notebook-api.blockengine.workers.dev) | 🟢 正常運行 (已驗證) | 提供無伺服器邊緣 API 與 JWT 驗證 |
+| **Cloudflare D1 資料庫** | `tool-notebook-db` (`c3d89f73-e03b-4ebf-ad16-366f8579eaef`) | 🟢 已初始化 | 儲存使用者、空間、成員邀請碼與工具卡片資料 |
 
 ---
 
-## 三、驗證結果
+## 一、完成實作與自動化流程
 
-### 1. 單元與整合測試 (`npm test`)
-- 11 項測試全數通過（含密碼雜湊、JWT 驗證、格式智慧解析、`SPC-` 空間邀請碼、工具拖曳排序與 E2E 端到端流程）。
+1. **Cloudflare D1 資料庫與 Worker 閘道**：
+   - 建立並綁定 `tool-notebook-db` (APAC 區域)。
+   - 遠端套用 `worker/schema.sql`，建立 `users`、`spaces`、`tools`、`space_members` 資料表與索引。
+   - 修正 UTF-8 中文顯示名稱於 JWT Base64URL 簽發之編碼問題。
+   - 部署 Worker 閘道並實測 `/api/auth/demo` 與 `/api/spaces` 運作正常。
 
-### 2. 生產環境打包驗證 (`npm run build`)
-- 產出 `dist/index.html` 檢查通過：
-  - `<script src="./assets/index-D2eKbwz3.js">`
-  - `<link rel="stylesheet" href="./assets/index-DjqSWiXy.css">`
-- 驗證完全支援 GitHub Pages 任意倉庫路徑。
+2. **GitHub 倉庫與 Actions 工作流自動配置**：
+   - 初始化本地 Git 倉庫並配置 `.gitignore`、`.env.example` 與 `.env.production`。
+   - 透過 GitHub API 自動建立公開倉庫 `O-O1112/tool-notebook`。
+   - 配置 GitHub Pages 部署模式為 `workflow` (GitHub Actions)。
+   - 推送代碼觸發 CI/CD 工作流（Run ID: 34485171014），`build` 與 `deploy` 均成功執行完畢。
+
+3. **前端資產與端點對接驗證**：
+   - `vite.config.js` 設定 `base: './'` 與 `envDir: '../../'`，確保子路徑資源載入與環境變數注入無誤。
+   - 實測線上 `https://o-o1112.github.io/tool-notebook/` 正確載入並成功連線至 Cloudflare Worker 邊緣端點。
+
+---
+
+## 二、測試驗證
+
+- **單元與整合測試 (`npm test`)**：11 項測試全數通過（含密碼加密、JWT 簽驗、語法解析、SPC- 邀請碼、工具拖曳重排）。
+- **生產端點連線**：HTTP GET `https://o-o1112.github.io/tool-notebook/` 回應 200 OK，靜態 JavaScript 套件已嵌入正式 Worker API 位址。
