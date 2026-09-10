@@ -73,7 +73,7 @@ export default function SpaceLayout({
             這個空間還沒有任何小工具
           </h3>
           <p className="text-xs text-[#89959b] mb-6 leading-relaxed">
-            點擊下方按鈕，直接貼上 HTML/JS 代碼、iframe 嵌入標籤或網址，即可在空間中開始使用！
+            點擊下方按鈕，直接貼上 HTML/JS 程式碼或 iframe 嵌入標籤，即可在空間中開始使用！
           </p>
           {isOwner && (
             <button

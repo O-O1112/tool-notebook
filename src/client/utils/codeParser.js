@@ -13,28 +13,15 @@ export function parseToolInput(input) {
 
   const trimmed = input.trim();
 
-  // 1. 判斷是否為純網址 (URL)
+  // 1. 若為純網址 (URL)，標註為不支援並提示改用 iframe 或 HTML
   const isUrl = /^https?:\/\/[^\s]+$/i.test(trimmed);
   if (isUrl) {
-    const urlObj = tryParseUrl(trimmed);
-    const domain = urlObj ? urlObj.hostname : '外部工具';
     return {
-      type: 'url',
-      titleSuggestion: `嵌入網頁 (${domain})`,
-      url: trimmed,
-      htmlContent: `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
-    iframe { width: 100%; height: 100%; border: none; }
-  </style>
-</head>
-<body>
-  <iframe src="${escapeHtmlAttr(trimmed)}" allow="fullscreen; clipboard-read; clipboard-write; camera; microphone"></iframe>
-</body>
-</html>`,
+      type: 'invalid',
+      isRawUrl: true,
+      titleSuggestion: '未支援的純網址',
+      error: '目前不支援直接貼上純網址。請使用 <iframe> 嵌入標籤（例如 <iframe src="..."></iframe>）或自訂 HTML 程式碼。',
+      htmlContent: '',
     };
   }
 

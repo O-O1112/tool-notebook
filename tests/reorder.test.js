@@ -23,10 +23,11 @@ test('reorder: 拖曳順序重排與持久化測試', async () => {
 
   try {
     // 1. 註冊使用者
+    const uid = Date.now() + Math.random().toString(36).slice(2, 6);
     const regRes = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'user_reorder_test', password: 'password123', displayName: '排序測試' }),
+      body: JSON.stringify({ username: `user_reorder_${uid}`, password: 'password123', displayName: '排序測試' }),
     });
     const { token } = await regRes.json();
 

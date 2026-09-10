@@ -1,6 +1,6 @@
-# 工具小本本 (Tool Notebook) - 上線部署與移除示範帳號成果報告
+# 工具小本本 (Tool Notebook) - 調整成果報告：移除純網址貼入支援
 
-專案已全自動完成建置、Cloudflare D1 邊緣資料庫初始化、Cloudflare Worker API 部署、GitHub 倉庫建立與 GitHub Pages 自動化發布，並依指示完全移除示範帳號機制。
+專案已全自動完成建置、測試與發布更新，依指示完全移除「直接貼上純網址」的功能，避免因外部網站安全防護機制（`X-Frame-Options` / CSP）導致常態性「拒絕連線」的問題，專注於 HTML/JS 代碼與 `<iframe>` 嵌入標籤。
 
 ---
 
@@ -11,26 +11,28 @@
 | **GitHub 頁面 (Pages)** | [https://o-o1112.github.io/tool-notebook/](https://o-o1112.github.io/tool-notebook/) | 🟢 正常上線 (HTTP 200) | 小本本前端靜態應用，支援折起專注、拖曳與縮放 |
 | **GitHub 專案倉庫** | [https://github.com/O-O1112/tool-notebook](https://github.com/O-O1112/tool-notebook) | 🟢 程式碼已同步 (main) | 包含完整工作流、設定檔與文檔 |
 | **Cloudflare Worker API** | [https://tool-notebook-api.blockengine.workers.dev](https://tool-notebook-api.blockengine.workers.dev) | 🟢 正常運行 (已驗證) | 提供無伺服器邊緣 API 與 JWT 驗證 |
-| **Cloudflare D1 資料庫** | `tool-notebook-db` (`c3d89f73-e03b-4ebf-ad16-366f8579eaef`) | 🟢 已清除示範資料 | 儲存真實使用者註冊之空間、成員與小工具 |
+| **Cloudflare D1 資料庫** | `tool-notebook-db` (`c3d89f73-e03b-4ebf-ad16-366f8579eaef`) | 🟢 邊緣 SQLite 存儲 | 儲存使用者帳號、空間、成員與工具資訊 |
 
 ---
 
-## 一、示範帳號移除摘要
+## 一、純網址貼上移除與防呆摘要
 
-1. **前端使用者介面 (`LoginCard.jsx`, `AuthContext.jsx`, `api.js`)**：
-   - 移除「快速體驗 (Demo)」與示範帳號點選按鈕，登入頁面僅保留乾淨直覺的帳號密碼註冊與登入表單。
-   - 清除前端 `demoLogin` 方法與對應 API 請求封裝。
-2. **後端與雲端邊緣閘道 (`worker/index.js`, `routes/auth.js`, `db.js`)**：
-   - 移除 Express 與 Cloudflare Worker 中的 `/api/auth/demo` 路由。
-   - 移除資料庫初始化種子程式 `seedDemoUsers`，確保本地 SQLite 與雲端皆不產生預設測試帳號。
-   - 從遠端 Cloudflare D1 清除原有的 `user_demo` 與 `team_demo` 測試數據。
-3. **自動化測試更新 (`tests/`)**：
-   - 更新 `e2e.test.js`、`inviteCode.test.js`、`reorder.test.js`，全部改走標準 `/api/auth/register` 註冊與登入流程，11 項測試全數綠燈通過。
+1. **核心解析模組 (`codeParser.js`)**：
+   - 移除原先對 `https?://` 純網址自動包裝為全屏 iframe 的邏輯。
+   - 純網址一律標記為 `type: 'invalid'`, `isRawUrl: true`，並提供友善錯誤說明。
+2. **新增工具視窗 (`AddToolModal.jsx`)**：
+   - 輸入標籤與佔位符提示改為「HTML/JS 原始碼或 `<iframe>` 嵌入標籤」。
+   - 若使用者誤貼純網址，跳出防呆警示提示該網址可能被外部網站阻擋，並提供「**轉為 &lt;iframe&gt; 標籤嘗試**」輔助按鈕。
+   - 純網址狀態下自動停用送出按鈕，防止無效工具加入空間。
+3. **介面提示清理 (`SpaceLayout.jsx`, `README.md`)**：
+   - 空間空狀態說明與專案簡介均移除「或網址」字樣。
+4. **自動化測試強化 (`tests/`)**：
+   - 更新單元測試 `tests/codeParser.test.js`，驗證純網址被正確攔截防呆。
+   - 優化各測試之使用者唯一性，11 項測試全數順利通過。
 
 ---
 
 ## 二、驗證結果
 
 - **單元與整合測試 (`npm test`)**：11/11 通過。
-- **前端編譯 (`npm run build`)**：打包乾淨，不包含示範登入元件。
-- **Worker 部署**：已重新發布至 Cloudflare Workers。
+- **前端編譯 (`npm run build`)**：打包通過，無任何編譯錯誤。

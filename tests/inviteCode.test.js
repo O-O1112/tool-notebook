@@ -28,10 +28,11 @@ test('inviteCode: 成員應能透過邀請碼加入空間', async () => {
 
   try {
     // 1. 註冊使用者 A，建立一個帶有邀請碼的新空間
+    const uid = Date.now() + Math.random().toString(36).slice(2, 6);
     const userAReg = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'user_a_invite', password: 'password123', displayName: '成員A' }),
+      body: JSON.stringify({ username: `user_a_${uid}`, password: 'password123', displayName: '成員A' }),
     });
     const { token: tokenA } = await userAReg.json();
 
@@ -51,7 +52,7 @@ test('inviteCode: 成員應能透過邀請碼加入空間', async () => {
     const userBReg = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'user_b_invite', password: 'password123', displayName: '成員B' }),
+      body: JSON.stringify({ username: `user_b_${uid}`, password: 'password123', displayName: '成員B' }),
     });
     const { token: tokenB } = await userBReg.json();
 

@@ -23,11 +23,12 @@ test('E2E: 伺服器整合 API 流程驗證 (註冊 -> 登入 -> 建立空間 ->
 
   try {
     // 1. 註冊新帳號
+    const uid = Date.now() + Math.random().toString(36).slice(2, 6);
     const regRes = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username: 'test_user_e2e',
+        username: `e2e_${uid}`,
         password: 'password123',
         displayName: '測試使用者',
       }),
