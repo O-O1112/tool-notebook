@@ -237,45 +237,6 @@ export default {
       return jsonResponse({ token, user: userPayload });
     }
 
-    // 3. 示範帳號登入 (Demo)
-    if (path === '/api/auth/demo' && method === 'POST') {
-      const body = await request.json().catch(() => ({}));
-      const account = body.account === 'team_demo' ? 'team_demo' : 'user_demo';
-
-      let user = await env.DB.prepare('SELECT * FROM users WHERE username = ?').bind(account).first();
-      // 若 D1 尚未建立示範使用者，自動建立
-      if (!user) {
-        const { hash, salt } = await hashPassword('demo123');
-        const name = account === 'team_demo' ? '李小華' : '王大明';
-        const res = await env.DB.prepare(`
-          INSERT INTO users (username, password_hash, salt, display_name, role)
-          VALUES (?, ?, ?, ?, 'user')
-        `).bind(account, hash, salt, name).run();
-
-        const userId = res.meta.last_row_id;
-        const code = account === 'team_demo' ? generateInviteCode() : 'SPC-2026';
-
-        const spaceRes = await env.DB.prepare(`
-          INSERT INTO spaces (user_id, name, description, layout, invite_code)
-          VALUES (?, ?, '示範工作空間', 'grid', ?)
-        `).bind(userId, `${name} 的工具看板`, code).run();
-
-        const spaceId = spaceRes.meta.last_row_id;
-
-        // 加入預設小工具
-        await env.DB.prepare(`
-          INSERT INTO tools (space_id, title, type, content, sort_order, col_span)
-          VALUES (?, '快速計數器', 'html', '<div style="padding:20px;text-align:center;"><h2>計數器</h2><button onclick="this.nextElementSibling.innerText++">點擊增加</button><h3>0</h3></div>', 0, 1)
-        `).bind(spaceId).run();
-
-        user = { id: userId, username: account, display_name: name };
-      }
-
-      const userPayload = { id: user.id, username: user.username, displayName: user.display_name };
-      const token = await signToken(userPayload, secret);
-      return jsonResponse({ token, user: userPayload });
-    }
-
     // 驗證後續需要登入之 API
     const user = await getAuthUser(request, secret);
     if (!user) {

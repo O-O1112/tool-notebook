@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { BookOpen, ArrowRight, Sparkles } from 'lucide-react';
+import { BookOpen, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginCard() {
-  const { login, register, demoLogin } = useAuth();
+  const { login, register } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,18 +28,6 @@ export default function LoginCard() {
       }
     } catch (err) {
       setError(err.message || '操作失敗，請確認輸入資料');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemo = async (account) => {
-    setError('');
-    setLoading(true);
-    try {
-      await demoLogin(account);
-    } catch (err) {
-      setError(err.message || '示範登入失敗');
     } finally {
       setLoading(false);
     }
@@ -135,32 +123,6 @@ export default function LoginCard() {
           >
             {isRegister ? '已有帳號？返回登入' : '還沒有帳號？立即註冊'}
           </button>
-        </div>
-
-        {/* 一鍵體驗示範登入 */}
-        <div className="mt-6 pt-5 border-t border-[#e4e8e5]">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-[#89959b] uppercase tracking-wider flex items-center gap-1">
-              <Sparkles size={12} className="text-[#e17b62]" />
-              快速體驗 (Demo)
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleDemo('user_demo')}
-              className="notebook-btn-secondary text-xs py-2 w-full justify-center"
-            >
-              示範帳號 (王大明)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemo('team_demo')}
-              className="notebook-btn-secondary text-xs py-2 w-full justify-center"
-            >
-              示範帳號 (李小華)
-            </button>
-          </div>
         </div>
       </div>
     </div>

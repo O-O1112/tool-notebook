@@ -22,26 +22,30 @@ test('E2E: 伺服器整合 API 流程驗證 (註冊 -> 登入 -> 建立空間 ->
   const baseUrl = `http://localhost:${port}/api`;
 
   try {
-    // 1. 示範帳號登入
-    const demoRes = await fetch(`${baseUrl}/auth/demo`, {
+    // 1. 註冊新帳號
+    const regRes = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ account: 'user_demo' }),
+      body: JSON.stringify({
+        username: 'test_user_e2e',
+        password: 'password123',
+        displayName: '測試使用者',
+      }),
     });
-    assert.strictEqual(demoRes.status, 200);
-    const demoData = await demoRes.json();
-    assert.ok(demoData.token, 'Demo 登入應取得 Token');
+    assert.strictEqual(regRes.status, 201);
+    const regData = await regRes.json();
+    assert.ok(regData.token, '註冊應取得 Token');
 
-    const teacherToken = demoData.token;
+    const userToken = regData.token;
 
     // 2. 取得空間列表
     const spacesRes = await fetch(`${baseUrl}/spaces`, {
-      headers: { Authorization: `Bearer ${teacherToken}` },
+      headers: { Authorization: `Bearer ${userToken}` },
     });
     assert.strictEqual(spacesRes.status, 200);
     const spacesData = await spacesRes.json();
     assert.ok(Array.isArray(spacesData.spaces));
-    assert.ok(spacesData.spaces.length >= 1, '應有預設示範空間');
+    assert.ok(spacesData.spaces.length >= 1, '註冊後應自動建立預設空間');
 
     const defaultSpace = spacesData.spaces[0];
 
@@ -50,7 +54,7 @@ test('E2E: 伺服器整合 API 流程驗證 (註冊 -> 登入 -> 建立空間 ->
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${teacherToken}`,
+        Authorization: `Bearer ${userToken}`,
       },
       body: JSON.stringify({
         title: '幾何圓形演示',
@@ -64,7 +68,7 @@ test('E2E: 伺服器整合 API 流程驗證 (註冊 -> 登入 -> 建立空間 ->
 
     // 4. 讀取空間詳情確認工具已正確寫入 SQLite
     const spaceDetailRes = await fetch(`${baseUrl}/spaces/${defaultSpace.id}`, {
-      headers: { Authorization: `Bearer ${teacherToken}` },
+      headers: { Authorization: `Bearer ${userToken}` },
     });
     assert.strictEqual(spaceDetailRes.status, 200);
     const detailData = await spaceDetailRes.json();

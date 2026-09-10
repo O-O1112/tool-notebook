@@ -44,20 +44,13 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
-  const demoLogin = async (account = 'user_demo') => {
-    const data = await api.demoLogin(account);
-    setAuthToken(data.token);
-    setUser(data.user);
-    return data.user;
-  };
-
   const logout = () => {
     setAuthToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, demoLogin, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

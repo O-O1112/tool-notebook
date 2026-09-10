@@ -45,7 +45,6 @@ export const api = {
   // 身分認證
   login: (username, password) => request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
   register: (payload) => request('/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
-  demoLogin: (role) => request('/auth/demo', { method: 'POST', body: JSON.stringify({ role }) }),
   getMe: () => request('/auth/me'),
 
   // 空間管理

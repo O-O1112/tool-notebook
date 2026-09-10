@@ -27,13 +27,13 @@ test('inviteCode: 成員應能透過邀請碼加入空間', async () => {
   const baseUrl = `http://localhost:${port}/api`;
 
   try {
-    // 1. 以示範帳號 A 登入，建立一個帶有邀請碼的新空間
-    const userALogin = await fetch(`${baseUrl}/auth/demo`, {
+    // 1. 註冊使用者 A，建立一個帶有邀請碼的新空間
+    const userAReg = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ account: 'user_demo' }),
+      body: JSON.stringify({ username: 'user_a_invite', password: 'password123', displayName: '成員A' }),
     });
-    const { token: tokenA } = await userALogin.json();
+    const { token: tokenA } = await userAReg.json();
 
     const createSpaceRes = await fetch(`${baseUrl}/spaces`, {
       method: 'POST',
@@ -47,13 +47,13 @@ test('inviteCode: 成員應能透過邀請碼加入空間', async () => {
     assert.ok(spaceA.invite_code, '建立之空間應具備邀請碼');
     assert.match(spaceA.invite_code, /^SPC-/);
 
-    // 2. 以示範帳號 B 登入
-    const userBLogin = await fetch(`${baseUrl}/auth/demo`, {
+    // 2. 註冊使用者 B
+    const userBReg = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ account: 'team_demo' }),
+      body: JSON.stringify({ username: 'user_b_invite', password: 'password123', displayName: '成員B' }),
     });
-    const { token: tokenB } = await userBLogin.json();
+    const { token: tokenB } = await userBReg.json();
 
     // 3. 成員 B 輸入該邀請碼加入空間
     const joinRes = await fetch(`${baseUrl}/spaces/join`, {

@@ -22,13 +22,13 @@ test('reorder: 拖曳順序重排與持久化測試', async () => {
   const baseUrl = `http://localhost:${port}/api`;
 
   try {
-    // 1. 教師登入
-    const loginRes = await fetch(`${baseUrl}/auth/demo`, {
+    // 1. 註冊使用者
+    const regRes = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ account: 'user_demo' }),
+      body: JSON.stringify({ username: 'user_reorder_test', password: 'password123', displayName: '排序測試' }),
     });
-    const { token } = await loginRes.json();
+    const { token } = await regRes.json();
 
     // 2. 建立新空間
     const spaceRes = await fetch(`${baseUrl}/spaces`, {

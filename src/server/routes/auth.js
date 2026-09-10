@@ -95,36 +95,6 @@ router.post('/login', (req, res) => {
   }
 });
 
-// 一鍵示範帳號登入 (快速體驗)
-router.post('/demo', (req, res) => {
-  try {
-    const { account = 'user_demo' } = req.body;
-    const targetUsername = account === 'team_demo' ? 'team_demo' : 'user_demo';
-
-    const getUser = db.prepare(`
-      SELECT id, username, display_name
-      FROM users WHERE username = ?
-    `);
-    const user = getUser.get(targetUsername);
-
-    if (!user) {
-      return res.status(404).json({ error: '示範帳號尚未建立' });
-    }
-
-    const userPayload = {
-      id: user.id,
-      username: user.username,
-      displayName: user.display_name,
-    };
-
-    const token = signToken(userPayload);
-    res.json({ token, user: userPayload });
-  } catch (err) {
-    console.error('Demo login error:', err);
-    res.status(500).json({ error: '伺服器錯誤，請稍後再試' });
-  }
-});
-
 // 取得當前登入者資訊
 router.get('/me', requireAuth, (req, res) => {
   try {
