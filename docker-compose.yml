@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: class_tool_notebook
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-production_secure_secret_class_tool_notebook_2026}
+      - DATABASE_PATH=/app/data/class_notebook.db
+    volumes:
+      - app_data:/app/data
+
+volumes:
+  app_data:
+    driver: local

@@ -1,0 +1,11 @@
+name = "tool-notebook-api"
+main = "index.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+JWT_SECRET = "production_secure_secret_key_tool_notebook_cf_2026"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tool-notebook-db"
+database_id = "c3d89f73-e03b-4ebf-ad16-366f8579eaef"
