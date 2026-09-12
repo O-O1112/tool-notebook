@@ -112,7 +112,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1f2a2e]/50 backdrop-blur-sm animate-fadeIn">
-      <div className="notebook-card w-full max-w-2xl bg-white overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="notebook-card w-full max-w-3xl lg:max-w-4xl bg-white overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Modal 標題列與頁籤 */}
         <div className="px-6 pt-4 border-b border-[#e4e8e5] bg-[#fafaf8]">
           <div className="flex items-center justify-between pb-3">
@@ -165,47 +165,48 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
               <span className="text-[11px] text-[#89959b]">點擊一鍵加入看板或自訂修改</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {TOOL_TEMPLATES.map((tmpl) => (
                 <div
                   key={tmpl.id}
                   className="notebook-card p-4 border border-[#e4e8e5] hover:border-[#e1ac9e] transition-all flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-bold text-[#1f2a2e]">{tmpl.title}</span>
-                      <span className="notebook-badge text-[10px]">{tmpl.category}</span>
+                    <div className="flex items-center justify-between mb-1.5 gap-2">
+                      <span className="text-xs font-bold text-[#1f2a2e] truncate">{tmpl.title}</span>
+                      <span className="notebook-badge text-[10px] shrink-0">{tmpl.category}</span>
                     </div>
                     <p className="text-[11px] text-[#89959b] leading-relaxed mb-3">
                       {tmpl.description}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-[#f0f2f1]">
-                    <button
-                      type="button"
-                      onClick={() => setTemplatePreview(tmpl)}
-                      className="notebook-btn-secondary text-[11px] py-1 px-2.5 flex items-center gap-1 text-[#69787f]"
-                    >
-                      <Eye size={12} />
-                      <span>預覽</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleCustomizeTemplate(tmpl)}
-                      className="notebook-btn-secondary text-[11px] py-1 px-2.5 flex items-center gap-1 text-[#69787f]"
-                    >
-                      <Code size={12} />
-                      <span>微調代碼</span>
-                    </button>
-                    <div className="flex-1" />
+                  <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-[#f0f2f1]">
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setTemplatePreview(tmpl)}
+                        className="notebook-btn-secondary text-[11px] py-1 px-2.5 whitespace-nowrap shrink-0 flex items-center gap-1 text-[#69787f]"
+                      >
+                        <Eye size={12} className="shrink-0" />
+                        <span>預覽</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCustomizeTemplate(tmpl)}
+                        className="notebook-btn-secondary text-[11px] py-1 px-2.5 whitespace-nowrap shrink-0 flex items-center gap-1 text-[#69787f]"
+                      >
+                        <Code size={12} className="shrink-0" />
+                        <span>微調代碼</span>
+                      </button>
+                    </div>
                     <button
                       type="button"
                       disabled={submitting}
                       onClick={() => handleApplyTemplate(tmpl)}
-                      className="notebook-btn-primary text-[11px] py-1 px-3 flex items-center gap-1"
+                      className="notebook-btn-primary text-[11px] py-1 px-3 whitespace-nowrap shrink-0 flex items-center gap-1 ml-auto"
                     >
-                      <Plus size={12} />
+                      <Plus size={12} className="shrink-0" />
                       <span>加入</span>
                     </button>
                   </div>

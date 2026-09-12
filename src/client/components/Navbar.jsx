@@ -163,7 +163,7 @@ export default function Navbar({
 
             {/* 空間邀請碼標籤 (一鍵複製給團隊成員) */}
             {currentSpace?.invite_code && (
-              <div className="hidden lg:flex items-center gap-1 bg-[#fff9f6] border border-[#e1ac9e] px-2.5 py-1 rounded-notebook-sm text-xs">
+              <div className="hidden lg:flex items-center gap-1 bg-[#fff9f6] border border-[#e1ac9e] px-2.5 py-1 rounded-notebook-sm text-xs whitespace-nowrap shrink-0">
                 <KeyRound size={12} className="text-[#e17b62]" />
                 <span className="text-[11px] text-[#89959b]">邀請碼:</span>
                 <span className="font-mono font-bold text-[#e17b62] tracking-wider">
@@ -311,8 +311,8 @@ export default function Navbar({
 
             {/* 訪客模式標籤 */}
             {isGuest && (
-              <div className="flex items-center gap-1 bg-[#f0f7f6] text-[#3b827e] border border-[#b8dfd9] px-2.5 py-1 rounded-notebook-sm text-xs font-medium">
-                <Eye size={13} />
+              <div className="flex items-center gap-1 bg-[#f0f7f6] text-[#3b827e] border border-[#b8dfd9] px-2.5 py-1 rounded-notebook-sm text-xs font-medium whitespace-nowrap shrink-0">
+                <Eye size={13} className="shrink-0" />
                 <span>訪客唯讀模式</span>
               </div>
             )}
@@ -321,10 +321,10 @@ export default function Navbar({
             {!isGuest && (
               <button
                 onClick={onOpenJoinModal}
-                className="notebook-btn-secondary text-xs py-1.5 px-2.5 hidden sm:inline-flex"
+                className="notebook-btn-secondary text-xs py-1.5 px-2.5 hidden sm:inline-flex whitespace-nowrap shrink-0"
                 title="輸入邀請碼加入他人共享的空間"
               >
-                <KeyRound size={13} />
+                <KeyRound size={13} className="shrink-0" />
                 <span>加入空間</span>
               </button>
             )}
@@ -333,10 +333,10 @@ export default function Navbar({
             {!isGuest && currentSpace && onOpenSettings && (
               <button
                 onClick={onOpenSettings}
-                className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5"
+                className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0"
                 title="空間設定與備份 (JSON 匯出/匯入)"
               >
-                <Settings size={13} />
+                <Settings size={13} className="shrink-0" />
                 <span className="hidden md:inline">設定與備份</span>
               </button>
             )}
@@ -345,9 +345,9 @@ export default function Navbar({
             {!isGuest && isOwner && (
               <button
                 onClick={onAddToolClick}
-                className="notebook-btn-primary text-xs py-1.5 px-3"
+                className="notebook-btn-primary text-xs py-1.5 px-3 whitespace-nowrap shrink-0"
               >
-                <Plus size={14} />
+                <Plus size={14} className="shrink-0" />
                 <span className="hidden sm:inline">新增工具</span>
               </button>
             )}

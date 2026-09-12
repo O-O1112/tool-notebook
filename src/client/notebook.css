@@ -69,8 +69,9 @@ html, body, #root {
   padding: 0;
   color: var(--ink);
   background-color: var(--paper);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", Arial, sans-serif;
+  font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", "微軟正黑體", "PingFang TC", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 班級小本本 28px 方眼格背景紋理 */
@@ -116,12 +117,13 @@ html, body, #root {
   gap: 4px;
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   padding: 2px 8px;
   border-radius: 9999px;
   border: 1px solid var(--line);
   background: #ffffff;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .notebook-badge-teacher {
@@ -167,6 +169,8 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  white-space: nowrap;
+  user-select: none;
   transition: all 0.15s ease;
 }
 
@@ -189,6 +193,8 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  white-space: nowrap;
+  user-select: none;
   transition: all 0.15s ease;
 }
 
@@ -209,6 +215,7 @@ html, body, #root {
   background: var(--paper);
   border: 1px solid var(--line);
   color: var(--muted);
+  white-space: nowrap;
   transition: all 0.15s ease;
 }
 

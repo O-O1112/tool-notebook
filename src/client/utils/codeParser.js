@@ -80,7 +80,7 @@ export function parseToolInput(input) {
     body {
       margin: 0;
       padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", Arial, sans-serif;
+      font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", "微軟正黑體", Arial, sans-serif;
       color: #1f2a2e;
       background: #ffffff;
     }

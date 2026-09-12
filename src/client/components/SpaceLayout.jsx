@@ -220,11 +220,11 @@ export default function SpaceLayout({
           </div>
 
           {/* 類型篩選標籤 */}
-          <div className="flex items-center gap-1.5 text-xs">
+          <div className="flex items-center gap-1.5 text-xs flex-wrap">
             <button
               type="button"
               onClick={() => setFilterType('all')}
-              className={`px-2.5 py-1 rounded-md transition-colors ${
+              className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'all'
                   ? 'bg-[#1f2a2e] text-white font-semibold'
                   : 'text-[#69787f] hover:bg-[#f5f7f6]'
@@ -235,7 +235,7 @@ export default function SpaceLayout({
             <button
               type="button"
               onClick={() => setFilterType('html')}
-              className={`px-2.5 py-1 rounded-md transition-colors ${
+              className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'html'
                   ? 'bg-[#1f2a2e] text-white font-semibold'
                   : 'text-[#69787f] hover:bg-[#f5f7f6]'
@@ -246,7 +246,7 @@ export default function SpaceLayout({
             <button
               type="button"
               onClick={() => setFilterType('iframe')}
-              className={`px-2.5 py-1 rounded-md transition-colors ${
+              className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'iframe'
                   ? 'bg-[#1f2a2e] text-white font-semibold'
                   : 'text-[#69787f] hover:bg-[#f5f7f6]'
