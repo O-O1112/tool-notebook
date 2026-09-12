@@ -192,7 +192,7 @@ export default function App() {
         } else if (params.get('share')) {
           // 訪客分享由 share effect 處理
         } else {
-          // 預設進入 Padlet 空間主頁大廳
+          // 預設進入空間主頁大廳
           setCurrentView('dashboard');
         }
       } catch (err) {
@@ -337,7 +337,7 @@ export default function App() {
     }
   };
 
-  // 8.5 便箋彩色卡片更換 (Padlet Card Colors)
+  // 8.5 便箋彩色卡片更換 (Card Colors)
   const handleUpdateToolColor = async (toolId, color) => {
     if (!currentSpace) return;
     setTools((prev) =>
@@ -356,7 +356,7 @@ export default function App() {
     }
   };
 
-  // 8.6 貨架跨欄移動與分組更新 (Padlet Shelf Move)
+  // 8.6 貨架跨欄移動與分組更新 (Shelf Move)
   const handleUpdateToolSection = async (toolId, section) => {
     if (!currentSpace) return;
     setTools((prev) =>
@@ -559,7 +559,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col notebook-grid-bg">
-      {/* 頂部導覽列：Padlet 大廳 vs 空間工作區動態切換 */}
+      {/* 頂部導覽列：空間大廳 vs 空間工作區動態切換 */}
       <Navbar
         currentView={currentView}
         onNavigateHome={handleNavigateHome}
@@ -669,7 +669,7 @@ export default function App() {
         onJoinSuccess={handleJoinSpace}
       />
 
-      {/* Padlet 一鍵 QR Code 與訪客分享對話框 */}
+      {/* 一鍵 QR Code 與訪客分享對話框 */}
       <QRCodeModal
         isOpen={qrModalOpen}
         onClose={() => setQrModalOpen(false)}

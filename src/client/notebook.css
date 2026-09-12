@@ -241,7 +241,7 @@ html, body, #root {
 }
 
 /* ========================================================
-   Padlet 特色 1：手帳彩色便箋色紙 (Card Accent Colors)
+   特色 1：手帳彩色便箋色紙 (Card Accent Colors)
    ======================================================== */
 .card-color-default {
   background: var(--card-bg, #ffffff);
@@ -273,7 +273,7 @@ html, body, #root {
 }
 
 /* ========================================================
-   Padlet 特色 2：緊湊瀑布流 (Masonry Wall Layout)
+   特色 2：緊湊瀑布流 (Masonry Wall Layout)
    ======================================================== */
 .masonry-wall-container {
   column-gap: 1.5rem;
@@ -299,7 +299,7 @@ html, body, #root {
 }
 
 /* ========================================================
-   Padlet 特色 3：貨架分欄模式 (Shelf / Columns Kanban)
+   特色 3：貨架分欄模式 (Shelf / Columns Kanban)
    ======================================================== */
 .shelf-scroll-area {
   display: flex;
@@ -335,7 +335,7 @@ html, body, #root {
 }
 
 /* ========================================================
-   Padlet 空間大廳主頁 (Space Dashboard)
+   空間大廳主頁 (Space Dashboard)
    ======================================================== */
 .dashboard-space-card {
   background: var(--card-bg, #ffffff);

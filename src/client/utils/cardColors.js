@@ -1,5 +1,5 @@
 /**
- * 手帳便箋彩色卡片配色清單 (Padlet Card Colors)
+ * 手帳便箋彩色卡片配色清單 (Card Colors)
  * 提供 6 種淡雅的手帳便箋紙質色彩
  */
 export const CARD_COLORS = [

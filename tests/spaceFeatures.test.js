@@ -9,7 +9,7 @@ import { initDB } from '../src/server/db.js';
 import authRoutes from '../src/server/routes/auth.js';
 import spacesRoutes from '../src/server/routes/spaces.js';
 
-test('padlet: QR Code 向量 SVG 與 DataURL 應正確產出', async () => {
+test('spaceFeatures: QR Code 向量 SVG 與 DataURL 應正確產出', async () => {
   const testUrl = 'https://o-o1112.github.io/tool-notebook/?share=SPC-9999';
   const svg = await generateQRCodeSVG(testUrl);
   assert.ok(typeof svg === 'string', 'SVG 應為字串');
@@ -21,7 +21,7 @@ test('padlet: QR Code 向量 SVG 與 DataURL 應正確產出', async () => {
   assert.ok(dataUrl.startsWith('data:image/png;base64,'), '應為標準 base64 png 格式');
 });
 
-test('padlet: 便箋粉彩調色盤應包含 6 種手帳紙質配色', () => {
+test('spaceFeatures: 便箋粉彩調色盤應包含 6 種手帳紙質配色', () => {
   assert.ok(Array.isArray(CARD_COLORS), 'CARD_COLORS 應為陣列');
   assert.strictEqual(CARD_COLORS.length, 6, '應定義 6 款色票');
 
@@ -35,7 +35,7 @@ test('padlet: 便箋粉彩調色盤應包含 6 種手帳紙質配色', () => {
   }
 });
 
-test('padlet: 免登入訪客模式 API (GET /spaces/share/:code) 應無授權存取', async () => {
+test('spaceFeatures: 免登入訪客模式 API (GET /spaces/share/:code) 應無授權存取', async () => {
   initDB();
 
   const app = express();
@@ -55,7 +55,7 @@ test('padlet: 免登入訪客模式 API (GET /spaces/share/:code) 應無授權�
     const regRes = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: `padlet_host_${uid}`, password: 'password123', displayName: '工作坊主講人' }),
+      body: JSON.stringify({ username: `host_${uid}`, password: 'password123', displayName: '工作坊主講人' }),
     });
     const { token } = await regRes.json();
 

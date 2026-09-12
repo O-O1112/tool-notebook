@@ -96,7 +96,7 @@ export default function SpaceDashboard({
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="notebook-badge bg-[#fff0eb] text-[#e17b62] border-[#f7d2c8]">
-              Padlet 空間大廳
+              空間主頁大廳
             </span>
             <span className="text-xs text-[#89959b]">共 {spaces.length} 個空間</span>
           </div>
@@ -191,7 +191,7 @@ export default function SpaceDashboard({
         </div>
       </div>
 
-      {/* Padlet 式空間卡片牆 Grid */}
+      {/* 空間卡片牆 Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {/* 卡片 1：引導式新建空間卡片 */}
         <div

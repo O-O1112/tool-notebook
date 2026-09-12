@@ -42,7 +42,7 @@ export default function QRCodeModal({ isOpen, onClose, space }) {
             </div>
             <div>
               <h2 className="text-sm font-bold text-[#1f2a2e]">空間 QR Code 快速分享</h2>
-              <p className="text-[11px] text-[#89959b]">Padlet 式一鍵分享，手機掃碼免登入即用</p>
+              <p className="text-[11px] text-[#89959b]">一鍵快速分享，手機掃碼免登入即用</p>
             </div>
           </div>
           <button

@@ -511,7 +511,7 @@ export default function SpaceLayout({
         </div>
       )}
 
-      {/* 模式 4：Padlet 貨架分欄模式 (Shelf / Columns Kanban) */}
+      {/* 模式 4：貨架分欄模式 (Shelf / Columns Kanban) */}
       {layout === 'shelf' && (
         <div className="shelf-scroll-area">
           {allSections.map((sec) => {
@@ -636,7 +636,7 @@ export default function SpaceLayout({
         </div>
       )}
 
-      {/* 模式 5：Padlet 緊湊瀑布流模式 (Masonry Wall Mode) */}
+      {/* 模式 5：緊湊瀑布流模式 (Masonry Wall Mode) */}
       {layout === 'wall' && sortedAndFilteredTools.length > 0 && (
         <div className="masonry-wall-container">
           {sortedAndFilteredTools.map((tool, index) => (

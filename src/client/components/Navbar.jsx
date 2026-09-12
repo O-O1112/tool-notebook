@@ -89,7 +89,7 @@ export default function Navbar({
                 type="button"
                 onClick={onNavigateHome}
                 className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 text-[#57767f] hover:text-[#1f2a2e]"
-                title="返回 Padlet 空間主頁大廳"
+                title="返回空間主頁大廳"
               >
                 <ArrowLeft size={14} />
                 <span className="font-semibold hidden xs:inline">返回大廳</span>
@@ -213,7 +213,7 @@ export default function Navbar({
                       ? 'bg-white text-[#e17b62] shadow-sm font-semibold'
                       : 'text-[#89959b] hover:text-[#1f2a2e]'
                   }`}
-                  title="分欄收納貨架 (Padlet Shelf / 看板模式)"
+                  title="分欄收納貨架 (看板模式)"
                 >
                   <Columns3 size={15} />
                 </button>
@@ -224,7 +224,7 @@ export default function Navbar({
                       ? 'bg-white text-[#e17b62] shadow-sm font-semibold'
                       : 'text-[#89959b] hover:text-[#1f2a2e]'
                   }`}
-                  title="緊湊瀑布流模式 (Padlet Wall / 高矮無縫自適應)"
+                  title="緊湊瀑布流模式 (高矮無縫自適應)"
                 >
                   <Kanban size={15} />
                 </button>
