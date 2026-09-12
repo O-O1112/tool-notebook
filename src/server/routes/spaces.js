@@ -226,7 +226,7 @@ router.patch('/:id/tools/:toolId', (req, res) => {
   try {
     const spaceId = Number(req.params.id);
     const toolId = Number(req.params.toolId);
-    const { colSpan, title } = req.body;
+    const { colSpan, title, content, type } = req.body;
 
     const checkSpace = db.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?');
     if (!checkSpace.get(spaceId, req.user.id)) {
@@ -237,6 +237,8 @@ router.patch('/:id/tools/:toolId', (req, res) => {
     const params = [];
     if (colSpan !== undefined) { updates.push('col_span = ?'); params.push(Number(colSpan)); }
     if (title !== undefined) { updates.push('title = ?'); params.push(title.trim()); }
+    if (content !== undefined) { updates.push('content = ?'); params.push(content.trim()); }
+    if (type !== undefined) { updates.push('type = ?'); params.push(type.trim()); }
 
     if (updates.length > 0) {
       params.push(toolId, spaceId);

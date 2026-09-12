@@ -1,13 +1,30 @@
-import React, { useState } from 'react';
-import { LayoutGrid, Layers, X, Plus, ChevronDown, ChevronUp, Code, Globe, Frame, Maximize2, RotateCcw, GripVertical } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import {
+  LayoutGrid,
+  Layers,
+  X,
+  Plus,
+  ChevronDown,
+  ChevronUp,
+  Code,
+  Globe,
+  Frame,
+  Maximize2,
+  RotateCcw,
+  GripVertical,
+  Search,
+  Pencil,
+  Filter,
+} from 'lucide-react';
 import ToolCard from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
 
 export default function SpaceLayout({
-  tools,
+  tools = [],
   layout,
   onDeleteTool,
+  onEditTool,
   onOpenAddModal,
   onToggleColSpan,
   onReorderTools,
@@ -15,12 +32,21 @@ export default function SpaceLayout({
 }) {
   const [activeTabId, setActiveTabId] = useState(tools[0]?.id || null);
   const [focusedTool, setFocusedTool] = useState(null);
-
-  // 折起模式下的當前展開工具 ID (預設展開第一個，或 null)
   const [expandedToolId, setExpandedToolId] = useState(tools[0]?.id || null);
-
-  // 拖曳狀態管理
   const [draggedIndex, setDraggedIndex] = useState(null);
+
+  // 搜尋與篩選狀態
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState('all'); // 'all' | 'html' | 'iframe'
+
+  // 過濾後工具清單
+  const filteredTools = useMemo(() => {
+    return tools.filter((tool) => {
+      const matchQuery = !searchQuery.trim() || tool.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
+      const matchType = filterType === 'all' || tool.type === filterType;
+      return matchQuery && matchType;
+    });
+  }, [tools, searchQuery, filterType]);
 
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
@@ -48,7 +74,6 @@ export default function SpaceLayout({
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'url': return <Globe size={13} className="text-blue-500" />;
       case 'iframe': return <Frame size={13} className="text-emerald-500" />;
       default: return <Code size={13} className="text-amber-500" />;
     }
@@ -56,9 +81,8 @@ export default function SpaceLayout({
 
   const getTypeName = (type) => {
     switch (type) {
-      case 'url': return '網頁';
       case 'iframe': return 'Iframe';
-      default: return '程式';
+      default: return '自訂程式';
     }
   };
 
@@ -73,15 +97,15 @@ export default function SpaceLayout({
             這個空間還沒有任何小工具
           </h3>
           <p className="text-xs text-[#89959b] mb-6 leading-relaxed">
-            點擊下方按鈕，直接貼上 HTML/JS 程式碼或 iframe 嵌入標籤，即可在空間中開始使用！
+            點擊下方按鈕，直接挑選實用範本或貼上代碼，即可在空間中開始使用！
           </p>
           {isOwner && (
             <button
               onClick={onOpenAddModal}
-              className="notebook-btn-primary w-full py-2.5"
+              className="notebook-btn-primary w-full py-2.5 justify-center"
             >
               <Plus size={16} />
-              <span>立即貼上工具代碼</span>
+              <span>挑選範本或貼上工具代碼</span>
             </button>
           )}
         </div>
@@ -90,22 +114,89 @@ export default function SpaceLayout({
   }
 
   // 當前分頁選定工具
-  const currentTabTool = tools.find((t) => t.id === activeTabId) || tools[0];
+  const currentTabTool = filteredTools.find((t) => t.id === activeTabId) || filteredTools[0] || tools[0];
 
   return (
-    <div>
+    <div className="space-y-4">
+      {/* 頂部搜尋與過濾篩選工具列 */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-4 py-2.5 rounded-notebook border border-[#e4e8e5] shadow-sm">
+        {/* 搜尋框 */}
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#89959b]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜尋工具名稱…"
+            className="notebook-input w-full pl-8 py-1.5 text-xs"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#89959b] hover:text-[#1f2a2e] text-xs"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* 類型篩選標籤 */}
+        <div className="flex items-center gap-1.5 text-xs">
+          <button
+            type="button"
+            onClick={() => setFilterType('all')}
+            className={`px-2.5 py-1 rounded-md transition-colors ${
+              filterType === 'all'
+                ? 'bg-[#1f2a2e] text-white font-semibold'
+                : 'text-[#69787f] hover:bg-[#f5f7f6]'
+            }`}
+          >
+            全部 ({tools.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterType('html')}
+            className={`px-2.5 py-1 rounded-md transition-colors ${
+              filterType === 'html'
+                ? 'bg-[#1f2a2e] text-white font-semibold'
+                : 'text-[#69787f] hover:bg-[#f5f7f6]'
+            }`}
+          >
+            自訂程式
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterType('iframe')}
+            className={`px-2.5 py-1 rounded-md transition-colors ${
+              filterType === 'iframe'
+                ? 'bg-[#1f2a2e] text-white font-semibold'
+                : 'text-[#69787f] hover:bg-[#f5f7f6]'
+            }`}
+          >
+            Iframe 視窗
+          </button>
+        </div>
+      </div>
+
+      {/* 搜尋無結果提示 */}
+      {filteredTools.length === 0 && (
+        <div className="notebook-card p-8 text-center text-[#89959b] text-xs">
+          找不到符合「{searchQuery}」的小工具，請嘗試其他關鍵字或清除篩選。
+        </div>
+      )}
+
       {/* 模式 1：折起專注模式 (Collapsed / Focus Accordion Mode) */}
-      {layout === 'collapsed' && (
+      {layout === 'collapsed' && filteredTools.length > 0 && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between px-1 mb-1">
             <span className="text-xs font-semibold text-[#89959b] uppercase tracking-wider">
               折起清單
             </span>
-            <span className="notebook-badge text-[11px]">共 {tools.length} 個小工具</span>
+            <span className="notebook-badge text-[11px]">共 {filteredTools.length} 個小工具</span>
           </div>
 
           <div className="flex flex-col gap-2.5">
-            {tools.map((tool, index) => {
+            {filteredTools.map((tool, index) => {
               const isExpanded = expandedToolId === tool.id;
               const parsed = parseToolInput(tool.content);
 
@@ -145,12 +236,22 @@ export default function SpaceLayout({
                     </div>
                   </div>
 
-                  {/* 展開之大尺寸沙盒工作區 (高度 560px 專注教學展示) */}
+                  {/* 展開之大尺寸沙盒工作區 */}
                   {isExpanded && (
                     <div className="border-t border-[#e4e8e5] flex flex-col h-[560px] bg-white animate-fadeIn">
                       <div className="flex items-center justify-between px-4 py-2 bg-[#fdfdfc] border-b border-[#e4e8e5] text-xs">
                         <span className="text-[#89959b]">正在專注使用中</span>
                         <div className="flex items-center gap-1.5">
+                          {isOwner && onEditTool && (
+                            <button
+                              onClick={() => onEditTool(tool)}
+                              className="text-xs text-[#89959b] hover:text-[#e17b62] hover:bg-[#fff0eb] px-2 py-1 rounded flex items-center gap-1"
+                              title="編輯此工具"
+                            >
+                              <Pencil size={13} />
+                              <span>編輯</span>
+                            </button>
+                          )}
                           <button
                             onClick={() => setFocusedTool(tool)}
                             className="text-xs text-[#e17b62] hover:underline flex items-center gap-1 font-medium px-2 py-1 rounded hover:bg-[#fff0eb]"
@@ -188,11 +289,11 @@ export default function SpaceLayout({
       )}
 
       {/* 模式 2：分頁切換模式 (Tabs Mode) */}
-      {layout === 'tabs' && (
+      {layout === 'tabs' && filteredTools.length > 0 && (
         <div className="flex flex-col gap-4">
           {/* 分頁標籤切換列 */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {tools.map((t) => {
+            {filteredTools.map((t) => {
               const isActive = (currentTabTool?.id === t.id);
               return (
                 <button
@@ -217,6 +318,7 @@ export default function SpaceLayout({
               <ToolCard
                 tool={currentTabTool}
                 onDelete={onDeleteTool}
+                onEdit={onEditTool}
                 onFocus={setFocusedTool}
                 onToggleColSpan={onToggleColSpan}
                 isOwner={isOwner}
@@ -226,18 +328,19 @@ export default function SpaceLayout({
         </div>
       )}
 
-      {/* 模式 3：靈活網格模式 (Grid Mode - 支援拖曳交換與跨欄尺寸) */}
-      {layout === 'grid' && (
+      {/* 模式 3：靈活網格模式 (Grid Mode) */}
+      {layout === 'grid' && filteredTools.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {tools.map((tool, index) => (
+          {filteredTools.map((tool, index) => (
             <ToolCard
               key={tool.id}
               index={index}
               tool={tool}
               onDelete={onDeleteTool}
+              onEdit={onEditTool}
               onFocus={setFocusedTool}
               onToggleColSpan={onToggleColSpan}
-              draggable={isOwner}
+              draggable={isOwner && !searchQuery.trim()} // 搜尋時暫時禁用拖曳重排
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}

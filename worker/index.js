@@ -347,6 +347,7 @@ export default {
 
         if (layout) await env.DB.prepare('UPDATE spaces SET layout = ? WHERE id = ?').bind(layout, spaceId).run();
         if (name) await env.DB.prepare('UPDATE spaces SET name = ? WHERE id = ?').bind(name, spaceId).run();
+        if (description !== undefined) await env.DB.prepare('UPDATE spaces SET description = ? WHERE id = ?').bind(description, spaceId).run();
 
         const updated = await env.DB.prepare('SELECT * FROM spaces WHERE id = ?').bind(spaceId).first();
         return jsonResponse({ space: updated });
@@ -421,9 +422,18 @@ export default {
 
       if (method === 'PATCH') {
         const body = await request.json().catch(() => ({}));
-        if (body.colSpan) {
-          await env.DB.prepare('UPDATE tools SET col_span = ? WHERE id = ? AND space_id = ?').bind(Number(body.colSpan), toolId, spaceId).run();
+        const updates = [];
+        const bindings = [];
+        if (body.colSpan !== undefined) { updates.push('col_span = ?'); bindings.push(Number(body.colSpan)); }
+        if (body.title !== undefined) { updates.push('title = ?'); bindings.push(body.title.trim()); }
+        if (body.content !== undefined) { updates.push('content = ?'); bindings.push(body.content.trim()); }
+        if (body.type !== undefined) { updates.push('type = ?'); bindings.push(body.type.trim()); }
+
+        if (updates.length > 0) {
+          bindings.push(toolId, spaceId);
+          await env.DB.prepare(`UPDATE tools SET ${updates.join(', ')} WHERE id = ? AND space_id = ?`).bind(...bindings).run();
         }
+
         const updated = await env.DB.prepare('SELECT * FROM tools WHERE id = ?').bind(toolId).first();
         return jsonResponse({ tool: updated });
       }

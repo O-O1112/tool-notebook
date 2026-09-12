@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { RotateCcw, Maximize2, Trash2, Code, Globe, Frame, GripVertical, Minimize2, MoveHorizontal } from 'lucide-react';
+import { RotateCcw, Maximize2, Trash2, Code, Globe, Frame, GripVertical, Minimize2, MoveHorizontal, Pencil } from 'lucide-react';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
 
 export default function ToolCard({
   tool,
   onDelete,
+  onEdit,
   onFocus,
   onToggleColSpan,
   draggable = true,
@@ -97,6 +98,15 @@ export default function ToolCard({
           >
             <RotateCcw size={14} />
           </button>
+          {isOwner && onEdit && (
+            <button
+              onClick={() => onEdit(tool)}
+              className="p-1.5 text-[#89959b] hover:text-[#e17b62] hover:bg-[#fff0eb] rounded-md transition-colors"
+              title="編輯小工具代碼與設定"
+            >
+              <Pencil size={14} />
+            </button>
+          )}
           <button
             onClick={() => onFocus(tool)}
             className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"

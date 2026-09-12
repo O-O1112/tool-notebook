@@ -4,6 +4,8 @@ import LoginCard from './components/LoginCard';
 import Navbar from './components/Navbar';
 import SpaceLayout from './components/SpaceLayout';
 import AddToolModal from './components/AddToolModal';
+import EditToolModal from './components/EditToolModal';
+import SpaceSettingsModal from './components/SpaceSettingsModal';
 import JoinSpaceModal from './components/JoinSpaceModal';
 import { api } from './utils/api';
 
@@ -16,6 +18,8 @@ export default function App() {
   const [layout, setLayout] = useState('grid');
   const [loadingSpace, setLoadingSpace] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editingTool, setEditingTool] = useState(null);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
 
   // 1. 使用者登入後載入其所有空間 (自建 + 透過邀請碼加入的)
@@ -67,7 +71,6 @@ export default function App() {
   const handleJoinSpace = async (inviteCode) => {
     const data = await api.joinSpace(inviteCode);
     alert(data.message || '成功加入空間！');
-    // 重新整理空間清單並切換到該空間
     const listRes = await api.getSpaces();
     setSpaces(listRes.spaces || []);
     loadSpaceDetail(data.space.id);
@@ -141,7 +144,16 @@ export default function App() {
     );
   };
 
-  // 10. 刪除工具
+  // 10. 編輯工具 (就地更新代碼、標題、寬度)
+  const handleUpdateTool = async (toolId, payload) => {
+    if (!currentSpace) return;
+    const data = await api.updateTool(currentSpace.id, toolId, payload);
+    setTools((prev) =>
+      prev.map((t) => (t.id === toolId ? { ...t, ...data.tool } : t))
+    );
+  };
+
+  // 11. 刪除工具
   const handleDeleteTool = async (toolId) => {
     if (!currentSpace) return;
     if (!window.confirm('確定要刪除這個小工具嗎？')) return;
@@ -159,6 +171,55 @@ export default function App() {
     } catch (err) {
       alert(err.message || '刪除工具失敗');
     }
+  };
+
+  // 12. 更新空間資訊 (名稱、描述)
+  const handleUpdateSpace = async (spaceId, payload) => {
+    const data = await api.updateSpace(spaceId, payload);
+    setCurrentSpace((prev) => ({ ...prev, ...data.space }));
+    setSpaces((prev) =>
+      prev.map((s) => (s.id === spaceId ? { ...s, ...data.space } : s))
+    );
+  };
+
+  // 13. 刪除空間
+  const handleDeleteSpace = async (spaceId) => {
+    try {
+      await api.deleteSpace(spaceId);
+      const remainingSpaces = spaces.filter((s) => s.id !== spaceId);
+      setSpaces(remainingSpaces);
+      setSettingsModalOpen(false);
+
+      if (remainingSpaces.length > 0) {
+        loadSpaceDetail(remainingSpaces[0].id);
+      } else {
+        setCurrentSpace(null);
+        setTools([]);
+      }
+    } catch (err) {
+      alert(err.message || '刪除空間失敗');
+    }
+  };
+
+  // 14. 批次匯入工具清單
+  const handleImportTools = async (spaceId, importedTools) => {
+    let successCount = 0;
+    for (const tool of importedTools) {
+      try {
+        await api.addTool(spaceId, {
+          title: tool.title || '匯入的小工具',
+          type: tool.type || 'html',
+          content: tool.content || '',
+          colSpan: tool.col_span || 1,
+        });
+        successCount++;
+      } catch (err) {
+        console.warn('匯入個別工具失敗:', tool.title, err);
+      }
+    }
+
+    alert(`成功匯入 ${successCount} 個小工具！`);
+    loadSpaceDetail(spaceId);
   };
 
   const isOwner = currentSpace?.is_owner === 1 || currentSpace?.user_id === user?.id;
@@ -190,6 +251,7 @@ export default function App() {
         onCreateSpace={handleCreateSpace}
         onOpenJoinModal={() => setJoinModalOpen(true)}
         onAddToolClick={() => setAddModalOpen(true)}
+        onOpenSettings={() => setSettingsModalOpen(true)}
         layout={layout}
         onToggleLayout={handleToggleLayout}
         onRegenerateCode={handleRegenerateCode}
@@ -207,6 +269,7 @@ export default function App() {
             tools={tools}
             layout={layout}
             onDeleteTool={handleDeleteTool}
+            onEditTool={(tool) => setEditingTool(tool)}
             onOpenAddModal={() => setAddModalOpen(true)}
             onToggleColSpan={handleToggleColSpan}
             onReorderTools={handleReorderTools}
@@ -215,11 +278,31 @@ export default function App() {
         )}
       </main>
 
-      {/* 貼上工具對話框 */}
+      {/* 貼上 / 範本新增工具對話框 */}
       <AddToolModal
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         onAddTool={handleAddTool}
+      />
+
+      {/* 編輯工具對話框 */}
+      <EditToolModal
+        isOpen={Boolean(editingTool)}
+        tool={editingTool}
+        onClose={() => setEditingTool(null)}
+        onSaveTool={handleUpdateTool}
+      />
+
+      {/* 空間設定與備份對話框 */}
+      <SpaceSettingsModal
+        isOpen={settingsModalOpen}
+        space={currentSpace}
+        tools={tools}
+        onClose={() => setSettingsModalOpen(false)}
+        onUpdateSpace={handleUpdateSpace}
+        onDeleteSpace={handleDeleteSpace}
+        onImportTools={handleImportTools}
+        isOwner={isOwner}
       />
 
       {/* 輸入邀請碼加入空間對話框 */}

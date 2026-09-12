@@ -13,6 +13,7 @@ import {
   RotateCcw,
   ListCollapse,
   User,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,6 +24,7 @@ export default function Navbar({
   onCreateSpace,
   onOpenJoinModal,
   onAddToolClick,
+  onOpenSettings,
   layout,
   onToggleLayout,
   onRegenerateCode,
@@ -219,6 +221,18 @@ export default function Navbar({
               <span>加入空間</span>
             </button>
 
+            {/* 空間設定與備份按鈕 */}
+            {currentSpace && onOpenSettings && (
+              <button
+                onClick={onOpenSettings}
+                className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5"
+                title="空間設定與備份 (JSON 匯出/匯入)"
+              >
+                <Settings size={13} />
+                <span className="hidden md:inline">設定與備份</span>
+              </button>
+            )}
+
             {/* 貼上工具按鈕 (僅空間擁有者可新增) */}
             {isOwner && (
               <button
@@ -226,7 +240,7 @@ export default function Navbar({
                 className="notebook-btn-primary text-xs py-1.5 px-3"
               >
                 <Plus size={14} />
-                <span className="hidden sm:inline">貼上工具</span>
+                <span className="hidden sm:inline">新增工具</span>
               </button>
             )}
 
