@@ -113,6 +113,7 @@ router.get('/me', requireAuth, (req, res) => {
         id: user.id,
         username: user.username,
         displayName: user.display_name,
+        display_name: user.display_name,
         createdAt: user.created_at,
       },
     });

@@ -271,7 +271,16 @@ export default {
     // 4. 當前使用者資料
     if (path === '/api/auth/me' && method === 'GET') {
       const dbUser = await env.DB.prepare('SELECT id, username, display_name, created_at FROM users WHERE id = ?').bind(user.id).first();
-      return jsonResponse({ user: dbUser });
+      if (!dbUser) return jsonResponse({ error: '找不到該使用者' }, 404);
+      return jsonResponse({
+        user: {
+          id: dbUser.id,
+          username: dbUser.username,
+          displayName: dbUser.display_name,
+          display_name: dbUser.display_name,
+          createdAt: dbUser.created_at,
+        }
+      });
     }
 
     // 5. 取得空間清單

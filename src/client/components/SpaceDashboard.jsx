@@ -101,7 +101,7 @@ export default function SpaceDashboard({
             <span className="text-xs text-[var(--muted,#89959b)]">共 {spaces.length} 個空間</span>
           </div>
           <h1 className="text-2xl font-extrabold text-[var(--ink,#1f2a2e)] tracking-tight">
-            歡迎回來，{user?.displayName || '同學'}！
+            歡迎回來，{user?.displayName || user?.display_name || user?.username || '同學'}！
           </h1>
           <p className="text-xs text-[var(--muted,#89959b)] max-w-xl leading-relaxed">
             選擇任意空間卡片立即進入工作區；或是建立全新主題貨架、掃描 QR Code 共享小工具。

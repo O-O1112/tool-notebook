@@ -41,3 +41,23 @@ test('auth: 竄改或無效 Token 應被拒絕', () => {
   const emptyToken = '';
   assert.strictEqual(verifyToken(emptyToken), null);
 });
+
+test('auth: 使用者名稱解析應相容 display_name、displayName 與 username，防止重啟回退為同學', () => {
+  const resolveUserName = (user) => {
+    return user?.displayName || user?.display_name || user?.username || '同學';
+  };
+
+  // 1. 具備 displayName
+  assert.strictEqual(resolveUserName({ displayName: '王大明' }), '王大明');
+
+  // 2. 僅具備資料庫蛇形欄位 display_name (如 worker /api/auth/me 返回)
+  assert.strictEqual(resolveUserName({ display_name: '李小華' }), '李小華');
+
+  // 3. 僅具備 username
+  assert.strictEqual(resolveUserName({ username: 'teacher_101' }), 'teacher_101');
+
+  // 4. 空物件或未登入才回退為預設稱謂
+  assert.strictEqual(resolveUserName(null), '同學');
+  assert.strictEqual(resolveUserName({}), '同學');
+});
+

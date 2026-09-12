@@ -374,7 +374,7 @@ export default function Navbar({
                   <User size={13} />
                 </div>
                 <span className="text-xs font-medium text-[#1f2a2e] max-w-[90px] truncate">
-                  {user?.displayName}
+                  {user?.displayName || user?.display_name || user?.username || '使用者'}
                 </span>
               </div>
 
