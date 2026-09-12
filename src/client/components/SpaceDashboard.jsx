@@ -276,10 +276,12 @@ export default function SpaceDashboard({
   };
 
   return (
-    <div className="flex-1 w-full flex flex-col md:flex-row items-stretch gap-5 lg:gap-7 min-h-[calc(100vh-140px)] animate-fadeIn">
-      {/* ========================================================
-          行動端快速導覽分類條 (Mobile Adaptive Category Bar)
-          ======================================================== */}
+    <div className="flex-1 w-full flex flex-col justify-between min-h-[calc(100vh-110px)] animate-fadeIn">
+      {/* 頂部主體：側邊欄導覽與工作空間內容區 */}
+      <div className="flex-1 w-full flex flex-col md:flex-row items-stretch gap-5 lg:gap-7">
+        {/* ========================================================
+            行動端快速導覽分類條 (Mobile Adaptive Category Bar)
+            ======================================================== */}
       <div className="md:hidden space-y-3 bg-[var(--card-bg)] p-3.5 rounded-2xl border border-[var(--line,#e4e8e5)] shadow-xs">
         {/* 行動端名片與問候 (點擊可開啟帳號設定) */}
         <div className="flex items-center justify-between gap-3">
@@ -914,12 +916,13 @@ export default function SpaceDashboard({
             </div>
           )}
         </div>
-
-        {/* 底部精緻手繪風天際線浮水印 Line Art SVG (滿版寬度自適應、放大且細緻化) */}
-        <div className="pt-10 pb-4 w-full flex justify-center items-center pointer-events-none overflow-hidden">
-          <PanoramicSkyline className="w-full max-w-7xl h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink,#1f2a2e)] opacity-45 dark:opacity-30 pointer-events-none transition-opacity" />
-        </div>
       </section>
     </div>
-  );
+
+    {/* 底部精緻手繪風全景天際線：全寬展開、完全貼近頁底 */}
+    <div className="pt-6 w-full -mb-4 sm:-mb-6 flex justify-center items-end pointer-events-none overflow-hidden">
+      <PanoramicSkyline className="w-full max-w-[1700px] h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink,#1f2a2e)] opacity-45 dark:opacity-30 pointer-events-none transition-opacity" />
+    </div>
+  </div>
+);
 }

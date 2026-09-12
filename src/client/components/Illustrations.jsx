@@ -405,10 +405,10 @@ export function SearchEmptyIllustration({ className = 'w-72 h-44' }) {
  * 鉛筆與鋼筆筆尖建築群、荷蘭風車與水車、天文台望遠鏡、星空新月與北斗七星、海崖紅白螺旋燈塔、
  * 雙桅帆船、海港木棧橋、海鳥與連綿松林海角。
  */
-export function PanoramicSkyline({ className = 'w-full h-28 sm:h-36 md:h-44 opacity-45 dark:opacity-30 pointer-events-none' }) {
+export function PanoramicSkyline({ className = 'w-full h-28 sm:h-36 md:h-48 lg:h-56 opacity-45 dark:opacity-30 pointer-events-none' }) {
   return (
     <svg
-      viewBox="0 0 1600 160"
+      viewBox="0 0 1600 152"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.2"
