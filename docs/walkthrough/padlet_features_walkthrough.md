@@ -52,6 +52,14 @@
 ### 2. 生產環境打包 (`npm run build`)
 - Vite 6.4.3 生產編譯無任何警告或報錯，成功產出於 `dist/`。
 
+### 3. 問題修復：`V.trim is not a function` 根因定位與防護
+- **問題現象**：在空白空間中點擊「挑選範本或貼上工具代碼」開啟對話框，挑選任何內建範本並點擊「加入」時，瀏覽器彈出 `V.trim is not a function` 報錯。
+- **根本原因**：`SpaceLayout.jsx` 中的空白引導按鈕使用 `onClick={onOpenAddModal}`，導致 React 的合成點擊事件物件（`PointerEvent`）被作為第一個參數傳入 `App.jsx` 的 `onOpenAddModal(section)`，進而被當成 `initialSection` 傳遞至 `AddToolModal`。在執行 `section.trim()` 時因事件物件無 `.trim` 方法而拋出例外（生產環境壓縮後為 `V.trim`）。
+- **修復方案**：
+  1. `SpaceLayout.jsx`：改為 `onClick={() => onOpenAddModal && onOpenAddModal('一般工具')}`，避免事件物件外洩。
+  2. `App.jsx`：加強型別防禦：`typeof section === 'string' && section.trim() ? section.trim() : '一般工具'`。
+  3. `AddToolModal.jsx` & `EditToolModal.jsx`：建立 `sanitizeSection` 輔助函式，針對初始狀態與提交 payload 實施全面字串安全防護。
+
 ---
 
 ## 📁 異動檔案彙整
