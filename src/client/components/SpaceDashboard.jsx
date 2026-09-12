@@ -486,27 +486,6 @@ export default function SpaceDashboard({
               </span>
             </button>
           </nav>
-
-          {/* 快捷動作按鈕 */}
-          <div className="space-y-2 pt-1">
-            <button
-              type="button"
-              onClick={onCreateSpaceClick}
-              className="w-full notebook-btn-primary text-xs py-2.5 justify-center flex items-center gap-1.5 shadow-sm"
-            >
-              <Plus size={15} />
-              <span>建立新空間</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onOpenJoinModal}
-              className="w-full notebook-btn-secondary text-xs py-2.5 justify-center flex items-center gap-1.5"
-            >
-              <KeyRound size={14} className="text-[#3b827e]" />
-              <span>加入他人空間</span>
-            </button>
-          </div>
         </div>
 
         {/* 側邊欄底部配額卡片 */}
