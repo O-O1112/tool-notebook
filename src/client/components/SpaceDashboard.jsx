@@ -16,6 +16,7 @@ import {
   MoreVertical,
   Settings,
   Trash2,
+  User,
   Users,
   ExternalLink,
   Sparkles,
@@ -244,19 +245,41 @@ export default function SpaceDashboard({
           行動端快速導覽分類條 (Mobile Adaptive Category Bar)
           ======================================================== */}
       <div className="md:hidden space-y-3 bg-[var(--card-bg)] p-3.5 rounded-2xl border border-[var(--line,#e4e8e5)] shadow-xs">
-        {/* 行動端名片與問候 */}
+        {/* 行動端名片與問候 (點擊可開啟帳號設定) */}
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-sm shadow-xs shrink-0">
+          <div
+            onClick={() => onOpenSettings && onOpenSettings(null, 'account')}
+            role="button"
+            tabIndex={0}
+            className="flex items-center gap-2.5 min-w-0 cursor-pointer group"
+            title="點擊前往個人帳號設定"
+          >
+            <div className="w-8 h-8 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-sm shadow-xs shrink-0 group-hover:scale-105 transition-transform">
               {displayName.slice(0, 1)}
             </div>
             <div className="min-w-0">
-              <h2 className="text-xs font-bold text-[var(--ink,#1f2a2e)] truncate">您好，{displayName}</h2>
+              <div className="flex items-center gap-1">
+                <h2 className="text-xs font-bold text-[var(--ink,#1f2a2e)] truncate group-hover:text-[var(--coral,#e17b62)] transition-colors">
+                  您好，{displayName}
+                </h2>
+                <User size={11} className="text-[var(--muted,#89959b)] group-hover:text-[var(--coral,#e17b62)] shrink-0" />
+              </div>
               <span className="text-[10px] text-[var(--coral,#e17b62)] font-medium">{todayGreeting}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            {onOpenSettings && (
+              <button
+                type="button"
+                onClick={() => onOpenSettings(null, 'appearance')}
+                className="notebook-btn-secondary text-[11px] py-1.5 px-2 flex items-center gap-1"
+                title="帳號與偏好設定"
+              >
+                <Settings size={12} className="text-[#3b827e]" />
+                <span>設定</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={onOpenJoinModal}
@@ -359,19 +382,31 @@ export default function SpaceDashboard({
           ======================================================== */}
       <aside className="hidden md:flex md:w-64 lg:w-72 xl:w-80 shrink-0 flex-col justify-between space-y-5 sticky top-20 self-start">
         <div className="space-y-4">
-          {/* 使用者名片迎賓區 */}
-          <div className="notebook-card p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-base shadow-xs shrink-0">
-              {displayName.slice(0, 1)}
+          {/* 使用者名片迎賓區 (點擊可前往個人帳號設定) */}
+          <div
+            onClick={() => onOpenSettings && onOpenSettings(null, 'account')}
+            role="button"
+            tabIndex={0}
+            className="notebook-card p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#f7d2c8] hover:bg-[#fff9f7] transition-all group shadow-xs"
+            title="點擊前往個人帳號設定"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-base shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                {displayName.slice(0, 1)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-sm font-bold text-[var(--ink,#1f2a2e)] truncate group-hover:text-[var(--coral,#e17b62)] transition-colors">
+                  您好，{displayName}
+                </h2>
+                <p className="text-[11px] text-[var(--coral,#e17b62)] font-medium flex items-center gap-1">
+                  <span>{todayGreeting}</span>
+                </p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-sm font-bold text-[var(--ink,#1f2a2e)] truncate">
-                您好，{displayName}
-              </h2>
-              <p className="text-[11px] text-[var(--coral,#e17b62)] font-medium flex items-center gap-1">
-                <span>{todayGreeting}</span>
-              </p>
-            </div>
+            <span className="text-[11px] px-2 py-1 rounded-lg bg-[var(--paper,#f5f7f6)] text-[var(--muted,#89959b)] group-hover:bg-[#fff0eb] group-hover:text-[#e17b62] transition-colors flex items-center gap-1 shrink-0">
+              <User size={12} />
+              <span>帳號</span>
+            </span>
           </div>
 
           {/* 搜尋空間輸入框 */}
@@ -485,6 +520,42 @@ export default function SpaceDashboard({
                 {trashSpaces.length}
               </span>
             </button>
+
+            {/* 分隔線與偏好設定群組 */}
+            <div className="pt-2 pb-1 px-3">
+              <div className="h-[1px] bg-[var(--line,#e4e8e5)] mb-2" />
+              <span className="text-[10px] font-bold tracking-wider text-[var(--muted,#89959b)] uppercase">
+                偏好與管理
+              </span>
+            </div>
+
+            {/* 帳號設定入口 */}
+            <button
+              type="button"
+              onClick={() => onOpenSettings && onOpenSettings(null, 'account')}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)] hover:text-[#e17b62] transition-all"
+              title="修改顯示暱稱與帳號資訊"
+            >
+              <div className="flex items-center gap-2.5">
+                <User size={15} className="text-[#3b827e]" />
+                <span>帳號設定</span>
+              </div>
+              <span className="text-[10px] text-[var(--muted,#89959b)]">個人資料</span>
+            </button>
+
+            {/* 偏好與外觀入口 */}
+            <button
+              type="button"
+              onClick={() => onOpenSettings && onOpenSettings(null, 'appearance')}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)] hover:text-[#e17b62] transition-all"
+              title="主題紙質與預設偏好"
+            >
+              <div className="flex items-center gap-2.5">
+                <Settings size={15} className="text-[#e17b62]" />
+                <span>偏好與外觀</span>
+              </div>
+              <span className="text-[10px] text-[var(--muted,#89959b)]">主題紙質</span>
+            </button>
           </nav>
         </div>
 
@@ -575,21 +646,34 @@ export default function SpaceDashboard({
                         <span>{layoutInfo.label}</span>
                       </span>
 
-                      {/* 右上角快捷操作：加星號 ⭐ 或垃圾桶標記 */}
+                      {/* 右上角快捷操作：加星號 ⭐、空間設定 ⚙️ 或更多選單 */}
                       <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                         {!isTrashItem && (
-                          <button
-                            type="button"
-                            onClick={() => onToggleFavorite && onToggleFavorite(sp.id)}
-                            className={`p-1.5 rounded-lg transition-all ${
-                              isFavorite
-                                ? 'text-amber-500 bg-white/90 shadow-xs'
-                                : 'text-slate-400 hover:text-amber-500 hover:bg-white/90'
-                            }`}
-                            title={isFavorite ? '從我的最愛移除' : '加入我的最愛'}
-                          >
-                            <Star size={15} className={isFavorite ? 'fill-amber-400 text-amber-500' : ''} />
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => onToggleFavorite && onToggleFavorite(sp.id)}
+                              className={`p-1.5 rounded-lg transition-all ${
+                                isFavorite
+                                  ? 'text-amber-500 bg-white/90 shadow-xs'
+                                  : 'text-slate-400 hover:text-amber-500 hover:bg-white/90'
+                              }`}
+                              title={isFavorite ? '從我的最愛移除' : '加入我的最愛'}
+                            >
+                              <Star size={15} className={isFavorite ? 'fill-amber-400 text-amber-500' : ''} />
+                            </button>
+
+                            {onOpenSettings && (
+                              <button
+                                type="button"
+                                onClick={() => onOpenSettings(sp, 'info')}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-[#e17b62] hover:bg-white/90 transition-all shadow-xs"
+                                title="手帳空間設定 (名稱、描述、備份等)"
+                              >
+                                <Settings size={15} />
+                              </button>
+                            )}
+                          </>
                         )}
 
                         {/* 更多功能下拉選單 */}

@@ -292,15 +292,15 @@ export default function Navbar({
                 </div>
               )}
 
-              {/* 空間設定與備份按鈕 */}
+              {/* 空間設定按鈕 */}
               {!isGuest && currentSpace && onOpenSettings && (
                 <button
-                  onClick={onOpenSettings}
-                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0"
-                  title="空間設定與備份 (JSON 匯出/匯入)"
+                  onClick={() => onOpenSettings('info')}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-[#e17b62] hover:bg-[#fff0eb]"
+                  title="空間設定 (名稱、備忘、JSON 工具備份)"
                 >
                   <Settings size={13} className="shrink-0" />
-                  <span className="hidden md:inline">設定</span>
+                  <span className="font-semibold hidden sm:inline">空間設定</span>
                 </button>
               )}
 
@@ -357,11 +357,12 @@ export default function Navbar({
               {onOpenSettings && (
                 <button
                   type="button"
-                  onClick={onOpenSettings}
-                  className="notebook-btn-secondary text-xs p-1.5 flex items-center justify-center shrink-0 text-[#89959b] hover:text-[var(--ink,#1f2a2e)]"
-                  title="外觀風格與偏好調節"
+                  onClick={() => onOpenSettings('appearance')}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center justify-center gap-1.5 shrink-0 text-[#89959b] hover:text-[var(--ink,#1f2a2e)]"
+                  title="外觀風格與空間偏好設定"
                 >
-                  <Settings size={15} className="shrink-0" />
+                  <Settings size={14} className="shrink-0" />
+                  <span className="hidden sm:inline">偏好設定</span>
                 </button>
               )}
             </>
@@ -373,15 +374,18 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={onOpenAccountSettings || onOpenSettings}
-                className="hidden md:flex items-center gap-1.5 pl-2 border-l border-[#e4e8e5] hover:opacity-80 transition-opacity text-left cursor-pointer group"
+                className="hidden md:flex items-center gap-2 pl-2 border-l border-[#e4e8e5] hover:opacity-80 transition-opacity text-left cursor-pointer group"
                 title="點擊管理個人帳號與暱稱"
               >
                 <div className="w-6 h-6 rounded-full bg-[#f0f4f3] group-hover:bg-[#fff0eb] group-hover:text-[#e17b62] flex items-center justify-center text-[#57767f] transition-colors">
                   <User size={13} />
                 </div>
-                <span className="text-xs font-medium text-[#1f2a2e] group-hover:text-[#e17b62] max-w-[90px] truncate transition-colors">
-                  {user?.displayName || user?.display_name || user?.username || '使用者'}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium text-[#1f2a2e] group-hover:text-[#e17b62] max-w-[100px] truncate transition-colors leading-none">
+                    {user?.displayName || user?.display_name || user?.username || '使用者'}
+                  </span>
+                  <span className="text-[9px] text-[var(--muted,#89959b)] leading-tight mt-0.5">帳號設定</span>
+                </div>
               </button>
 
               <button
