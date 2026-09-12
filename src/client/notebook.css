@@ -126,6 +126,20 @@ html, body, #root {
   white-space: nowrap;
 }
 
+.notebook-badge-teacher,
+.notebook-badge-student {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  border-width: 1px;
+  border-style: solid;
+  white-space: nowrap;
+}
+
 .notebook-badge-teacher {
   background: #fff4f0;
   color: var(--coral);
@@ -201,6 +215,23 @@ html, body, #root {
 .notebook-btn-secondary:hover {
   background: var(--paper);
   border-color: var(--coral-border, #cbd4d0);
+}
+
+/* 緊湊按鈕尺寸變體 (防字彙折行與圖標重疊) */
+.notebook-btn-xs {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  gap: 4px !important;
+  white-space: nowrap !important;
+}
+
+.notebook-btn-sm {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
 }
 
 /* 工具標籤 Chip */
@@ -363,7 +394,8 @@ html, body, #root {
   justify-content: space-between;
   padding: 16px 20px;
   position: relative;
-  overflow: hidden;
+  border-top-left-radius: 17px;
+  border-top-right-radius: 17px;
 }
 
 .dashboard-cover-pattern {

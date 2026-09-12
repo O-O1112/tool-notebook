@@ -77,15 +77,15 @@ export default function SpaceDashboard({
   const getLayoutInfo = (layout) => {
     switch (layout) {
       case 'shelf':
-        return { label: '貨架分欄', icon: <Columns3 size={13} className="text-[#e17b62]" /> };
+        return { label: '貨架分欄', icon: <Kanban size={13} className="text-[#e17b62] shrink-0" /> };
       case 'wall':
-        return { label: '瀑布流', icon: <Kanban size={13} className="text-[#3b827e]" /> };
+        return { label: '瀑布流', icon: <Columns3 size={13} className="text-[#3b827e] shrink-0" /> };
       case 'tabs':
-        return { label: '分頁輪播', icon: <Layers size={13} className="text-[#8b5cf6]" /> };
+        return { label: '分頁輪播', icon: <Layers size={13} className="text-[#8b5cf6] shrink-0" /> };
       case 'collapsed':
-        return { label: '折起專注', icon: <ListCollapse size={13} className="text-[#d97706]" /> };
+        return { label: '折起專注', icon: <ListCollapse size={13} className="text-[#d97706] shrink-0" /> };
       default:
-        return { label: '網格並排', icon: <LayoutGrid size={13} className="text-[#3b82f6]" /> };
+        return { label: '網格並排', icon: <LayoutGrid size={13} className="text-[#3b82f6] shrink-0" /> };
     }
   };
 
@@ -222,7 +222,7 @@ export default function SpaceDashboard({
             <div
               key={space.id}
               onClick={() => onSelectSpace(space.id)}
-              className="dashboard-space-card group"
+              className={`dashboard-space-card group ${isMenuOpen ? 'z-30 overflow-visible' : 'overflow-hidden'}`}
             >
               {/* 卡片封面條紋與圖示 */}
               <div
@@ -333,22 +333,25 @@ export default function SpaceDashboard({
                 </div>
 
                 {/* 底部中繼資訊列 */}
-                <div className="pt-2.5 border-t border-[#f0f2f1] flex items-center justify-between text-[11px]">
-                  <span className="text-[#69787f] font-medium flex items-center gap-1">
+                <div className="pt-2.5 border-t border-[#f0f2f1] flex items-center justify-between text-[11px] gap-2">
+                  <span className="text-[#69787f] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
                     <span>{space.tool_count || 0} 個工具</span>
                   </span>
 
-                  <div className="flex items-center gap-1 text-[#89959b]">
+                  <div className="flex items-center gap-1.5 text-[#89959b] min-w-0">
                     {isOwner ? (
-                      <span className="notebook-badge-teacher text-[10px] py-0.5 px-2">
+                      <span className="notebook-badge-teacher text-[10px] py-0.5 px-2 shrink-0 whitespace-nowrap">
                         我建立的
                       </span>
                     ) : (
-                      <span className="notebook-badge-student text-[10px] py-0.5 px-2">
+                      <span
+                        className="notebook-badge-student text-[10px] py-0.5 px-2 truncate max-w-[110px] whitespace-nowrap"
+                        title={space.owner_name ? `由 ${space.owner_name} 共享` : '成員共享'}
+                      >
                         {space.owner_name || '成員共享'}
                       </span>
                     )}
-                    <ArrowRight size={13} className="text-[#89959b] group-hover:text-[#e17b62] group-hover:translate-x-0.5 transition-all" />
+                    <ArrowRight size={13} className="text-[#89959b] shrink-0 group-hover:text-[#e17b62] group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </div>
               </div>

@@ -88,11 +88,11 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={onNavigateHome}
-                className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 text-[#57767f] hover:text-[#1f2a2e]"
+                className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 text-[#57767f] hover:text-[#1f2a2e] shrink-0"
                 title="返回空間主頁大廳"
               >
-                <ArrowLeft size={14} />
-                <span className="font-semibold hidden xs:inline">返回大廳</span>
+                <ArrowLeft size={14} className="shrink-0" />
+                <span className="font-semibold whitespace-nowrap hidden sm:inline">返回大廳</span>
               </button>
 
               <div className="h-5 w-[1px] bg-[#e4e8e5]" />
@@ -102,12 +102,12 @@ export default function Navbar({
                 <button
                   type="button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
+                  className="notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 whitespace-nowrap shrink-0"
                 >
                   <span className="max-w-[130px] truncate font-medium">
                     {currentSpace ? currentSpace.name : '選擇空間'}
                   </span>
-                  <ChevronDown size={14} className="text-[#89959b]" />
+                  <ChevronDown size={14} className="text-[#89959b] shrink-0" />
                 </button>
 
                 {dropdownOpen && (
@@ -172,25 +172,25 @@ export default function Navbar({
               {/* 空間邀請碼標籤 (一鍵複製給團隊成員) */}
               {currentSpace?.invite_code && (
                 <div className="hidden lg:flex items-center gap-1 bg-[#fff9f6] border border-[#e1ac9e] px-2.5 py-1 rounded-notebook-sm text-xs whitespace-nowrap shrink-0">
-                  <KeyRound size={12} className="text-[#e17b62]" />
+                  <KeyRound size={12} className="text-[#e17b62] shrink-0" />
                   <span className="text-[11px] text-[#89959b]">邀請碼:</span>
                   <span className="font-mono font-bold text-[#e17b62] tracking-wider">
                     {currentSpace.invite_code}
                   </span>
                   <button
                     onClick={handleCopyCode}
-                    className="p-1 hover:text-[#cf5e43] text-[#e17b62] transition-colors ml-1"
+                    className="p-1 hover:text-[#cf5e43] text-[#e17b62] transition-colors ml-1 shrink-0"
                     title="複製邀請碼"
                   >
-                    {copiedCode ? <Check size={12} /> : <Copy size={12} />}
+                    {copiedCode ? <Check size={12} className="shrink-0" /> : <Copy size={12} className="shrink-0" />}
                   </button>
                   {isOwner && onRegenerateCode && (
                     <button
                       onClick={() => onRegenerateCode(currentSpace.id)}
-                      className="p-1 hover:text-[#1f2a2e] text-[#89959b] transition-colors"
+                      className="p-1 hover:text-[#1f2a2e] text-[#89959b] transition-colors shrink-0"
                       title="重新產生邀請碼"
                     >
-                      <RotateCcw size={11} />
+                      <RotateCcw size={11} className="shrink-0" />
                     </button>
                   )}
                 </div>
@@ -205,7 +205,7 @@ export default function Navbar({
             /* 空間內部右側：佈局切換、QR Code、設定、新增工具 */
             <>
               {/* 佈局切換器 (貨架分欄 | 瀑布流 | 網格 | 分頁 | 折起專注) */}
-              <div className="bg-[#f5f7f6] p-0.5 rounded-notebook-sm flex items-center border border-[#e4e8e5]">
+              <div className="bg-[#f5f7f6] p-0.5 rounded-notebook-sm flex items-center border border-[#e4e8e5] shrink-0">
                 <button
                   onClick={() => onToggleLayout('shelf')}
                   className={`p-1.5 rounded-md transition-colors ${
@@ -215,7 +215,7 @@ export default function Navbar({
                   }`}
                   title="分欄收納貨架 (看板模式)"
                 >
-                  <Columns3 size={15} />
+                  <Kanban size={15} />
                 </button>
                 <button
                   onClick={() => onToggleLayout('wall')}
@@ -226,7 +226,7 @@ export default function Navbar({
                   }`}
                   title="緊湊瀑布流模式 (高矮無縫自適應)"
                 >
-                  <Kanban size={15} />
+                  <Columns3 size={15} />
                 </button>
                 <button
                   onClick={() => onToggleLayout('grid')}

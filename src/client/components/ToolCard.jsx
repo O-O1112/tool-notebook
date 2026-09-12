@@ -105,39 +105,39 @@ export default function ToolCard({
       } ${tool.isPinned ? 'ring-2 ring-[#e17b62]/40 shadow-md' : ''}`}
     >
       {/* 工具卡片頂部控制列 */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#e4e8e5] bg-inherit select-none">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#e4e8e5] bg-inherit select-none gap-2">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {/* 拖曳把手 */}
           {isOwner && (
             <div
-              className="cursor-grab active:cursor-grabbing p-1 text-[#a2aaad] hover:text-[#1f2a2e] rounded transition-colors"
+              className="cursor-grab active:cursor-grabbing p-1 text-[#a2aaad] hover:text-[#1f2a2e] rounded transition-colors shrink-0"
               title="拖曳以重新排列工具順序"
             >
-              <GripVertical size={16} />
+              <GripVertical size={16} className="shrink-0" />
             </div>
           )}
 
           <div className="w-2 h-2 rounded-full bg-[#e17b62] shrink-0" />
-          <h3 className="text-sm font-semibold text-[var(--ink,#1f2a2e)] truncate" title={tool.title}>
+          <h3 className="text-sm font-semibold text-[var(--ink,#1f2a2e)] truncate shrink" title={tool.title}>
             {tool.title}
           </h3>
 
           {/* 置頂標記 */}
           {tool.isPinned && (
             <span className="notebook-pin-badge shrink-0" title="已置頂釘選">
-              <Pin size={10} className="fill-current" />
-              <span>置頂</span>
+              <Pin size={10} className="fill-current shrink-0" />
+              <span className="hidden sm:inline">置頂</span>
             </span>
           )}
 
-          <span className="notebook-badge shrink-0">
-            {getTypeIcon(tool.type)}
-            <span>{getTypeName(tool.type)}</span>
+          <span className="notebook-badge shrink-0 text-[10px]" title={getTypeName(tool.type)}>
+            <span className="shrink-0">{getTypeIcon(tool.type)}</span>
+            <span className="hidden xl:inline">{getTypeName(tool.type)}</span>
           </span>
         </div>
 
         {/* 控制按鈕組 */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           {/* 便箋色票切換 */}
           {isOwner && onChangeColor && (
             <div className="relative">

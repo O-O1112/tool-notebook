@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { X, FolderPlus, Columns3, Kanban, LayoutGrid, Layers, ListCollapse, ArrowRight } from 'lucide-react';
 
 const LAYOUT_OPTIONS = [
-  { key: 'shelf', label: '貨架分欄', desc: '看板分欄分類', icon: Columns3 },
-  { key: 'wall', label: '緊湊瀑布流', desc: '無縫高矮自適應', icon: Kanban },
+  { key: 'shelf', label: '貨架分欄', desc: '看板分欄分類', icon: Kanban },
+  { key: 'wall', label: '緊湊瀑布流', desc: '無縫高矮自適應', icon: Columns3 },
   { key: 'grid', label: '網格並排', desc: '支援拖曳重排與自由縮放', icon: LayoutGrid },
   { key: 'tabs', label: '分頁輪播', desc: '橫向分頁切換小工具', icon: Layers },
   { key: 'collapsed', label: '折起專注', desc: '純清單點擊展開', icon: ListCollapse },

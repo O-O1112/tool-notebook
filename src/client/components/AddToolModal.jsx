@@ -181,12 +181,12 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-[#f0f2f1]">
-                    <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-[#f0f2f1] flex-wrap sm:flex-nowrap">
+                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
                       <button
                         type="button"
                         onClick={() => setTemplatePreview(tmpl)}
-                        className="notebook-btn-secondary text-[11px] py-1 px-2.5 whitespace-nowrap shrink-0 flex items-center gap-1 text-[#69787f]"
+                        className="notebook-btn-secondary notebook-btn-xs whitespace-nowrap shrink-0 flex items-center gap-1 text-[#69787f]"
                       >
                         <Eye size={12} className="shrink-0" />
                         <span>預覽</span>
@@ -194,7 +194,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
                       <button
                         type="button"
                         onClick={() => handleCustomizeTemplate(tmpl)}
-                        className="notebook-btn-secondary text-[11px] py-1 px-2.5 whitespace-nowrap shrink-0 flex items-center gap-1 text-[#69787f]"
+                        className="notebook-btn-secondary notebook-btn-xs whitespace-nowrap shrink-0 flex items-center gap-1 text-[#69787f]"
                       >
                         <Code size={12} className="shrink-0" />
                         <span>微調代碼</span>
@@ -204,7 +204,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
                       type="button"
                       disabled={submitting}
                       onClick={() => handleApplyTemplate(tmpl)}
-                      className="notebook-btn-primary text-[11px] py-1 px-3 whitespace-nowrap shrink-0 flex items-center gap-1 ml-auto"
+                      className="notebook-btn-primary notebook-btn-xs whitespace-nowrap shrink-0 flex items-center gap-1 ml-auto"
                     >
                       <Plus size={12} className="shrink-0" />
                       <span>加入</span>
