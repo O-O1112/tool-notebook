@@ -842,4 +842,193 @@ export function ThemePaperDoodle({ className = 'w-28 h-14' }) {
   );
 }
 
+/**
+ * 置頂卡片專屬手繪和紙膠帶飾紋 (WashiTapePinDoodle)
+ * 半透明膠帶條，帶有撕裂鋸齒邊緣與溫暖格子斜紋
+ */
+export function WashiTapePinDoodle({ className = 'w-24 h-7' }) {
+  return (
+    <svg viewBox="0 0 96 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 和紙膠帶主體 (半透明質地) */}
+      <path
+        d="M 6 4 L 90 4 L 88 8 L 92 14 L 87 20 L 91 24 L 6 24 L 8 20 L 4 14 L 9 8 Z"
+        fill="#e17b62"
+        fillOpacity="0.22"
+        stroke="#e17b62"
+        strokeWidth="1.2"
+      />
+      {/* 和紙微撕裂邊緣細線 */}
+      <path d="M 6 4 L 9 8 L 4 14 L 8 20 L 6 24" stroke="#e17b62" strokeWidth="1.4" opacity="0.8" />
+      <path d="M 90 4 L 88 8 L 92 14 L 87 20 L 91 24" stroke="#e17b62" strokeWidth="1.4" opacity="0.8" />
+      {/* 內部手繪裝飾紋理 (小圓點與幾何斜紋) */}
+      <line x1="22" y1="6" x2="16" y2="22" stroke="#e17b62" strokeWidth="1" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="36" y1="6" x2="30" y2="22" stroke="#e17b62" strokeWidth="1" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="50" y1="6" x2="44" y2="22" stroke="#e17b62" strokeWidth="1" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="64" y1="6" x2="58" y2="22" stroke="#e17b62" strokeWidth="1" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="78" y1="6" x2="72" y2="22" stroke="#e17b62" strokeWidth="1" opacity="0.4" strokeDasharray="2 2" />
+      {/* 圖釘微光芒 */}
+      <circle cx="48" cy="14" r="2.5" fill="#ffffff" stroke="#e17b62" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+/**
+ * 空間 QR Code 航空郵票與波浪郵戳飾紋 (AirmailStampDoodle)
+ */
+export function AirmailStampDoodle({ className = 'w-24 h-16' }) {
+  return (
+    <svg viewBox="0 0 100 68" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 郵票齒孔外框 */}
+      <rect x="8" y="8" width="46" height="52" rx="3" stroke="#e17b62" strokeDasharray="3 3" fill="var(--card-bg,#1c222b)" />
+      <rect x="13" y="13" width="36" height="42" rx="2" stroke="#e17b62" fill="#fff0eb" fillOpacity="0.2" />
+      {/* 郵票內愛心印花 */}
+      <path d="M 31 32 Q 31 29 28 29 Q 25 29 25 32 Q 25 36 31 40 Q 37 36 37 32 Q 37 29 34 29 Q 31 29 31 32 Z" fill="#e17b62" stroke="#e17b62" />
+      <text x="31" y="49" textAnchor="middle" fontSize="6" fill="#e17b62" fontWeight="bold" stroke="none">AIR MAIL</text>
+      
+      {/* 圓形紀念郵戳 */}
+      <circle cx="68" cy="30" r="16" stroke="#3b827e" strokeWidth="1.2" opacity="0.85" />
+      <circle cx="68" cy="30" r="13" stroke="#3b827e" strokeDasharray="2 2" opacity="0.6" />
+      <path d="M 60 30 L 76 30" stroke="#3b827e" opacity="0.8" />
+      
+      {/* 波浪郵戳消印線條 */}
+      <path d="M 64 52 Q 74 48 84 52 Q 94 56 100 52" stroke="#3b827e" strokeWidth="1.3" opacity="0.75" />
+      <path d="M 64 57 Q 74 53 84 57 Q 94 61 100 57" stroke="#3b827e" strokeWidth="1.3" opacity="0.75" />
+    </svg>
+  );
+}
+
+/**
+ * 邀請碼通關黃銅鑰匙飾紋 (VintageKeyDoodle)
+ */
+export function VintageKeyDoodle({ className = 'w-16 h-16' }) {
+  return (
+    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 復古黃銅鑰匙握柄 (愛心鏤空) */}
+      <circle cx="22" cy="22" r="13" stroke="#f59e0b" fill="#fef3c7" fillOpacity="0.2" />
+      <circle cx="22" cy="22" r="7" stroke="#f59e0b" />
+      {/* 鑰匙長桿 */}
+      <line x1="31" y1="31" x2="52" y2="52" stroke="#f59e0b" strokeWidth="2.5" />
+      {/* 齒痕 */}
+      <line x1="47" y1="47" x2="54" y2="40" stroke="#f59e0b" strokeWidth="2.2" />
+      <line x1="41" y1="41" x2="46" y2="36" stroke="#f59e0b" strokeWidth="2.2" />
+      <line x1="50" y1="50" x2="55" y2="45" stroke="#f59e0b" strokeWidth="2" />
+      {/* 星塵光芒 */}
+      <path d="M 22 4 Q 22 8 19 8 Q 22 8 22 12 Q 22 8 25 8 Q 22 8 22 4 Z" fill="#f59e0b" stroke="#f59e0b" />
+      <circle cx="56" cy="24" r="1.5" fill="#3b827e" />
+      <circle cx="36" cy="12" r="1.2" fill="#e17b62" />
+    </svg>
+  );
+}
+
+/**
+ * 建立空間方格藍圖草稿飾紋 (DraftingNotebookDoodle)
+ */
+export function DraftingNotebookDoodle({ className = 'w-20 h-16' }) {
+  return (
+    <svg viewBox="0 0 80 64" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 方格藍圖底紙 */}
+      <rect x="8" y="10" width="56" height="46" rx="3" stroke="#60a5fa" fill="var(--card-bg,#1c222b)" strokeDasharray="3 3" />
+      {/* 藍圖網格線 */}
+      <line x1="16" y1="10" x2="16" y2="56" stroke="#93c5fd" strokeWidth="0.8" opacity="0.6" />
+      <line x1="28" y1="10" x2="28" y2="56" stroke="#93c5fd" strokeWidth="0.8" opacity="0.6" />
+      <line x1="40" y1="10" x2="40" y2="56" stroke="#93c5fd" strokeWidth="0.8" opacity="0.6" />
+      <line x1="52" y1="10" x2="52" y2="56" stroke="#93c5fd" strokeWidth="0.8" opacity="0.6" />
+      <line x1="8" y1="22" x2="64" y2="22" stroke="#93c5fd" strokeWidth="0.8" opacity="0.6" />
+      <line x1="8" y1="34" x2="64" y2="34" stroke="#93c5fd" strokeWidth="0.8" opacity="0.6" />
+      <line x1="8" y1="46" x2="64" y2="46" stroke="#93c5fd" strokeWidth="0.8" opacity="0.6" />
+      
+      {/* 繪圖圓規 */}
+      <path d="M 50 6 L 40 40 L 58 46" stroke="#e17b62" strokeWidth="1.6" />
+      <circle cx="50" cy="6" r="3" fill="#e17b62" />
+      {/* 繪圖弧線 */}
+      <path d="M 28 44 A 16 16 0 0 1 54 44" stroke="#e17b62" strokeDasharray="2 2" opacity="0.7" />
+    </svg>
+  );
+}
+
+/**
+ * 創客工具工作台飾紋 (CraftStudioDoodle)
+ */
+export function CraftStudioDoodle({ className = 'w-24 h-14' }) {
+  return (
+    <svg viewBox="0 0 100 56" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 切割墊底板 */}
+      <rect x="6" y="14" width="70" height="36" rx="2" stroke="#3b827e" fill="var(--card-bg,#1c222b)" />
+      <line x1="6" y1="26" x2="76" y2="26" stroke="#3b827e" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="6" y1="38" x2="76" y2="38" stroke="#3b827e" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="24" y1="14" x2="24" y2="50" stroke="#3b827e" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="42" y1="14" x2="42" y2="50" stroke="#3b827e" opacity="0.4" strokeDasharray="2 2" />
+      <line x1="60" y1="14" x2="60" y2="50" stroke="#3b827e" opacity="0.4" strokeDasharray="2 2" />
+      
+      {/* 直角量尺 */}
+      <path d="M 52 4 L 52 42 L 86 42" stroke="#f59e0b" strokeWidth="1.8" />
+      <line x1="56" y1="42" x2="56" y2="38" stroke="#f59e0b" />
+      <line x1="64" y1="42" x2="64" y2="38" stroke="#f59e0b" />
+      <line x1="72" y1="42" x2="72" y2="38" stroke="#f59e0b" />
+      <line x1="80" y1="42" x2="80" y2="38" stroke="#f59e0b" />
+      
+      {/* 標籤小吊牌 */}
+      <rect x="14" y="6" width="22" height="14" rx="2" stroke="#e17b62" fill="#fff0eb" fillOpacity="0.4" />
+      <circle cx="18" cy="13" r="1.5" fill="#e17b62" />
+      <line x1="23" y1="13" x2="31" y2="13" stroke="#e17b62" />
+    </svg>
+  );
+}
+
+/**
+ * 空間工具區頂部書桌文具橫幅飾紋 (SpaceStationeryBannerDoodle)
+ */
+export function SpaceStationeryBannerDoodle({ className = 'w-48 h-12' }) {
+  return (
+    <svg viewBox="0 0 180 44" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 迴紋針 Paperclip */}
+      <path d="M 12 18 L 12 30 Q 12 36 17 36 Q 22 36 22 30 L 22 14 Q 22 8 16 8 Q 10 8 10 14 L 10 28" stroke="#89959b" strokeWidth="1.4" />
+      
+      {/* 紙膠帶小卷 */}
+      <ellipse cx="44" cy="24" rx="12" ry="12" stroke="#e17b62" fill="#fff0eb" fillOpacity="0.2" />
+      <ellipse cx="44" cy="24" rx="6" ry="6" stroke="#e17b62" />
+      <path d="M 44 36 L 62 36 L 66 32" stroke="#e17b62" strokeDasharray="2 2" />
+      
+      {/* 鋼筆沾水筆尖 Fountain Pen */}
+      <path d="M 88 36 L 96 12 L 104 36 Z" stroke="#3b827e" fill="#3b827e" fillOpacity="0.15" />
+      <line x1="96" y1="12" x2="96" y2="28" stroke="#3b827e" />
+      <circle cx="96" cy="28" r="1.5" fill="#3b827e" />
+      
+      {/* 玻璃墨水瓶 */}
+      <rect x="122" y="16" width="22" height="20" rx="3" stroke="#89959b" fill="var(--card-bg,#1c222b)" />
+      <rect x="127" y="10" width="12" height="6" rx="1" stroke="#89959b" />
+      <line x1="125" y1="26" x2="141" y2="26" stroke="#3b827e" strokeDasharray="2 2" />
+      
+      {/* 漂浮星芒 */}
+      <circle cx="160" cy="18" r="1.5" fill="#f59e0b" />
+      <circle cx="75" cy="14" r="1.2" fill="#e17b62" />
+    </svg>
+  );
+}
+
+/**
+ * 個人專屬手帳封蠟火漆印章 (WaxSealDoodle)
+ */
+export function WaxSealDoodle({ className = 'w-10 h-10' }) {
+  return (
+    <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 封蠟熔滴不規則邊緣 */}
+      <path
+        d="M 22 3 Q 29 2 34 7 Q 41 12 40 20 Q 42 28 36 34 Q 30 41 22 41 Q 14 42 8 36 Q 2 30 4 21 Q 3 13 10 7 Q 15 2 22 3 Z"
+        fill="#e17b62"
+        fillOpacity="0.18"
+        stroke="#e17b62"
+        strokeWidth="1.4"
+      />
+      {/* 內印圓框 */}
+      <circle cx="22" cy="22" r="12" stroke="#e17b62" strokeWidth="1.2" />
+      <circle cx="22" cy="22" r="10" stroke="#e17b62" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
+      {/* 中心展開書本標章 */}
+      <path d="M 17 25 Q 20 23 22 24 Q 24 23 27 25 L 27 19 Q 24 17 22 18 Q 20 17 17 19 Z" fill="#e17b62" stroke="#e17b62" />
+      <line x1="22" y1="18" x2="22" y2="24" stroke="#e17b62" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+
 

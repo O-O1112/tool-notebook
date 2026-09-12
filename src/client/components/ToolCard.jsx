@@ -17,6 +17,7 @@ import {
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
 import { CARD_COLORS } from '../utils/cardColors';
+import { WashiTapePinDoodle } from './Illustrations';
 export { CARD_COLORS };
 
 export default function ToolCard({
@@ -98,12 +99,19 @@ export default function ToolCard({
       onDragStart={handleDragStartInternal}
       onDragOver={(e) => onDragOver && onDragOver(e, index)}
       onDrop={(e) => onDrop && onDrop(e, index)}
-      className={`notebook-card notebook-card-hover flex flex-col ${cardHeightClass} overflow-hidden transition-all card-color-${
+      className={`notebook-card notebook-card-hover relative flex flex-col ${cardHeightClass} overflow-hidden transition-all card-color-${
         tool.color || 'default'
       } ${
         layout !== 'shelf' && layout !== 'wall' && colSpan >= 2 ? 'md:col-span-2' : 'col-span-1'
       } ${tool.isPinned ? 'ring-2 ring-[#e17b62]/40 shadow-md' : ''}`}
     >
+      {/* 置頂和紙膠帶飾紋 */}
+      {tool.isPinned && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none z-20">
+          <WashiTapePinDoodle className="w-20 h-5" />
+        </div>
+      )}
+
       {/* 工具卡片頂部控制列 */}
       <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#e4e8e5] bg-inherit select-none gap-2">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">

@@ -4,6 +4,7 @@ import { parseToolInput } from '../utils/codeParser';
 import { TOOL_TEMPLATES } from '../utils/toolTemplates';
 import SandboxedFrame from './SandboxedFrame';
 import { CARD_COLORS } from './ToolCard';
+import { CraftStudioDoodle } from './Illustrations';
 
 const sanitizeSection = (val) => (typeof val === 'string' && val.trim() ? val.trim() : '一般工具');
 
@@ -115,14 +116,18 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
       <div className="notebook-card w-full max-w-3xl lg:max-w-4xl bg-white overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Modal 標題列與頁籤 */}
         <div className="px-6 pt-4 border-b border-[#e4e8e5] bg-[#fafaf8]">
-          <div className="flex items-center justify-between pb-3">
+          <div className="flex items-center justify-between pb-3 relative">
             <div className="flex items-center gap-2.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#e17b62]" />
               <h2 className="text-base font-bold text-[#1f2a2e]">新增小工具</h2>
             </div>
+            {/* 創客工具台背景飾紋 */}
+            <div className="absolute right-12 top-0 pointer-events-none opacity-35 dark:opacity-20 hidden sm:block">
+              <CraftStudioDoodle className="w-18 h-10 text-[#3b827e]" />
+            </div>
             <button
               onClick={handleClose}
-              className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"
+              className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors z-10"
             >
               <X size={18} />
             </button>

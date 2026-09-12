@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, ExternalLink, QrCode, Sparkles } from 'lucide-react';
 import { generateQRCodeSVG } from '../utils/qrcode';
+import { AirmailStampDoodle } from './Illustrations';
 
 export default function QRCodeModal({ isOpen, onClose, space }) {
   const [svgHtml, setSvgHtml] = useState('');
@@ -54,8 +55,13 @@ export default function QRCodeModal({ isOpen, onClose, space }) {
         </div>
 
         {/* QR Code 預覽卡片 */}
-        <div className="flex flex-col items-center justify-center py-6 bg-[#fafaf8] rounded-2xl border border-[#e4e8e5] my-4">
-          <div className="p-3 bg-white rounded-xl shadow-md border border-[#e4e8e5]">
+        <div className="flex flex-col items-center justify-center py-6 bg-[#fafaf8] dark:bg-[#1a212b] rounded-2xl border border-[#e4e8e5] dark:border-[#2d3945] my-4 relative overflow-hidden">
+          {/* 右上角航空郵票與波浪郵戳飾紋 */}
+          <div className="absolute right-2.5 top-2 pointer-events-none opacity-40 dark:opacity-25">
+            <AirmailStampDoodle className="w-20 h-14" />
+          </div>
+
+          <div className="p-3 bg-white rounded-xl shadow-md border border-[#e4e8e5] z-10">
             {svgHtml ? (
               <div
                 className="w-48 h-48 flex items-center justify-center"

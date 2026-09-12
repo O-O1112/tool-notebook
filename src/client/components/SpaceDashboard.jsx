@@ -41,6 +41,7 @@ import {
   CoverDoodle,
   CreateSpaceDoodle,
   BookshelfDoodle,
+  WaxSealDoodle,
 } from './Illustrations';
 
 const COVER_COLORS = [
@@ -422,10 +423,15 @@ export default function SpaceDashboard({
             onClick={() => onOpenSettings && onOpenSettings(null, 'account')}
             role="button"
             tabIndex={0}
-            className="notebook-card p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#f7d2c8] hover:bg-[#fff9f7] transition-all group shadow-xs"
+            className="notebook-card p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#f7d2c8] hover:bg-[#fff9f7] transition-all group shadow-xs relative overflow-hidden"
             title="點擊前往個人帳號設定"
           >
-            <div className="flex items-center gap-3 min-w-0">
+            {/* 背景手帳火漆封蠟飾紋 */}
+            <div className="absolute right-16 top-1 pointer-events-none opacity-25 dark:opacity-15 transition-transform group-hover:scale-110">
+              <WaxSealDoodle className="w-9 h-9" />
+            </div>
+
+            <div className="flex items-center gap-3 min-w-0 z-10">
               <div className="w-10 h-10 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-base shadow-xs shrink-0 group-hover:scale-105 transition-transform">
                 {displayName.slice(0, 1)}
               </div>

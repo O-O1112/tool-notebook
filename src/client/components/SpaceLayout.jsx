@@ -22,7 +22,7 @@ import {
 import ToolCard from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
-import { ToolsEmptyIllustration, SearchEmptyIllustration, EmptyShelfBasketDoodle } from './Illustrations';
+import { ToolsEmptyIllustration, SearchEmptyIllustration, EmptyShelfBasketDoodle, SpaceStationeryBannerDoodle } from './Illustrations';
 
 export default function SpaceLayout({
   tools = [],
@@ -198,8 +198,13 @@ export default function SpaceLayout({
   return (
     <div className="w-full flex-1 flex flex-col space-y-4 animate-fadeIn">
       {/* 頂部搜尋、標籤與過濾篩選工具列 */}
-      <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-notebook border border-[var(--line,#e4e8e5)] shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-notebook border border-[var(--line,#e4e8e5)] shadow-sm relative overflow-hidden">
+        {/* 背景文具橫幅微型飾紋 */}
+        <div className="absolute right-4 top-1 pointer-events-none opacity-25 dark:opacity-15 hidden lg:block">
+          <SpaceStationeryBannerDoodle className="w-36 h-9 text-[var(--muted,#89959b)]" />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 z-10">
           {/* 搜尋框 */}
           <div className="relative flex-1 min-w-[200px] max-w-md">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#89959b] pointer-events-none shrink-0" />

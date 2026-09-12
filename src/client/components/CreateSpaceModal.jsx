@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, FolderPlus, Columns3, Kanban, LayoutGrid, Layers, ListCollapse, ArrowRight } from 'lucide-react';
+import { DraftingNotebookDoodle } from './Illustrations';
 
 const LAYOUT_OPTIONS = [
   { key: 'shelf', label: '貨架分欄', desc: '看板分欄分類', icon: Kanban },
@@ -44,11 +45,16 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreateSpace }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1f2a2e]/50 backdrop-blur-sm animate-fadeIn">
-      <div className="notebook-card w-full max-w-md p-6 bg-white shadow-2xl relative">
+      <div className="notebook-card w-full max-w-md p-6 bg-white shadow-2xl relative overflow-hidden">
+        {/* 背景方格藍圖草稿飾紋 */}
+        <div className="absolute right-12 top-3 pointer-events-none opacity-30 dark:opacity-20">
+          <DraftingNotebookDoodle className="w-16 h-13 text-[#60a5fa]" />
+        </div>
+
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"
+          className="absolute right-4 top-4 p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors z-10"
         >
           <X size={16} />
         </button>
