@@ -35,11 +35,14 @@
   - 保留當前空間邀請碼標籤與一鍵複製/重產。
   - 右側保留完整的五種佈局切換器（修正貨架分欄與瀑布流圖示對應）、手帳主題切換、QR Code 分享、設定與「+ 新增工具」。
 
-### 4. 模態視窗與卡片版面重疊修復 (`AddToolModal.jsx` & `notebook.css`)
-- **按鈕樣式層級與尺寸**：
+### 4. 文字與圖標重疊修復 (`notebook.css`, `SpaceDashboard.jsx`, `SpaceLayout.jsx`, `AddToolModal.jsx`)
+- **搜尋輸入框文字與放大鏡圖示重疊修復**：
+  - **根因分析**：`.notebook-input` 在 `notebook.css` 中設定 `padding: 10px 14px;`，因宣告順序晚於 Tailwind，覆蓋了 Tailwind 的 `pl-8` 類別，導致輸入框文字自左側 14px 起始，直接與左側 12px~26px 的 `<Search>` 放大鏡圖示重疊。
+  - **解決方案**：新增專屬 `.notebook-input-search`（`padding-left: 36px !important; padding-right: 32px !important;`），確保文字與放大鏡圖示之間保留 10px 舒適間距，並預留右側清除按鈕空間；同時將圖示加上 `pointer-events-none` 與 `shrink-0`，點擊圖示直接聚焦輸入框。
+- **模態視窗按鈕排版**：
   - 新增 `.notebook-btn-xs` 與 `.notebook-btn-sm` 樣式規格，透過 `!important` 確保緊湊按鈕內距固定（`padding: 4px 8px`、`white-space: nowrap`）。
   - 徹底解決「新增工具」範本卡片在窄寬度下，按鈕內「預覽」、「微調代碼」、「加入」等中文字被 CSS 預設大按鈕 padding 擠壓成單字折行（如「預」/「覽」）與圖示碰撞之問題。
-- **工具卡片 (`ToolCard.jsx`)**：
+- **工具卡片 (`ToolCard.jsx`) 與大廳卡片**：
   - 標題與類型標籤加入 `shrink` 與 `truncate` 保護，在緊湊視窗下類型文字響應式隱藏、只留圖示，確保拖曳握把與操作按鈕群組永遠排版工整無重疊。
 
 ### 5. 路由與瀏覽器歷史同步 (`App.jsx`)

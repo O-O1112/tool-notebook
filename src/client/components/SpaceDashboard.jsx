@@ -113,18 +113,18 @@ export default function SpaceDashboard({
           <button
             type="button"
             onClick={onOpenJoinModal}
-            className="notebook-btn-secondary text-xs py-2 px-3.5 flex-1 md:flex-initial flex items-center justify-center gap-1.5"
+            className="notebook-btn-secondary text-xs py-2 px-3.5 flex-1 md:flex-initial flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
             title="輸入他人分享的邀請碼加入空間"
           >
-            <KeyRound size={14} className="text-[#3b827e]" />
+            <KeyRound size={14} className="text-[#3b827e] shrink-0" />
             <span>加入空間</span>
           </button>
           <button
             type="button"
             onClick={onCreateSpaceClick}
-            className="notebook-btn-primary text-xs py-2 px-4 flex-1 md:flex-initial flex items-center justify-center gap-1.5"
+            className="notebook-btn-primary text-xs py-2 px-4 flex-1 md:flex-initial flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
           >
-            <Plus size={15} />
+            <Plus size={15} className="shrink-0" />
             <span>建立新空間</span>
           </button>
         </div>
@@ -171,13 +171,13 @@ export default function SpaceDashboard({
 
         {/* 即時關鍵字搜尋 */}
         <div className="relative min-w-[240px] max-w-sm">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#89959b]" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#89959b] pointer-events-none shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="搜尋空間名稱、說明或邀請碼…"
-            className="notebook-input w-full pl-8 py-1.5 text-xs"
+            className="notebook-input notebook-input-search w-full"
           />
           {searchQuery && (
             <button

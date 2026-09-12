@@ -201,13 +201,13 @@ export default function SpaceLayout({
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* 搜尋框 */}
           <div className="relative flex-1 min-w-[200px] max-w-md">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#89959b]" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#89959b] pointer-events-none shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="搜尋工具名稱或 #標籤…"
-              className="notebook-input w-full pl-8 py-1.5 text-xs"
+              className="notebook-input notebook-input-search w-full"
             />
             {searchQuery && (
               <button
@@ -260,8 +260,9 @@ export default function SpaceLayout({
         {/* 標籤過濾清單 (若有任何標籤) */}
         {availableTags.length > 0 && (
           <div className="flex items-center gap-1.5 pt-2 border-t border-[#e4e8e5]/70 overflow-x-auto pb-0.5">
-            <span className="text-[11px] text-[#89959b] font-medium flex items-center gap-1 shrink-0">
-              <Tag size={12} /> 標籤：
+            <span className="text-[11px] text-[#89959b] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
+              <Tag size={12} className="shrink-0" />
+              <span>標籤：</span>
             </span>
             <button
               onClick={() => setSelectedTag(null)}

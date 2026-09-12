@@ -234,6 +234,17 @@ html, body, #root {
   white-space: nowrap !important;
 }
 
+/* 搜尋專用輸入框 (保留圖示空間與清除按鈕，防文字與搜尋圖標重疊) */
+.notebook-input-search {
+  padding-left: 36px !important;
+  padding-right: 32px !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+
 /* 工具標籤 Chip */
 .notebook-tag {
   display: inline-flex;
