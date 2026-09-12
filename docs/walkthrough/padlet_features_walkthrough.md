@@ -60,6 +60,19 @@
   2. `App.jsx`：加強型別防禦：`typeof section === 'string' && section.trim() ? section.trim() : '一般工具'`。
   3. `AddToolModal.jsx` & `EditToolModal.jsx`：建立 `sanitizeSection` 輔助函式，針對初始狀態與提交 payload 實施全面字串安全防護。
 
+### 4. 文字字型與按鈕斷行修復（「有些字會跑掉」排版優化）
+- **問題現象**：
+  1. **按鈕文字直立折行**：範本卡片中的「預覽」變成「預」與「覽」上下兩行；「微調代碼」變成「微調代」與「碼」；「加入」變成「加」與「入」。
+  2. **中文字型回退鋸齒**：在 Windows 環境下未引入 Google Fonts 且未宣告「微軟正黑體」，繁體中文回退至細明體（PMingLiU），文字發虛且間距不均。
+- **根本原因**：
+  1. 對話框寬度（`max-w-2xl`，僅 672px）在雙欄網格下單欄卡片寬度僅約 300px，卡片底部的 3 顆按鈕因寬度受限且未設定 `white-space: nowrap`，導致中文字元被強制斷行。
+  2. 全域 CSS 與元件按鈕未加入 `white-space: nowrap` 與 `shrink-0`。
+  3. `index.html` 未預載 `Noto Sans TC` 網路字型，且 CSS `font-family` 缺漏 Windows 正黑體。
+- **修復方案**：
+  1. **字型補全**：在 `index.html` 引入 Google Fonts `Noto Sans TC`，並於 `notebook.css` 與 `codeParser.js` 補上 `"Noto Sans TC", "Microsoft JhengHei", "微軟正黑體"`，確保各作業系統均呈現現代平滑黑體。
+  2. **擴大對話框視野**：將 `AddToolModal` 寬度升級為 `max-w-3xl lg:max-w-4xl`，提供充足按鈕排版間距。
+  3. **防折行樣式**：全域按鈕（`.notebook-btn-primary`, `.notebook-btn-secondary`, `.notebook-badge`, `.notebook-tag`）與各元件按鈕均加上 `white-space: nowrap` 與 `shrink-0`，杜絕任何中文字詞被迫折行。
+
 ---
 
 ## 📁 異動檔案彙整
