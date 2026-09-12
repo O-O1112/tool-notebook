@@ -683,8 +683,8 @@ export default function App() {
         isGuest={isGuest}
       />
 
-      {/* 主內容區塊：大廳卡片牆 vs 空間小工具排版 */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
+      {/* 主內容區塊：全螢幕自適應填滿 */}
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col min-h-0">
         {currentView === 'dashboard' ? (
           <SpaceDashboard
             spaces={spaces}

@@ -195,7 +195,7 @@ export default function SpaceLayout({
   const currentTabTool = sortedAndFilteredTools.find((t) => t.id === activeTabId) || sortedAndFilteredTools[0] || tools[0];
 
   return (
-    <div className="space-y-4">
+    <div className="w-full flex-1 flex flex-col space-y-4 animate-fadeIn">
       {/* 頂部搜尋、標籤與過濾篩選工具列 */}
       <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-notebook border border-[var(--line,#e4e8e5)] shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -445,7 +445,7 @@ export default function SpaceLayout({
 
       {/* 模式 2：分頁切換模式 (Tabs Mode) */}
       {layout === 'tabs' && sortedAndFilteredTools.length > 0 && (
-        <div className="flex flex-col gap-4">
+        <div className="flex-1 flex flex-col gap-4 min-h-[calc(100vh-230px)]">
           {/* 分頁標籤切換列 */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             {sortedAndFilteredTools.map((t) => {
@@ -470,7 +470,7 @@ export default function SpaceLayout({
 
           {/* 當前分頁內容卡片 */}
           {currentTabTool && (
-            <div className="w-full">
+            <div className="w-full flex-1 flex flex-col">
               <ToolCard
                 tool={currentTabTool}
                 layout="tabs"
@@ -489,7 +489,7 @@ export default function SpaceLayout({
 
       {/* 模式 3：靈活網格模式 (Grid Mode) */}
       {layout === 'grid' && sortedAndFilteredTools.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 sm:gap-6">
           {sortedAndFilteredTools.map((tool, index) => (
             <ToolCard
               key={tool.id}

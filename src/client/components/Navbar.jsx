@@ -58,8 +58,8 @@ export default function Navbar({
   const isOwner = currentSpace?.is_owner === 1 || currentSpace?.user_id === user?.id;
 
   return (
-    <header className="sticky top-0 z-40 bg-[var(--card-bg)]/90 backdrop-blur border-b border-[var(--line,#e4e8e5)] px-4 md:px-8 py-2.5">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 bg-[var(--card-bg)]/90 backdrop-blur border-b border-[var(--line,#e4e8e5)] px-4 sm:px-6 lg:px-8 py-2.5">
+      <div className="w-full flex items-center justify-between gap-3">
         {/* 左側：大廳 vs 空間內導覽 */}
         <div className="flex items-center gap-3">
           {currentView === 'dashboard' ? (

@@ -333,6 +333,14 @@ html, body, #root {
   .masonry-wall-container { column-count: 4; }
 }
 
+@media (min-width: 1800px) {
+  .masonry-wall-container { column-count: 5; }
+}
+
+@media (min-width: 2200px) {
+  .masonry-wall-container { column-count: 6; }
+}
+
 .masonry-wall-item {
   break-inside: avoid;
   margin-bottom: 1.5rem;
@@ -349,11 +357,13 @@ html, body, #root {
   overflow-x: auto;
   padding-bottom: 1rem;
   scroll-behavior: smooth;
-  align-items: flex-start;
+  align-items: stretch;
+  flex: 1;
+  min-height: calc(100vh - 220px);
 }
 
 .shelf-column-card {
-  flex: 0 0 340px;
+  flex: 0 0 320px;
   max-width: 360px;
   background: var(--paper, #fbfbf9);
   border: 1px solid var(--line);
@@ -367,6 +377,7 @@ html, body, #root {
 
 .shelf-drop-zone {
   min-height: 80px;
+  flex: 1;
   transition: all 0.2s ease;
 }
 

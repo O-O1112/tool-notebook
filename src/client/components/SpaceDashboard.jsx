@@ -217,14 +217,14 @@ export default function SpaceDashboard({
       case 'shared':
         return {
           title: '尚無他人共享的空間',
-          desc: '點擊左側「加入他人空間」，輸入好友或同事的邀請碼即可共同協作！',
+          desc: '點擊「加入他人空間」，輸入好友或同事的邀請碼即可共同協作！',
           action: onOpenJoinModal,
           actionText: '輸入邀請碼加入',
         };
       case 'owned':
         return {
           title: '您尚未建立任何手帳空間',
-          desc: '立即點擊下方按鈕建立您的第一個主題手帳空間，開啟靈活工作看板！',
+          desc: '立即點擊按鈕建立您的第一個主題手帳空間，開啟靈活工作看板！',
           action: onCreateSpaceClick,
           actionText: '立即建立新空間',
         };
@@ -239,11 +239,125 @@ export default function SpaceDashboard({
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-stretch gap-6 min-h-[calc(100vh-140px)] animate-fadeIn">
+    <div className="flex-1 w-full flex flex-col md:flex-row items-stretch gap-5 lg:gap-7 min-h-[calc(100vh-140px)] animate-fadeIn">
       {/* ========================================================
-          左側邊欄工作區導覽 (Sidebar Dashboard)
+          行動端快速導覽分類條 (Mobile Adaptive Category Bar)
           ======================================================== */}
-      <aside className="w-full md:w-64 lg:w-72 shrink-0 flex flex-col justify-between space-y-5">
+      <div className="md:hidden space-y-3 bg-[var(--card-bg)] p-3.5 rounded-2xl border border-[var(--line,#e4e8e5)] shadow-xs">
+        {/* 行動端名片與問候 */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-sm shadow-xs shrink-0">
+              {displayName.slice(0, 1)}
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-xs font-bold text-[var(--ink,#1f2a2e)] truncate">您好，{displayName}</h2>
+              <span className="text-[10px] text-[var(--coral,#e17b62)] font-medium">{todayGreeting}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={onOpenJoinModal}
+              className="notebook-btn-secondary text-[11px] py-1.5 px-2.5 flex items-center gap-1"
+              title="加入空間"
+            >
+              <KeyRound size={12} className="text-[#3b827e]" />
+              <span>加入</span>
+            </button>
+            <button
+              type="button"
+              onClick={onCreateSpaceClick}
+              className="notebook-btn-primary text-[11px] py-1.5 px-2.5 flex items-center gap-1"
+            >
+              <Plus size={13} />
+              <span>建立</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 搜尋空間輸入框 */}
+        <div className="relative">
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted,#89959b)] pointer-events-none shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜尋手帳或空間…"
+            className="notebook-input notebook-input-search w-full text-xs pl-7 py-1.5"
+          />
+        </div>
+
+        {/* 5 分類橫向切換藥丸列 */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+          <button
+            type="button"
+            onClick={() => setActiveNav('recent')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
+              activeNav === 'recent'
+                ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
+                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+            }`}
+          >
+            <Clock size={13} />
+            <span>最近 ({recentSpaces.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNav('owned')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
+              activeNav === 'owned'
+                ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
+                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+            }`}
+          >
+            <FolderHeart size={13} />
+            <span>自建 ({ownedSpaces.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNav('shared')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
+              activeNav === 'shared'
+                ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
+                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+            }`}
+          >
+            <Users size={13} />
+            <span>共享 ({sharedSpaces.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNav('favorites')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
+              activeNav === 'favorites'
+                ? 'bg-amber-50 text-amber-600 font-bold shadow-xs'
+                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+            }`}
+          >
+            <Star size={13} className={activeNav === 'favorites' ? 'fill-amber-400 text-amber-500' : ''} />
+            <span>最愛 ({favoriteSpaces.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNav('trash')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
+              activeNav === 'trash'
+                ? 'bg-red-50 text-red-600 font-bold shadow-xs'
+                : 'bg-[var(--paper,#f5f7f6)] text-[var(--muted,#89959b)]'
+            }`}
+          >
+            <Trash2 size={13} />
+            <span>回收桶 ({trashSpaces.length})</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ========================================================
+          桌面端左側邊欄工作區導覽 (Desktop Sidebar Dashboard)
+          ======================================================== */}
+      <aside className="hidden md:flex md:w-64 lg:w-72 xl:w-80 shrink-0 flex-col justify-between space-y-5 sticky top-20 self-start">
         <div className="space-y-4">
           {/* 使用者名片迎賓區 */}
           <div className="notebook-card p-4 flex items-center gap-3">
@@ -450,9 +564,9 @@ export default function SpaceDashboard({
             </div>
           </div>
 
-          {/* 空間卡片網格清單 */}
+          {/* 空間卡片自適應滿版網格清單 */}
           {displayedSpaces.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
               {displayedSpaces.map((sp, idx) => {
                 const isFavorite = favoriteSpaceIds.includes(sp.id);
                 const isTrashItem = trashSpaceIds.includes(sp.id);
@@ -703,10 +817,10 @@ export default function SpaceDashboard({
           )}
         </div>
 
-        {/* 底部精緻手繪風天際線浮水印 Line Art SVG */}
-        <div className="pt-12 pb-4 flex justify-center items-center pointer-events-none opacity-20 dark:opacity-10 overflow-hidden">
+        {/* 底部精緻手繪風天際線浮水印 Line Art SVG (滿版寬度自適應) */}
+        <div className="pt-8 pb-2 w-full flex justify-center items-center pointer-events-none opacity-20 dark:opacity-10 overflow-hidden">
           <svg
-            className="w-full max-w-2xl h-16 text-[var(--ink,#1f2a2e)]"
+            className="w-full max-w-5xl h-16 text-[var(--ink,#1f2a2e)]"
             viewBox="0 0 800 60"
             fill="none"
             stroke="currentColor"
