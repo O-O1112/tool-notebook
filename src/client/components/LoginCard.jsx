@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { LoginWelcomeIllustration } from './Illustrations';
 
 export default function LoginCard() {
   const { login, register } = useAuth();
@@ -37,7 +38,7 @@ export default function LoginCard() {
     <div className="min-h-screen flex items-center justify-center p-4 notebook-grid-bg">
       <div className="notebook-card w-full max-w-[420px] p-8 sm:p-10 shadow-2xl relative">
         {/* 頂部 Logo 與標題 */}
-        <div className="flex items-center gap-3.5 mb-6">
+        <div className="flex items-center gap-3.5 mb-4">
           <div className="brand-mark">
             <BookOpen size={20} />
           </div>
@@ -47,6 +48,11 @@ export default function LoginCard() {
             </h1>
             <p className="text-xs text-[#89959b]">多功能工具嵌入空間</p>
           </div>
+        </div>
+
+        {/* 迎賓手繪手帳插圖 */}
+        <div className="flex justify-center mb-5 pointer-events-none">
+          <LoginWelcomeIllustration className="w-52 h-20 text-[var(--ink,#1f2a2e)] opacity-85" />
         </div>
 
         {/* 錯誤訊息 */}

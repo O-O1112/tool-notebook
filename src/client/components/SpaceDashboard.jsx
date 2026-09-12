@@ -38,6 +38,9 @@ import {
   SharedEmptyIllustration,
   SearchEmptyIllustration,
   PanoramicSkyline,
+  CoverDoodle,
+  CreateSpaceDoodle,
+  BookshelfDoodle,
 } from './Illustrations';
 
 const COVER_COLORS = [
@@ -592,7 +595,7 @@ export default function SpaceDashboard({
         </div>
 
         {/* 側邊欄底部配額卡片 */}
-        <div className="p-3.5 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] text-xs space-y-1">
+        <div className="p-3.5 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] text-xs space-y-1.5 overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="font-bold text-[var(--ink,#1f2a2e)]">手帳工作空間</span>
             <span className="notebook-badge bg-white text-[10px] text-[var(--muted,#89959b)]">已啟用</span>
@@ -600,6 +603,9 @@ export default function SpaceDashboard({
           <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
             已使用 {ownedSpaces.length} 個由您建立的空間，無限無拘束自由編排。
           </p>
+          <div className="pt-0.5 flex justify-center">
+            <BookshelfDoodle className="w-full h-8 opacity-65 dark:opacity-45 text-[var(--ink,#1f2a2e)]" />
+          </div>
         </div>
       </aside>
 
@@ -666,16 +672,21 @@ export default function SpaceDashboard({
                   >
                     {/* 卡片頂部封面底紋 (支援深淺自適應，深色模式低飽和沉穩優雅) */}
                     <div
-                      className={`dashboard-cover dashboard-cover-pattern cover-theme-${isTrashItem ? 'trash' : idx % 6}`}
+                      className={`dashboard-cover dashboard-cover-pattern cover-theme-${isTrashItem ? 'trash' : idx % 6} relative overflow-hidden`}
                     >
+                      {/* 封面專屬手繪飾紋插畫 */}
+                      <div className="absolute right-14 top-1.5 w-16 h-11 pointer-events-none opacity-45 dark:opacity-35 transition-transform group-hover:scale-105">
+                        <CoverDoodle themeIndex={idx} isTrash={isTrashItem} className="w-full h-full" />
+                      </div>
+
                       {/* 佈局模式徽章 */}
-                      <span className="notebook-badge bg-white/90 backdrop-blur text-[11px] shadow-xs flex items-center gap-1">
+                      <span className="notebook-badge bg-white/90 backdrop-blur text-[11px] shadow-xs flex items-center gap-1 z-10">
                         {layoutInfo.icon}
                         <span>{layoutInfo.label}</span>
                       </span>
 
                       {/* 右上角快捷操作：加星號 ⭐、空間設定 ⚙️ 或更多選單 */}
-                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-1.5 z-10" onClick={(e) => e.stopPropagation()}>
                         {!isTrashItem && (
                           <>
                             <button
@@ -863,12 +874,12 @@ export default function SpaceDashboard({
                 <button
                   type="button"
                   onClick={onCreateSpaceClick}
-                  className="dashboard-create-card min-h-[190px] flex flex-col items-center justify-center p-6 text-center gap-2.5 text-[var(--coral,#e17b62)]"
+                  className="dashboard-create-card min-h-[190px] flex flex-col items-center justify-center p-6 text-center gap-2 text-[var(--coral,#e17b62)] group"
                 >
-                  <div className="w-11 h-11 rounded-2xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center shadow-xs">
-                    <Plus size={20} />
+                  <div className="p-2 rounded-2xl bg-[#fff0eb] dark:bg-[#2b2524] border border-[#f7d2c8] dark:border-[#523e3b] flex items-center justify-center shadow-xs transition-transform group-hover:scale-110 group-hover:rotate-3">
+                    <CreateSpaceDoodle className="w-12 h-12" />
                   </div>
-                  <div className="text-xs font-bold text-[var(--ink,#1f2a2e)]">建立新手帳空間</div>
+                  <div className="text-xs font-bold text-[var(--ink,#1f2a2e)] group-hover:text-[var(--coral,#e17b62)] transition-colors">建立新手帳空間</div>
                   <div className="text-[11px] text-[var(--muted,#89959b)] max-w-[160px]">
                     自訂分欄貨架、嵌入課堂或工作小工具
                   </div>

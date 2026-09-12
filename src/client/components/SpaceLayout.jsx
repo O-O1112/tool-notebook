@@ -22,7 +22,7 @@ import {
 import ToolCard from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
-import { ToolsEmptyIllustration, SearchEmptyIllustration } from './Illustrations';
+import { ToolsEmptyIllustration, SearchEmptyIllustration, EmptyShelfBasketDoodle } from './Illustrations';
 
 export default function SpaceLayout({
   tools = [],
@@ -586,8 +586,9 @@ export default function SpaceLayout({
                   ))}
 
                   {secTools.length === 0 && (
-                    <div className="py-10 px-4 border-2 border-dashed border-[#e4e8e5] rounded-xl text-center text-xs text-[#89959b]">
-                      可將工具拖曳至此欄
+                    <div className="py-8 px-4 border-2 border-dashed border-[#e4e8e5] dark:border-[#334247] rounded-xl text-center flex flex-col items-center justify-center gap-1.5 text-xs text-[var(--muted,#89959b)]">
+                      <EmptyShelfBasketDoodle className="w-14 h-11 text-[var(--muted,#89959b)] opacity-60 dark:opacity-40" />
+                      <span>可將工具拖曳至此欄</span>
                     </div>
                   )}
                 </div>

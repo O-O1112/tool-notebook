@@ -24,6 +24,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { BackupArchiveDoodle, ThemePaperDoodle } from './Illustrations';
 
 const THEMES = [
   { key: 'warm', name: '方眼米紙', desc: '手帳方眼格紋理，溫潤護眼', color: '#fbfbf9', border: '#e4e8e5' },
@@ -455,14 +456,17 @@ export default function SpaceSettingsModal({
 
               {/* 手帳紙質底色選擇 */}
               <div>
-                <label className="block text-xs font-bold text-[var(--ink,#1f2a2e)] mb-2">
-                  手帳紙質風格底色
-                  {isDarkMode && (
-                    <span className="ml-2 font-normal text-[11px] text-[var(--muted,#89959b)]">
-                      (目前處於深色模式，切回日間模式時將套用所選紙質)
-                    </span>
-                  )}
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-[var(--ink,#1f2a2e)]">
+                    手帳紙質風格底色
+                    {isDarkMode && (
+                      <span className="ml-2 font-normal text-[11px] text-[var(--muted,#89959b)]">
+                        (目前深色，日間套用)
+                      </span>
+                    )}
+                  </label>
+                  <ThemePaperDoodle className="w-16 h-8 opacity-70 dark:opacity-40" />
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {THEMES.map((t) => {
                     const isSelected = !isDarkMode && theme === t.key;
@@ -593,13 +597,18 @@ export default function SpaceSettingsModal({
           {activeTab === 'backup' && space && (
             <div className="space-y-4 animate-fadeIn">
               <div className="p-4 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] space-y-3">
-                <h4 className="text-xs font-bold text-[var(--ink,#1f2a2e)] flex items-center gap-1.5">
-                  <FileText size={15} className="text-[#e17b62]" />
-                  <span>工具資料轉移與 JSON 封裝</span>
-                </h4>
-                <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
-                  將目前空間內的 {tools.length} 個小工具（包含自訂 HTML/JS、Iframe 配置、色票便箋與釘選狀態）打包為標準 JSON 檔案，供離線保存或轉移至其他空間。
-                </p>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-[var(--ink,#1f2a2e)] flex items-center gap-1.5">
+                      <FileText size={15} className="text-[#e17b62]" />
+                      <span>工具資料轉移與 JSON 封裝</span>
+                    </h4>
+                    <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
+                      將目前空間內的 {tools.length} 個小工具（包含自訂 HTML/JS、Iframe 配置、色票便箋與釘選狀態）打包為標準 JSON 檔案，供離線保存或轉移至其他空間。
+                    </p>
+                  </div>
+                  <BackupArchiveDoodle className="w-24 h-12 shrink-0 opacity-70 dark:opacity-40 text-[var(--ink,#1f2a2e)]" />
+                </div>
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <button

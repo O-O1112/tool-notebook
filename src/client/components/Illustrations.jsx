@@ -541,3 +541,305 @@ export function PanoramicSkyline({ className = 'w-full h-16 sm:h-20 opacity-25 d
     </svg>
   );
 }
+
+/**
+ * 手帳空間卡片封面主題手繪插圖飾紋 (CoverDoodle)
+ * 為 6 款彩色卡片封面與回收桶封面提供專屬手繪向量小插圖
+ */
+export function CoverDoodle({ themeIndex = 0, isTrash = false, className = 'w-24 h-16 pointer-events-none opacity-45 dark:opacity-35' }) {
+  if (isTrash) {
+    return (
+      <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        {/* 回收籃與綠葉 */}
+        <rect x="35" y="24" width="30" height="24" rx="3" stroke="#64748b" />
+        <line x1="42" y1="24" x2="42" y2="48" stroke="#64748b" strokeDasharray="2 2" />
+        <line x1="50" y1="24" x2="50" y2="48" stroke="#64748b" strokeDasharray="2 2" />
+        <line x1="58" y1="24" x2="58" y2="48" stroke="#64748b" strokeDasharray="2 2" />
+        {/* 紙質封套與發芽嫩葉 */}
+        <path d="M 40 18 L 60 18 L 65 24 L 35 24 Z" stroke="#64748b" />
+        <path d="M 50 14 Q 56 6 62 10 Q 58 18 50 14 Z" stroke="#34d399" fill="#34d399" fillOpacity="0.3" />
+        <circle cx="28" cy="35" r="1.5" fill="#64748b" opacity="0.5" />
+        <circle cx="74" cy="32" r="1.5" fill="#64748b" opacity="0.5" />
+      </svg>
+    );
+  }
+
+  switch (themeIndex % 6) {
+    case 0: // 珊瑚蜜桃：桃花花瓣、手沖馬克杯與書籤緞帶
+      return (
+        <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          {/* 馬克杯 */}
+          <path d="M 52 25 L 54 47 A 4 4 0 0 0 66 47 L 68 25 Z" stroke="#f08b73" fill="#f08b73" fillOpacity="0.12" />
+          <path d="M 68 28 C 74 28 74 40 68 40" stroke="#f08b73" />
+          <path d="M 58 18 Q 61 12 58 6" stroke="#f08b73" strokeDasharray="2 2" strokeWidth="1" />
+          {/* 蜜桃花與花瓣 */}
+          <circle cx="34" cy="36" r="3" stroke="#f08b73" fill="#f08b73" fillOpacity="0.3" />
+          <path d="M 34 29 Q 37 32 34 36" stroke="#f08b73" />
+          <path d="M 41 36 Q 37 39 34 36" stroke="#f08b73" />
+          <path d="M 34 43 Q 31 39 34 36" stroke="#f08b73" />
+          <path d="M 27 36 Q 31 32 34 36" stroke="#f08b73" />
+          <circle cx="25" cy="22" r="1.5" fill="#f08b73" />
+          <circle cx="78" cy="44" r="1.5" fill="#f08b73" />
+        </svg>
+      );
+
+    case 1: // 薄荷松綠：小盆栽、多肉植物與澆水嫩葉
+      return (
+        <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          {/* 盆栽 */}
+          <path d="M 50 48 L 47 32 L 67 32 L 64 48 Z" stroke="#38b2ac" fill="#38b2ac" fillOpacity="0.15" />
+          <line x1="45" y1="32" x2="69" y2="32" stroke="#38b2ac" />
+          {/* 多肉/闊葉 */}
+          <path d="M 57 32 Q 44 14 34 20 Q 44 32 57 32 Z" stroke="#38b2ac" fill="#38b2ac" fillOpacity="0.25" />
+          <path d="M 57 32 Q 57 8 68 12 Q 65 28 57 32 Z" stroke="#38b2ac" fill="#38b2ac" fillOpacity="0.25" />
+          <path d="M 57 32 Q 74 18 80 26 Q 68 35 57 32 Z" stroke="#38b2ac" fill="#38b2ac" fillOpacity="0.25" />
+          <circle cx="26" cy="38" r="1.5" fill="#38b2ac" />
+          <circle cx="78" cy="18" r="1.5" fill="#38b2ac" />
+        </svg>
+      );
+
+    case 2: // 天峰蔚藍：摺紙紙飛機與天空雲朵
+      return (
+        <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          {/* 雲朵 */}
+          <path d="M 28 42 Q 33 34 42 36 Q 50 30 58 38 Q 66 36 68 44 Q 50 48 28 42 Z" stroke="#60a5fa" strokeDasharray="2 2" fill="#60a5fa" fillOpacity="0.08" />
+          {/* 紙飛機 */}
+          <path d="M 44 26 L 76 14 L 64 38 L 56 30 Z" stroke="#60a5fa" fill="#60a5fa" fillOpacity="0.2" />
+          <line x1="76" y1="14" x2="56" y2="30" stroke="#60a5fa" />
+          {/* 飛行軌跡 */}
+          <path d="M 22 36 Q 30 22 42 27" stroke="#60a5fa" strokeDasharray="2 2" strokeWidth="1" />
+          <circle cx="78" cy="38" r="1.5" fill="#60a5fa" />
+        </svg>
+      );
+
+    case 3: // 薰衣草紫：新月、羽毛筆與魔幻星宿
+      return (
+        <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          {/* 新月 */}
+          <path d="M 56 12 A 14 14 0 1 0 70 34 A 12 12 0 1 1 56 12 Z" stroke="#a78bfa" fill="#a78bfa" fillOpacity="0.2" />
+          {/* 羽毛沾水筆 */}
+          <path d="M 38 48 Q 44 32 32 18 Q 48 22 48 40 L 46 48 Z" stroke="#a78bfa" fill="#a78bfa" fillOpacity="0.12" />
+          <line x1="46" y1="48" x2="40" y2="34" stroke="#a78bfa" />
+          {/* 星星 */}
+          <path d="M 74 16 Q 74 20 70 20 Q 74 20 74 24 Q 74 20 78 20 Q 74 20 74 16 Z" stroke="#a78bfa" fill="#a78bfa" />
+          <circle cx="26" cy="36" r="1.5" fill="#a78bfa" />
+          <circle cx="78" cy="42" r="1.5" fill="#a78bfa" />
+        </svg>
+      );
+
+    case 4: // 晨曦暖黃：溫暖晨光、咖啡與復古小鬧鐘
+      return (
+        <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          {/* 復古小鬧鐘 */}
+          <circle cx="56" cy="36" r="12" stroke="#fbbf24" fill="#fbbf24" fillOpacity="0.15" />
+          <line x1="56" y1="36" x2="56" y2="29" stroke="#fbbf24" />
+          <line x1="56" y1="36" x2="62" y2="36" stroke="#fbbf24" />
+          {/* 鬧鐘雙耳 */}
+          <path d="M 46 25 Q 48 21 52 25" stroke="#fbbf24" />
+          <path d="M 60 25 Q 64 21 66 25" stroke="#fbbf24" />
+          {/* 鐘腳 */}
+          <line x1="48" y1="46" x2="44" y2="50" stroke="#fbbf24" />
+          <line x1="64" y1="46" x2="68" y2="50" stroke="#fbbf24" />
+          {/* 晨光光暈線 */}
+          <line x1="32" y1="18" x2="38" y2="24" stroke="#fbbf24" strokeDasharray="2 2" />
+          <line x1="28" y1="30" x2="36" y2="30" stroke="#fbbf24" strokeDasharray="2 2" />
+          <circle cx="76" cy="20" r="1.5" fill="#fbbf24" />
+        </svg>
+      );
+
+    default: // 典雅焦糖：復古相機、羅盤與旅行者印章
+      return (
+        <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          {/* 復古相機 */}
+          <rect x="42" y="24" width="28" height="20" rx="3" stroke="#e08b68" fill="#e08b68" fillOpacity="0.12" />
+          <circle cx="56" cy="34" r="6" stroke="#e08b68" fill="#e08b68" fillOpacity="0.2" />
+          <rect x="47" y="20" width="8" height="4" rx="1" stroke="#e08b68" />
+          <circle cx="65" cy="28" r="1.5" fill="#e08b68" />
+          {/* 旅行戳印 */}
+          <circle cx="30" cy="38" r="10" stroke="#e08b68" strokeDasharray="3 2" opacity="0.6" />
+          <line x1="24" y1="38" x2="36" y2="38" stroke="#e08b68" opacity="0.6" />
+          <circle cx="78" cy="22" r="1.5" fill="#e08b68" />
+        </svg>
+      );
+  }
+}
+
+/**
+ * 建立新空間卡片專屬插圖 (CreateSpaceDoodle)
+ * 空白畫布畫架、鉛筆與靈感光芒
+ */
+export function CreateSpaceDoodle({ className = 'w-16 h-16 text-[var(--coral,#e17b62)]' }) {
+  return (
+    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 畫架 */}
+      <line x1="22" y1="20" x2="16" y2="56" />
+      <line x1="42" y1="20" x2="48" y2="56" />
+      <line x1="32" y1="12" x2="32" y2="56" opacity="0.5" />
+      <line x1="14" y1="44" x2="50" y2="44" />
+      {/* 畫布 */}
+      <rect x="18" y="16" width="28" height="24" rx="2" fill="var(--card-bg,#1c222b)" stroke="#f08b73" />
+      {/* 畫布中心的加號與星星 */}
+      <circle cx="32" cy="28" r="7" stroke="#f08b73" fill="#f08b73" fillOpacity="0.2" />
+      <line x1="32" y1="24" x2="32" y2="32" stroke="#f08b73" strokeWidth="2" />
+      <line x1="28" y1="28" x2="36" y2="28" stroke="#f08b73" strokeWidth="2" />
+      {/* 靈感星芒 */}
+      <path d="M 48 10 Q 48 14 45 14 Q 48 14 48 18 Q 48 14 51 14 Q 48 14 48 10 Z" stroke="#fbbf24" fill="#fbbf24" />
+      <circle cx="14" cy="24" r="1.5" fill="#38b2ac" />
+    </svg>
+  );
+}
+
+/**
+ * 側邊欄底部配額卡片專屬手繪書架小品 (BookshelfDoodle)
+ * 排列整齊的手帳本、書擋與小盆栽
+ */
+export function BookshelfDoodle({ className = 'w-full h-12 text-[var(--ink,#1f2a2e)]' }) {
+  return (
+    <svg viewBox="0 0 200 40" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 層架橫板 */}
+      <line x1="10" y1="36" x2="190" y2="36" strokeWidth="1.8" />
+      {/* 左側書籍排立 */}
+      <rect x="25" y="12" width="8" height="24" rx="1" stroke="#f08b73" fill="#f08b73" fillOpacity="0.15" />
+      <rect x="34" y="8" width="9" height="28" rx="1" stroke="#38b2ac" fill="#38b2ac" fillOpacity="0.15" />
+      <rect x="44" y="14" width="7" height="22" rx="1" stroke="#fbbf24" fill="#fbbf24" fillOpacity="0.15" />
+      {/* 傾斜倚靠的筆記本 */}
+      <path d="M 52 16 L 62 12 L 67 34 L 57 36 Z" stroke="#a78bfa" fill="#a78bfa" fillOpacity="0.15" />
+      {/* 小仙人掌盆栽 */}
+      <path d="M 85 36 L 87 27 L 97 27 L 99 36 Z" fill="currentColor" fillOpacity="0.1" />
+      <ellipse cx="92" cy="22" rx="4" ry="7" stroke="#34d399" fill="#34d399" fillOpacity="0.25" />
+      <path d="M 88 23 Q 86 20 88 18" stroke="#34d399" />
+      <path d="M 96 21 Q 98 18 96 16" stroke="#34d399" />
+      {/* 右側書籍平疊 */}
+      <rect x="120" y="30" width="30" height="6" rx="1" />
+      <rect x="122" y="24" width="26" height="6" rx="1" />
+      <rect x="125" y="18" width="20" height="6" rx="1" stroke="#f08b73" fill="#f08b73" fillOpacity="0.2" />
+      {/* 書擋 */}
+      <path d="M 160 36 L 160 18 L 166 36 Z" />
+    </svg>
+  );
+}
+
+/**
+ * 貨架空欄位放置導引插畫 (EmptyShelfBasketDoodle)
+ */
+export function EmptyShelfBasketDoodle({ className = 'w-24 h-20 text-[var(--muted,#89959b)]' }) {
+  return (
+    <svg viewBox="0 0 80 60" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 收納籃/置物盒 */}
+      <path d="M 18 28 L 22 52 L 58 52 L 62 28 Z" fill="currentColor" fillOpacity="0.05" />
+      <line x1="14" y1="28" x2="66" y2="28" />
+      <line x1="28" y1="36" x2="52" y2="36" strokeDasharray="2 2" opacity="0.6" />
+      {/* 拖曳指向箭頭 */}
+      <path d="M 40 8 L 40 22 M 34 16 L 40 22 L 46 16" stroke="#f08b73" strokeWidth="2" />
+      <circle cx="26" cy="14" r="1.5" fill="#fbbf24" />
+      <circle cx="54" cy="14" r="1.5" fill="#38b2ac" />
+    </svg>
+  );
+}
+
+/**
+ * 登入 / 註冊迎賓手繪插圖 (LoginWelcomeIllustration)
+ * 溫暖手帳、蒸氣咖啡杯、鋼筆、眼鏡與星芒裝飾
+ */
+export function LoginWelcomeIllustration({ className = 'w-56 h-24' }) {
+  return (
+    <svg viewBox="0 0 240 100" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 桌面底線 */}
+      <line x1="20" y1="90" x2="220" y2="90" strokeDasharray="3 3" opacity="0.3" />
+
+      {/* 左側：展開的手帳筆記本 */}
+      <g transform="translate(30, 26)">
+        {/* 手帳書皮底板 */}
+        <path d="M 4 58 L 56 62 L 108 58 L 104 12 L 56 16 L 8 12 Z" fill="var(--paper,#f5f7f6)" stroke="currentColor" />
+        {/* 手帳中脊 */}
+        <line x1="56" y1="16" x2="56" y2="62" stroke="#e17b62" strokeWidth="1.8" />
+        {/* 左頁線條 */}
+        <line x1="18" y1="24" x2="48" y2="24" stroke="#89959b" strokeWidth="1" strokeDasharray="2 2" />
+        <line x1="18" y1="32" x2="48" y2="32" stroke="#89959b" strokeWidth="1" strokeDasharray="2 2" />
+        <line x1="18" y1="40" x2="42" y2="40" stroke="#89959b" strokeWidth="1" strokeDasharray="2 2" />
+        {/* 右頁清單方塊與線條 */}
+        <rect x="64" y="22" width="5" height="5" rx="1" stroke="#3b827e" />
+        <line x1="74" y1="25" x2="98" y2="25" stroke="#89959b" strokeWidth="1" />
+        <rect x="64" y="32" width="5" height="5" rx="1" stroke="#3b827e" />
+        <line x1="74" y1="35" x2="98" y2="35" stroke="#89959b" strokeWidth="1" />
+        <rect x="64" y="42" width="5" height="5" rx="1" stroke="#e17b62" />
+        <line x1="74" y1="45" x2="92" y2="45" stroke="#89959b" strokeWidth="1" />
+        {/* 紅色書籤帶 */}
+        <path d="M 56 62 Q 54 74 62 76 L 66 70 L 70 76 Q 60 70 56 62 Z" fill="#e17b62" stroke="#e17b62" />
+      </g>
+
+      {/* 右側：熱氣騰騰的馬克杯 */}
+      <g transform="translate(156, 38)">
+        {/* 杯身 */}
+        <rect x="8" y="16" width="30" height="34" rx="4" fill="var(--card-bg,#1c222b)" stroke="#e17b62" />
+        {/* 杯把手 */}
+        <path d="M 38 24 Q 48 24 48 33 Q 48 42 38 42" stroke="#e17b62" strokeWidth="1.5" />
+        {/* 熱氣蒸氣波浪 */}
+        <path d="M 16 10 Q 14 4 18 0" stroke="#e17b62" strokeWidth="1.2" opacity="0.7" />
+        <path d="M 23 12 Q 21 6 25 2" stroke="#e17b62" strokeWidth="1.2" opacity="0.85" />
+        <path d="M 30 10 Q 28 4 32 0" stroke="#e17b62" strokeWidth="1.2" opacity="0.7" />
+        {/* 杯上愛心印花 */}
+        <path d="M 23 33 Q 23 31 21 31 Q 19 31 19 33 Q 19 36 23 39 Q 27 36 27 33 Q 27 31 25 31 Q 23 31 23 33 Z" fill="#e17b62" stroke="#e17b62" strokeWidth="0.8" />
+      </g>
+
+      {/* 前方斜躺的鋼筆 */}
+      <g transform="translate(90, 78)">
+        <line x1="0" y1="8" x2="45" y2="4" stroke="#3b827e" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M 45 4 L 52 3.5 L 45 2.5 Z" fill="#fbbf24" stroke="#fbbf24" strokeWidth="1" />
+        <line x1="12" y1="9" x2="12" y2="5" stroke="#fbbf24" strokeWidth="1.5" />
+      </g>
+
+      {/* 飄浮靈感小星芒 */}
+      <path d="M 28 16 Q 28 20 25 20 Q 28 20 28 24 Q 28 20 31 20 Q 28 20 28 16 Z" stroke="#fbbf24" fill="#fbbf24" />
+      <circle cx="148" cy="22" r="1.5" fill="#3b827e" />
+      <circle cx="215" cy="30" r="1.5" fill="#fbbf24" />
+      <circle cx="16" cy="45" r="1.2" fill="#e17b62" />
+    </svg>
+  );
+}
+
+/**
+ * 備份與檔案收納手繪裝飾插圖 (BackupArchiveDoodle)
+ */
+export function BackupArchiveDoodle({ className = 'w-32 h-16' }) {
+  return (
+    <svg viewBox="0 0 140 70" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 檔案收納箱 */}
+      <rect x="25" y="22" width="90" height="42" rx="4" fill="var(--card-bg,#1c222b)" stroke="currentColor" />
+      {/* 箱蓋邊緣 */}
+      <path d="M 22 22 L 25 14 L 115 14 L 118 22 Z" fill="var(--paper,#f5f7f6)" stroke="currentColor" />
+      {/* 箱把手 */}
+      <rect x="58" y="38" width="24" height="8" rx="2" stroke="#e17b62" fill="currentColor" fillOpacity="0.05" />
+      {/* 露出箱口的資料夾與標籤 */}
+      <path d="M 38 14 L 38 6 L 56 6 L 62 10 L 80 10 L 80 14" stroke="#3b827e" fill="#3b827e" fillOpacity="0.15" />
+      <line x1="44" y1="10" x2="52" y2="10" stroke="#3b827e" />
+      {/* 向上與向下資料流動箭頭 */}
+      <path d="M 98 4 L 98 12 M 95 9 L 98 12 L 101 9" stroke="#fbbf24" strokeWidth="1.6" />
+      <circle cx="108" cy="8" r="1.5" fill="#e17b62" />
+      <circle cx="18" cy="36" r="1.5" fill="#3b827e" />
+    </svg>
+  );
+}
+
+/**
+ * 紙質與主題調色盤手繪裝飾插圖 (ThemePaperDoodle)
+ */
+export function ThemePaperDoodle({ className = 'w-28 h-14' }) {
+  return (
+    <svg viewBox="0 0 120 60" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* 疊放紙張 */}
+      <rect x="18" y="14" width="44" height="38" rx="3" transform="rotate(-6 18 14)" stroke="#89959b" fill="var(--card-bg,#1c222b)" />
+      <rect x="36" y="10" width="44" height="38" rx="3" transform="rotate(4 36 10)" stroke="#e17b62" fill="#fff9f6" fillOpacity="0.8" />
+      {/* 網格紋理暗示 */}
+      <line x1="44" y1="18" x2="72" y2="20" stroke="#f7d2c8" strokeDasharray="2 2" />
+      <line x1="44" y1="26" x2="72" y2="28" stroke="#f7d2c8" strokeDasharray="2 2" />
+      {/* 水彩畫筆 */}
+      <path d="M 88 12 L 98 22 L 76 44 L 68 46 L 70 38 Z" stroke="#3b827e" fill="#3b827e" fillOpacity="0.2" />
+      <line x1="86" y1="14" x2="94" y2="22" stroke="#fbbf24" strokeWidth="2" />
+      <circle cx="64" cy="50" r="2" fill="#e17b62" />
+      <circle cx="20" cy="18" r="1.5" fill="#fbbf24" />
+    </svg>
+  );
+}
+
+
