@@ -283,6 +283,25 @@ export default {
       });
     }
 
+    // 4.5 更新個人資料 (顯示名稱)
+    if (path === '/api/auth/profile' && method === 'PATCH') {
+      const body = await request.json().catch(() => ({}));
+      const { displayName } = body;
+      if (!displayName || !displayName.trim()) return jsonResponse({ error: '請輸入有效的顯示名稱' }, 400);
+
+      const finalName = displayName.trim();
+      await env.DB.prepare('UPDATE users SET display_name = ? WHERE id = ?').bind(finalName, user.id).run();
+
+      const userPayload = {
+        id: user.id,
+        username: user.username,
+        displayName: finalName,
+        display_name: finalName,
+      };
+      const token = await signToken(userPayload, secret);
+      return jsonResponse({ token, user: userPayload });
+    }
+
     // 5. 取得空間清單
     if (path === '/api/spaces' && method === 'GET') {
       const { results } = await env.DB.prepare(`

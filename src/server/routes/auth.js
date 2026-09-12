@@ -123,4 +123,30 @@ router.get('/me', requireAuth, (req, res) => {
   }
 });
 
+// 更新個人資料 (顯示名稱)
+router.patch('/profile', requireAuth, (req, res) => {
+  try {
+    const { displayName } = req.body;
+    if (!displayName || !displayName.trim()) {
+      return res.status(400).json({ error: '請輸入有效的顯示名稱' });
+    }
+
+    const finalName = displayName.trim();
+    const update = db.prepare('UPDATE users SET display_name = ? WHERE id = ?');
+    update.run(finalName, req.user.id);
+
+    const userPayload = {
+      id: req.user.id,
+      username: req.user.username,
+      displayName: finalName,
+      display_name: finalName,
+    };
+    const token = signToken(userPayload);
+    res.json({ token, user: userPayload });
+  } catch (err) {
+    console.error('Update profile error:', err);
+    res.status(500).json({ error: '更新個人資料失敗' });
+  }
+});
+
 export default router;

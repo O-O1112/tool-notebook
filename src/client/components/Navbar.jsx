@@ -34,6 +34,7 @@ export default function Navbar({
   onOpenJoinModal,
   onAddToolClick,
   onOpenSettings,
+  onOpenAccountSettings,
   onOpenQRCode,
   layout,
   onToggleLayout,
@@ -369,14 +370,19 @@ export default function Navbar({
           {/* 使用者名稱與登出 */}
           {user ? (
             <>
-              <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-[#e4e8e5]">
-                <div className="w-6 h-6 rounded-full bg-[#f0f4f3] flex items-center justify-center text-[#57767f]">
+              <button
+                type="button"
+                onClick={onOpenAccountSettings || onOpenSettings}
+                className="hidden md:flex items-center gap-1.5 pl-2 border-l border-[#e4e8e5] hover:opacity-80 transition-opacity text-left cursor-pointer group"
+                title="點擊管理個人帳號與暱稱"
+              >
+                <div className="w-6 h-6 rounded-full bg-[#f0f4f3] group-hover:bg-[#fff0eb] group-hover:text-[#e17b62] flex items-center justify-center text-[#57767f] transition-colors">
                   <User size={13} />
                 </div>
-                <span className="text-xs font-medium text-[#1f2a2e] max-w-[90px] truncate">
+                <span className="text-xs font-medium text-[#1f2a2e] group-hover:text-[#e17b62] max-w-[90px] truncate transition-colors">
                   {user?.displayName || user?.display_name || user?.username || '使用者'}
                 </span>
-              </div>
+              </button>
 
               <button
                 onClick={logout}

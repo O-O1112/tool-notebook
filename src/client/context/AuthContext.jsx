@@ -75,6 +75,17 @@ export function AuthProvider({ children }) {
     return normalized;
   };
 
+  const updateProfile = async (displayName) => {
+    const data = await api.updateProfile({ displayName });
+    const normalized = normalizeUser(data.user);
+    if (data.token) {
+      setAuthToken(data.token);
+    }
+    setUser(normalized);
+    localStorage.setItem('class_notebook_user', JSON.stringify(normalized));
+    return normalized;
+  };
+
   const logout = () => {
     setAuthToken(null);
     setUser(null);
@@ -82,7 +93,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -46,6 +46,7 @@ export const api = {
   login: (username, password) => request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
   register: (payload) => request('/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   getMe: () => request('/auth/me'),
+  updateProfile: (payload) => request('/auth/profile', { method: 'PATCH', body: JSON.stringify(payload) }),
 
   // 空間管理
   getSpaces: () => request('/spaces'),
