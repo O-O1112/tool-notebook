@@ -237,6 +237,31 @@ export default {
       return jsonResponse({ token, user: userPayload });
     }
 
+    // 2.5 免登入訪客透過邀請碼 / QR Code 查看空間 (公開唯讀)
+    const shareMatch = path.match(/^\/api\/spaces\/share\/([A-Za-z0-9\-]+)$/);
+    if (shareMatch && method === 'GET') {
+      const cleanCode = decodeURIComponent(shareMatch[1]).trim().toUpperCase();
+      const space = await env.DB.prepare(`
+        SELECT s.id, s.name, s.description, s.layout, s.invite_code, s.created_at,
+               u.display_name as owner_name,
+               0 as is_owner
+        FROM spaces s
+        JOIN users u ON s.user_id = u.id
+        WHERE UPPER(s.invite_code) = ?
+      `).bind(cleanCode).first();
+
+      if (!space) return jsonResponse({ error: '找不到此邀請碼對應的空間' }, 404);
+
+      const { results: tools } = await env.DB.prepare(`
+        SELECT id, space_id, title, type, content, col_span, sort_order, created_at
+        FROM tools
+        WHERE space_id = ?
+        ORDER BY sort_order ASC, id ASC
+      `).bind(space.id).all();
+
+      return jsonResponse({ space, tools: tools || [], isGuest: true });
+    }
+
     // 驗證後續需要登入之 API
     const user = await getAuthUser(request, secret);
     if (!user) {

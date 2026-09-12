@@ -11,10 +11,13 @@ import {
   MoveHorizontal,
   Pencil,
   Pin,
-  ExternalLink
+  ExternalLink,
+  Palette
 } from 'lucide-react';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
+import { CARD_COLORS } from '../utils/cardColors';
+export { CARD_COLORS };
 
 export default function ToolCard({
   tool,
@@ -23,6 +26,8 @@ export default function ToolCard({
   onFocus,
   onToggleColSpan,
   onTogglePin,
+  onChangeColor,
+  layout = 'grid',
   draggable = true,
   onDragStart,
   onDragOver,
@@ -31,6 +36,7 @@ export default function ToolCard({
   isOwner = true,
 }) {
   const [reloadKey, setReloadKey] = useState(0);
+  const [colorMenuOpen, setColorMenuOpen] = useState(false);
 
   const parsed = parseToolInput(tool.content);
   const colSpan = tool.col_span || 1;
@@ -75,18 +81,31 @@ export default function ToolCard({
     }
   };
 
+  const handleDragStartInternal = (e) => {
+    e.dataTransfer.setData('application/json', JSON.stringify({ toolId: tool.id, fromIndex: index }));
+    if (onDragStart) onDragStart(e, index);
+  };
+
+  const cardHeightClass = layout === 'wall'
+    ? 'h-[440px]'
+    : layout === 'shelf'
+    ? 'h-[480px]'
+    : 'h-[510px]';
+
   return (
     <div
       draggable={draggable && isOwner}
-      onDragStart={(e) => onDragStart && onDragStart(e, index)}
+      onDragStart={handleDragStartInternal}
       onDragOver={(e) => onDragOver && onDragOver(e, index)}
       onDrop={(e) => onDrop && onDrop(e, index)}
-      className={`notebook-card notebook-card-hover flex flex-col h-[510px] overflow-hidden transition-all ${
-        colSpan >= 2 ? 'md:col-span-2' : 'col-span-1'
+      className={`notebook-card notebook-card-hover flex flex-col ${cardHeightClass} overflow-hidden transition-all card-color-${
+        tool.color || 'default'
+      } ${
+        layout !== 'shelf' && layout !== 'wall' && colSpan >= 2 ? 'md:col-span-2' : 'col-span-1'
       } ${tool.isPinned ? 'ring-2 ring-[#e17b62]/40 shadow-md' : ''}`}
     >
       {/* 工具卡片頂部控制列 */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#e4e8e5] bg-[var(--card-bg,#ffffff)] select-none">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#e4e8e5] bg-inherit select-none">
         <div className="flex items-center gap-2 min-w-0">
           {/* 拖曳把手 */}
           {isOwner && (
@@ -119,6 +138,44 @@ export default function ToolCard({
 
         {/* 控制按鈕組 */}
         <div className="flex items-center gap-1 shrink-0">
+          {/* 便箋色票切換 */}
+          {isOwner && onChangeColor && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setColorMenuOpen(!colorMenuOpen)}
+                className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"
+                title="選擇便箋紙質色彩"
+              >
+                <Palette size={14} />
+              </button>
+
+              {colorMenuOpen && (
+                <div className="absolute right-0 mt-1 w-36 bg-white border border-[#e4e8e5] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn">
+                  <div className="text-[10px] font-semibold text-[#89959b] px-2 py-1 uppercase tracking-wider">
+                    便箋底色
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5 p-1">
+                    {CARD_COLORS.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => {
+                          onChangeColor(tool.id, c.id);
+                          setColorMenuOpen(false);
+                        }}
+                        className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-transform hover:scale-110 ${
+                          (tool.color || 'default') === c.id ? 'ring-2 ring-[#e17b62]' : ''
+                        }`}
+                        style={{ backgroundColor: c.bg, borderColor: c.border }}
+                        title={c.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 置頂釘選按鈕 */}
           {onTogglePin && (
             <button
@@ -143,8 +200,8 @@ export default function ToolCard({
             <ExternalLink size={14} />
           </button>
 
-          {/* 寬度尺寸切換 (1x / 2x) */}
-          {isOwner && onToggleColSpan && (
+          {/* 寬度尺寸切換 (1x / 2x - 僅在非貨架與非瀑布流下呈現) */}
+          {isOwner && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
             <button
               onClick={() => onToggleColSpan(tool.id, colSpan === 1 ? 2 : 1)}
               className={`p-1.5 rounded-md transition-colors text-xs flex items-center gap-1 ${

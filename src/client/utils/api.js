@@ -51,6 +51,7 @@ export const api = {
   getSpaces: () => request('/spaces'),
   createSpace: (payload) => request('/spaces', { method: 'POST', body: JSON.stringify(payload) }),
   joinSpace: (inviteCode) => request('/spaces/join', { method: 'POST', body: JSON.stringify({ inviteCode }) }),
+  getSpaceByShareCode: (code) => request(`/spaces/share/${encodeURIComponent(code)}`),
   regenerateInviteCode: (spaceId) => request(`/spaces/${spaceId}/regenerate-code`, { method: 'POST' }),
   getSpaceDetail: (id) => request(`/spaces/${id}`),
   updateSpace: (id, payload) => request(`/spaces/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),

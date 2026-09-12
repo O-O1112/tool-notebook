@@ -4,7 +4,41 @@ import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// 所有空間操作皆需驗證登入
+// 0. 免登入訪客透過邀請碼 / QR Code 查看空間 (公開唯讀)
+router.get('/share/:code', (req, res) => {
+  try {
+    const { code } = req.params;
+    if (!code) return res.status(400).json({ error: '請提供邀請碼' });
+    const cleanCode = code.trim().toUpperCase();
+
+    const space = db.prepare(`
+      SELECT s.id, s.name, s.description, s.layout, s.invite_code, s.created_at,
+             u.display_name as owner_name,
+             0 as is_owner
+      FROM spaces s
+      JOIN users u ON s.user_id = u.id
+      WHERE UPPER(s.invite_code) = ?
+    `).get(cleanCode);
+
+    if (!space) {
+      return res.status(404).json({ error: '找不到此邀請碼對應的空間' });
+    }
+
+    const tools = db.prepare(`
+      SELECT id, space_id, title, type, content, col_span, sort_order, created_at
+      FROM tools
+      WHERE space_id = ?
+      ORDER BY sort_order ASC, id ASC
+    `).all(space.id);
+
+    res.json({ space, tools: tools || [], isGuest: true });
+  } catch (err) {
+    console.error('Get share space error:', err);
+    res.status(500).json({ error: '無法讀取空間' });
+  }
+});
+
+// 所有後續空間操作皆需驗證登入
 router.use(requireAuth);
 
 // 1. 取得使用者的空間列表 (包含自己建立的空間 + 透過邀請碼加入的空間)

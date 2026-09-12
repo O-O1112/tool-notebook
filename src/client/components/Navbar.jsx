@@ -14,7 +14,11 @@ import {
   ListCollapse,
   User,
   Settings,
-  Palette
+  Palette,
+  Columns3,
+  Kanban,
+  QrCode,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -33,11 +37,13 @@ export default function Navbar({
   onOpenJoinModal,
   onAddToolClick,
   onOpenSettings,
+  onOpenQRCode,
   layout,
   onToggleLayout,
   onRegenerateCode,
   theme = 'warm',
   onSelectTheme,
+  isGuest = false,
 }) {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -185,8 +191,30 @@ export default function Navbar({
 
           {/* 右側：佈局切換、貼上工具、使用者稱呼與登出 */}
           <div className="flex items-center gap-2">
-            {/* 佈局切換器 (網格 | 分頁 | 折起專注) */}
+            {/* 佈局切換器 (貨架分欄 | 瀑布流 | 網格 | 分頁 | 折起專注) */}
             <div className="bg-[#f5f7f6] p-0.5 rounded-notebook-sm flex items-center border border-[#e4e8e5]">
+              <button
+                onClick={() => onToggleLayout('shelf')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  layout === 'shelf'
+                    ? 'bg-white text-[#e17b62] shadow-sm font-semibold'
+                    : 'text-[#89959b] hover:text-[#1f2a2e]'
+                }`}
+                title="分欄收納貨架 (Padlet Shelf / 看板模式)"
+              >
+                <Columns3 size={15} />
+              </button>
+              <button
+                onClick={() => onToggleLayout('wall')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  layout === 'wall'
+                    ? 'bg-white text-[#e17b62] shadow-sm font-semibold'
+                    : 'text-[#89959b] hover:text-[#1f2a2e]'
+                }`}
+                title="緊湊瀑布流模式 (Padlet Wall / 高矮無縫自適應)"
+              >
+                <Kanban size={15} />
+              </button>
               <button
                 onClick={() => onToggleLayout('grid')}
                 className={`p-1.5 rounded-md transition-colors ${
@@ -269,18 +297,40 @@ export default function Navbar({
               )}
             </div>
 
-            {/* 加入空間按鈕 */}
-            <button
-              onClick={onOpenJoinModal}
-              className="notebook-btn-secondary text-xs py-1.5 px-2.5 hidden sm:inline-flex"
-              title="輸入邀請碼加入他人共享的空間"
-            >
-              <KeyRound size={13} />
-              <span>加入空間</span>
-            </button>
+            {/* 空間 QR Code 分享按鈕 */}
+            {currentSpace && onOpenQRCode && (
+              <button
+                type="button"
+                onClick={onOpenQRCode}
+                className="notebook-btn-secondary text-xs p-1.5 flex items-center justify-center text-[#3b827e] hover:text-[#285d5a]"
+                title="空間 QR Code 與免登入分享"
+              >
+                <QrCode size={15} />
+              </button>
+            )}
+
+            {/* 訪客模式標籤 */}
+            {isGuest && (
+              <div className="flex items-center gap-1 bg-[#f0f7f6] text-[#3b827e] border border-[#b8dfd9] px-2.5 py-1 rounded-notebook-sm text-xs font-medium">
+                <Eye size={13} />
+                <span>訪客唯讀模式</span>
+              </div>
+            )}
+
+            {/* 加入空間按鈕 (訪客模式下不顯示) */}
+            {!isGuest && (
+              <button
+                onClick={onOpenJoinModal}
+                className="notebook-btn-secondary text-xs py-1.5 px-2.5 hidden sm:inline-flex"
+                title="輸入邀請碼加入他人共享的空間"
+              >
+                <KeyRound size={13} />
+                <span>加入空間</span>
+              </button>
+            )}
 
             {/* 空間設定與備份按鈕 */}
-            {currentSpace && onOpenSettings && (
+            {!isGuest && currentSpace && onOpenSettings && (
               <button
                 onClick={onOpenSettings}
                 className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5"
@@ -292,7 +342,7 @@ export default function Navbar({
             )}
 
             {/* 貼上工具按鈕 (僅空間擁有者可新增) */}
-            {isOwner && (
+            {!isGuest && isOwner && (
               <button
                 onClick={onAddToolClick}
                 className="notebook-btn-primary text-xs py-1.5 px-3"
@@ -302,24 +352,34 @@ export default function Navbar({
               </button>
             )}
 
-            {/* 使用者名稱 */}
-            <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-[#e4e8e5]">
-              <div className="w-6 h-6 rounded-full bg-[#f0f4f3] flex items-center justify-center text-[#57767f]">
-                <User size={13} />
-              </div>
-              <span className="text-xs font-medium text-[#1f2a2e] max-w-[90px] truncate">
-                {user?.displayName}
-              </span>
-            </div>
+            {/* 使用者名稱與登出 */}
+            {user ? (
+              <>
+                <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-[#e4e8e5]">
+                  <div className="w-6 h-6 rounded-full bg-[#f0f4f3] flex items-center justify-center text-[#57767f]">
+                    <User size={13} />
+                  </div>
+                  <span className="text-xs font-medium text-[#1f2a2e] max-w-[90px] truncate">
+                    {user?.displayName}
+                  </span>
+                </div>
 
-            {/* 登出按鈕 */}
-            <button
-              onClick={logout}
-              className="p-1.5 text-[#89959b] hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-              title="登出"
-            >
-              <LogOut size={16} />
-            </button>
+                <button
+                  onClick={logout}
+                  className="p-1.5 text-[#89959b] hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                  title="登出"
+                >
+                  <LogOut size={16} />
+                </button>
+              </>
+            ) : (
+              <a
+                href={window.location.pathname}
+                className="notebook-btn-primary text-xs py-1.5 px-3"
+              >
+                登入 / 註冊
+              </a>
+            )}
           </div>
         </div>
       </header>

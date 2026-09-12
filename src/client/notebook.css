@@ -232,3 +232,98 @@ html, body, #root {
   color: var(--coral);
   border: 1px solid var(--coral-border);
 }
+
+/* ========================================================
+   Padlet 特色 1：手帳彩色便箋色紙 (Card Accent Colors)
+   ======================================================== */
+.card-color-default {
+  background: var(--card-bg, #ffffff);
+}
+
+.card-color-peach {
+  background: #fff5f2 !important;
+  border-color: #f7d2c8 !important;
+}
+
+.card-color-mint {
+  background: #f1f9f6 !important;
+  border-color: #c7eadc !important;
+}
+
+.card-color-lemon {
+  background: #fefde8 !important;
+  border-color: #fae99f !important;
+}
+
+.card-color-sky {
+  background: #f0f7ff !important;
+  border-color: #cce1ff !important;
+}
+
+.card-color-lavender {
+  background: #f7f2fd !important;
+  border-color: #e5d3f8 !important;
+}
+
+/* ========================================================
+   Padlet 特色 2：緊湊瀑布流 (Masonry Wall Layout)
+   ======================================================== */
+.masonry-wall-container {
+  column-gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .masonry-wall-container { column-count: 2; }
+}
+
+@media (min-width: 1024px) {
+  .masonry-wall-container { column-count: 3; }
+}
+
+@media (min-width: 1440px) {
+  .masonry-wall-container { column-count: 4; }
+}
+
+.masonry-wall-item {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  width: 100%;
+}
+
+/* ========================================================
+   Padlet 特色 3：貨架分欄模式 (Shelf / Columns Kanban)
+   ======================================================== */
+.shelf-scroll-area {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scroll-behavior: smooth;
+  align-items: flex-start;
+}
+
+.shelf-column-card {
+  flex: 0 0 340px;
+  max-width: 360px;
+  background: var(--paper, #fbfbf9);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.shelf-drop-zone {
+  min-height: 80px;
+  transition: all 0.2s ease;
+}
+
+.shelf-drop-zone.drag-active {
+  background: rgba(225, 123, 98, 0.06);
+  border: 2px dashed var(--coral-border, #e1ac9e);
+  border-radius: 12px;
+}
+

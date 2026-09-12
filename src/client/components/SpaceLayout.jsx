@@ -31,6 +31,8 @@ export default function SpaceLayout({
   onOpenAddModal,
   onToggleColSpan,
   onTogglePin,
+  onChangeColor,
+  onUpdateToolSection,
   onReorderTools,
   isOwner = true,
 }) {
@@ -39,10 +41,25 @@ export default function SpaceLayout({
   const [expandedToolId, setExpandedToolId] = useState(tools[0]?.id || null);
   const [draggedIndex, setDraggedIndex] = useState(null);
 
+  // 貨架分欄 (Shelf) 狀態
+  const [newSectionName, setNewSectionName] = useState('');
+  const [showAddSectionInput, setShowAddSectionInput] = useState(false);
+  const [customSections, setCustomSections] = useState([]);
+  const [shelfDragOverSection, setShelfDragOverSection] = useState(null);
+
   // 搜尋與篩選狀態
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all' | 'html' | 'iframe'
   const [selectedTag, setSelectedTag] = useState(null); // null 表示全部
+
+  // 彙整空間內所有欄位名稱清單
+  const allSections = useMemo(() => {
+    const list = new Set(['一般工具', ...customSections]);
+    tools.forEach((t) => {
+      if (t.section) list.add(t.section);
+    });
+    return Array.from(list);
+  }, [tools, customSections]);
 
   // 彙整空間中所有工具的標籤清單
   const availableTags = useMemo(() => {
@@ -105,6 +122,32 @@ export default function SpaceLayout({
     if (onReorderTools) {
       onReorderTools(newTools);
     }
+  };
+
+  // 貨架跨欄位拖曳放置 (Cross-shelf Drop)
+  const handleShelfDrop = (e, targetSection) => {
+    e.preventDefault();
+    setShelfDragOverSection(null);
+    try {
+      const dataStr = e.dataTransfer.getData('application/json');
+      if (dataStr) {
+        const data = JSON.parse(dataStr);
+        if (data && data.toolId && onUpdateToolSection) {
+          onUpdateToolSection(data.toolId, targetSection);
+        }
+      }
+    } catch (err) {
+      console.warn('Shelf drop error:', err);
+    }
+  };
+
+  // 新增貨架欄位
+  const handleAddSectionSubmit = (e) => {
+    e.preventDefault();
+    if (!newSectionName.trim()) return;
+    setCustomSections((prev) => [...new Set([...prev, newSectionName.trim()])]);
+    setNewSectionName('');
+    setShowAddSectionInput(false);
   };
 
   const getTypeIcon = (type) => {
@@ -429,11 +472,13 @@ export default function SpaceLayout({
             <div className="w-full">
               <ToolCard
                 tool={currentTabTool}
+                layout="tabs"
                 onDelete={onDeleteTool}
                 onEdit={onEditTool}
                 onFocus={setFocusedTool}
                 onToggleColSpan={onToggleColSpan}
                 onTogglePin={onTogglePin}
+                onChangeColor={onChangeColor}
                 isOwner={isOwner}
               />
             </div>
@@ -449,17 +494,170 @@ export default function SpaceLayout({
               key={tool.id}
               index={index}
               tool={tool}
+              layout="grid"
               onDelete={onDeleteTool}
               onEdit={onEditTool}
               onFocus={setFocusedTool}
               onToggleColSpan={onToggleColSpan}
               onTogglePin={onTogglePin}
+              onChangeColor={onChangeColor}
               draggable={isOwner && !searchQuery.trim() && !selectedTag} // 搜尋或標籤過濾時暫時禁用拖曳重排
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               isOwner={isOwner}
             />
+          ))}
+        </div>
+      )}
+
+      {/* 模式 4：Padlet 貨架分欄模式 (Shelf / Columns Kanban) */}
+      {layout === 'shelf' && (
+        <div className="shelf-scroll-area">
+          {allSections.map((sec) => {
+            const secTools = sortedAndFilteredTools.filter(
+              (t) => (t.section || '一般工具') === sec
+            );
+            const isDragActive = shelfDragOverSection === sec;
+
+            return (
+              <div
+                key={sec}
+                className="shelf-column-card"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setShelfDragOverSection(sec);
+                }}
+                onDragLeave={() => setShelfDragOverSection(null)}
+                onDrop={(e) => handleShelfDrop(e, sec)}
+              >
+                {/* 欄位頂部標題與數量 */}
+                <div className="flex items-center justify-between px-1 py-0.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#e17b62] shrink-0" />
+                    <h4 className="text-xs font-bold text-[#1f2a2e] truncate">{sec}</h4>
+                  </div>
+                  <span className="notebook-badge text-[10px] shrink-0">{secTools.length}</span>
+                </div>
+
+                {/* 欄位內卡片列表 */}
+                <div
+                  className={`flex flex-col gap-3.5 shelf-drop-zone ${
+                    isDragActive ? 'drag-active' : ''
+                  }`}
+                >
+                  {secTools.map((tool, index) => (
+                    <ToolCard
+                      key={tool.id}
+                      index={index}
+                      tool={tool}
+                      layout="shelf"
+                      onDelete={onDeleteTool}
+                      onEdit={onEditTool}
+                      onFocus={setFocusedTool}
+                      onToggleColSpan={onToggleColSpan}
+                      onTogglePin={onTogglePin}
+                      onChangeColor={onChangeColor}
+                      draggable={isOwner}
+                      onDragStart={handleDragStart}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                      isOwner={isOwner}
+                    />
+                  ))}
+
+                  {secTools.length === 0 && (
+                    <div className="py-10 px-4 border-2 border-dashed border-[#e4e8e5] rounded-xl text-center text-xs text-[#89959b]">
+                      可將工具拖曳至此欄
+                    </div>
+                  )}
+                </div>
+
+                {/* 欄位底部快速新增按鈕 */}
+                {isOwner && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenAddModal && onOpenAddModal(sec)}
+                    className="notebook-btn-secondary text-xs py-2 justify-center border-dashed border-[#d8dedb] hover:border-[#e17b62] hover:text-[#e17b62]"
+                  >
+                    <Plus size={13} />
+                    <span>在此欄新增小工具</span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+
+          {/* 新增分欄按鈕 / 表單 */}
+          {isOwner && (
+            <div className="flex-shrink-0 w-64">
+              {showAddSectionInput ? (
+                <form
+                  onSubmit={handleAddSectionSubmit}
+                  className="p-3 bg-white border border-[#e4e8e5] rounded-2xl shadow-md space-y-2"
+                >
+                  <input
+                    type="text"
+                    autoFocus
+                    value={newSectionName}
+                    onChange={(e) => setNewSectionName(e.target.value)}
+                    placeholder="輸入新分欄名稱…"
+                    className="notebook-input w-full text-xs py-1.5"
+                    required
+                  />
+                  <div className="flex items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddSectionInput(false)}
+                      className="notebook-btn-secondary text-xs py-1 px-2.5"
+                    >
+                      取消
+                    </button>
+                    <button
+                      type="submit"
+                      className="notebook-btn-primary text-xs py-1 px-3"
+                    >
+                      新增欄位
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowAddSectionInput(true)}
+                  className="w-full notebook-btn-secondary py-3 text-xs border-dashed border-[#d8dedb] hover:border-[#e17b62] hover:text-[#e17b62] justify-center rounded-2xl"
+                >
+                  <Plus size={14} />
+                  <span>新增分欄 (Section)…</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 模式 5：Padlet 緊湊瀑布流模式 (Masonry Wall Mode) */}
+      {layout === 'wall' && sortedAndFilteredTools.length > 0 && (
+        <div className="masonry-wall-container">
+          {sortedAndFilteredTools.map((tool, index) => (
+            <div key={tool.id} className="masonry-wall-item">
+              <ToolCard
+                index={index}
+                tool={tool}
+                layout="wall"
+                onDelete={onDeleteTool}
+                onEdit={onEditTool}
+                onFocus={setFocusedTool}
+                onToggleColSpan={onToggleColSpan}
+                onTogglePin={onTogglePin}
+                onChangeColor={onChangeColor}
+                draggable={isOwner && !searchQuery.trim() && !selectedTag}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                isOwner={isOwner}
+              />
+            </div>
           ))}
         </div>
       )}

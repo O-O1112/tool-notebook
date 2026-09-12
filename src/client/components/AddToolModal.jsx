@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { X, Code, Frame, Play, Check, AlertTriangle, ArrowRightLeft, Sparkles, Plus, Eye } from 'lucide-react';
+import { X, Code, Frame, Play, Check, AlertTriangle, ArrowRightLeft, Sparkles, Plus, Eye, Palette, Folder } from 'lucide-react';
 import { parseToolInput } from '../utils/codeParser';
 import { TOOL_TEMPLATES } from '../utils/toolTemplates';
 import SandboxedFrame from './SandboxedFrame';
+import { CARD_COLORS } from './ToolCard';
 
-export default function AddToolModal({ isOpen, onClose, onAddTool }) {
+export default function AddToolModal({ isOpen, onClose, onAddTool, initialSection = '一般工具' }) {
   const [activeTab, setActiveTab] = useState('templates'); // 'templates' | 'custom'
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [tagsInput, setTagsInput] = useState('');
+  const [color, setColor] = useState('default');
+  const [section, setSection] = useState(initialSection || '一般工具');
   const [previewActive, setPreviewActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [templatePreview, setTemplatePreview] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSection(initialSection || '一般工具');
+    }
+  }, [isOpen, initialSection]);
 
   // 當使用者貼入內容時，智慧推薦標題與解析類型
   const parsed = parseToolInput(content);
@@ -44,6 +53,8 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
         content: content.trim(),
         colSpan: 1,
         tags: parseTags(tagsInput),
+        color,
+        section: section.trim() || '一般工具',
       });
       handleClose();
     } catch (err) {
@@ -62,6 +73,8 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
         content: tmpl.content,
         colSpan: tmpl.defaultColSpan || 1,
         tags: tmpl.category ? [tmpl.category] : [],
+        color,
+        section: section.trim() || '一般工具',
       });
       handleClose();
     } catch (err) {
@@ -254,6 +267,45 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
                   placeholder="例如：筆記, 生產力, 常用"
                   className="notebook-input w-full"
                 />
+              </div>
+            </div>
+
+            {/* 所屬貨架欄位與便箋底色 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#1f2a2e] mb-1.5 flex items-center gap-1">
+                  <Folder size={12} className="text-[#e17b62]" />
+                  <span>所屬貨架分欄 (Shelf)</span>
+                </label>
+                <input
+                  type="text"
+                  value={section}
+                  onChange={(e) => setSection(e.target.value)}
+                  placeholder="例如：一般工具、開發輔助、文字靈感"
+                  className="notebook-input w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#1f2a2e] mb-1.5 flex items-center gap-1">
+                  <Palette size={12} className="text-[#e17b62]" />
+                  <span>便箋底色 (Card Color)</span>
+                </label>
+                <div className="flex items-center gap-2 pt-1">
+                  {CARD_COLORS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setColor(c.id)}
+                      className={`w-7 h-7 rounded-lg border transition-all ${
+                        color === c.id
+                          ? 'ring-2 ring-[#e17b62] scale-110 shadow-sm'
+                          : 'opacity-80 hover:opacity-100 hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: c.bg, borderColor: c.border }}
+                      title={c.label}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 

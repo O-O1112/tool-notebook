@@ -7,6 +7,7 @@ import AddToolModal from './components/AddToolModal';
 import EditToolModal from './components/EditToolModal';
 import SpaceSettingsModal from './components/SpaceSettingsModal';
 import JoinSpaceModal from './components/JoinSpaceModal';
+import QRCodeModal from './components/QRCodeModal';
 import { api } from './utils/api';
 
 export default function App() {
@@ -21,9 +22,12 @@ export default function App() {
   });
   const [loadingSpace, setLoadingSpace] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [addModalSection, setAddModalSection] = useState('一般工具');
   const [editingTool, setEditingTool] = useState(null);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
 
   // 主題切換與 DOM 根節點同步
   useEffect(() => {
@@ -35,7 +39,7 @@ export default function App() {
     localStorage.setItem('notebook_theme', newTheme);
   };
 
-  // 本地置頂與標籤存取輔助
+  // 本地置頂、標籤、便箋色彩與分欄貨架存取輔助
   const getSpacePinnedIds = (spaceId) => {
     try {
       const data = localStorage.getItem(`notebook_pinned_${spaceId}`);
@@ -54,6 +58,24 @@ export default function App() {
     }
   };
 
+  const getSpaceColorsMap = (spaceId) => {
+    try {
+      const data = localStorage.getItem(`notebook_colors_${spaceId}`);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const getSpaceSectionsMap = (spaceId) => {
+    try {
+      const data = localStorage.getItem(`notebook_sections_${spaceId}`);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  };
+
   const saveSpacePinnedIds = (spaceId, ids) => {
     localStorage.setItem(`notebook_pinned_${spaceId}`, JSON.stringify(ids));
   };
@@ -61,6 +83,56 @@ export default function App() {
   const saveSpaceTagsMap = (spaceId, map) => {
     localStorage.setItem(`notebook_tags_${spaceId}`, JSON.stringify(map));
   };
+
+  const saveSpaceColorsMap = (spaceId, map) => {
+    localStorage.setItem(`notebook_colors_${spaceId}`, JSON.stringify(map));
+  };
+
+  const saveSpaceSectionsMap = (spaceId, map) => {
+    localStorage.setItem(`notebook_sections_${spaceId}`, JSON.stringify(map));
+  };
+
+  // 檢測 URL 訪客分享連結 (?share=SPC-XXXX)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareCode = params.get('share');
+    if (!shareCode) return;
+
+    async function loadGuestSpace() {
+      setLoadingSpace(true);
+      try {
+        const data = await api.getSpaceByShareCode(shareCode);
+        if (data?.space) {
+          setCurrentSpace(data.space);
+          const spaceId = data.space.id;
+          const pinnedIds = getSpacePinnedIds(spaceId);
+          const tagsMap = getSpaceTagsMap(spaceId);
+          const colorsMap = getSpaceColorsMap(spaceId);
+          const sectionsMap = getSpaceSectionsMap(spaceId);
+
+          const enrichedTools = (data.tools || []).map((t) => ({
+            ...t,
+            isPinned: pinnedIds.includes(t.id),
+            tags: tagsMap[t.id] || t.tags || [],
+            color: colorsMap[t.id] || t.color || 'default',
+            section: sectionsMap[t.id] || t.section || '一般工具',
+          }));
+
+          setTools(enrichedTools);
+          setLayout(data.space.layout || 'shelf');
+          setIsGuest(true);
+        }
+      } catch (err) {
+        console.error('載入訪客分享空間失敗:', err);
+      } finally {
+        setLoadingSpace(false);
+      }
+    }
+
+    if (!user) {
+      loadGuestSpace();
+    }
+  }, [user]);
 
   // 1. 使用者登入後載入其所有空間 (自建 + 透過邀請碼加入的)
   useEffect(() => {
@@ -81,7 +153,7 @@ export default function App() {
     fetchSpaces();
   }, [user]);
 
-  // 2. 載入特定空間的詳情與工具清單 (同步附加置頂與標籤狀態)
+  // 2. 載入特定空間的詳情與工具清單 (同步附加置頂、標籤、手帳色與分欄狀態)
   const loadSpaceDetail = async (spaceId) => {
     setLoadingSpace(true);
     try {
@@ -89,15 +161,20 @@ export default function App() {
       setCurrentSpace(data.space);
       const pinnedIds = getSpacePinnedIds(spaceId);
       const tagsMap = getSpaceTagsMap(spaceId);
+      const colorsMap = getSpaceColorsMap(spaceId);
+      const sectionsMap = getSpaceSectionsMap(spaceId);
 
       const enrichedTools = (data.tools || []).map((t) => ({
         ...t,
         isPinned: pinnedIds.includes(t.id),
         tags: tagsMap[t.id] || t.tags || [],
+        color: colorsMap[t.id] || t.color || 'default',
+        section: sectionsMap[t.id] || t.section || '一般工具',
       }));
 
       setTools(enrichedTools);
       setLayout(data.space.layout || 'grid');
+      setIsGuest(false);
     } catch (err) {
       console.error('載入空間工具失敗:', err);
     } finally {
@@ -183,11 +260,49 @@ export default function App() {
       prev.map((t) => (t.id === toolId ? { ...t, col_span: newColSpan } : t))
     );
 
-    if (currentSpace && isOwner) {
+    if (currentSpace && isOwner && !isGuest) {
       try {
         await api.updateTool(currentSpace.id, toolId, { colSpan: newColSpan });
       } catch (err) {
         console.warn('儲存尺寸失敗:', err);
+      }
+    }
+  };
+
+  // 8.5 便箋彩色卡片更換 (Padlet Card Colors)
+  const handleUpdateToolColor = async (toolId, color) => {
+    if (!currentSpace) return;
+    setTools((prev) =>
+      prev.map((t) => (t.id === toolId ? { ...t, color } : t))
+    );
+    const colorsMap = getSpaceColorsMap(currentSpace.id);
+    colorsMap[toolId] = color;
+    saveSpaceColorsMap(currentSpace.id, colorsMap);
+
+    if (isOwner && !isGuest) {
+      try {
+        await api.updateTool(currentSpace.id, toolId, { color });
+      } catch (err) {
+        // 本地更新成功
+      }
+    }
+  };
+
+  // 8.6 貨架跨欄移動與分組更新 (Padlet Shelf Move)
+  const handleUpdateToolSection = async (toolId, section) => {
+    if (!currentSpace) return;
+    setTools((prev) =>
+      prev.map((t) => (t.id === toolId ? { ...t, section } : t))
+    );
+    const sectionsMap = getSpaceSectionsMap(currentSpace.id);
+    sectionsMap[toolId] = section;
+    saveSpaceSectionsMap(currentSpace.id, sectionsMap);
+
+    if (isOwner && !isGuest) {
+      try {
+        await api.updateTool(currentSpace.id, toolId, { section });
+      } catch (err) {
+        // 本地更新成功
       }
     }
   };
@@ -200,12 +315,24 @@ export default function App() {
       ...data.tool,
       isPinned: false,
       tags: toolPayload.tags || [],
+      color: toolPayload.color || 'default',
+      section: toolPayload.section || '一般工具',
     };
 
     if (toolPayload.tags && toolPayload.tags.length > 0) {
       const tagsMap = getSpaceTagsMap(currentSpace.id);
       tagsMap[data.tool.id] = toolPayload.tags;
       saveSpaceTagsMap(currentSpace.id, tagsMap);
+    }
+    if (toolPayload.color) {
+      const colorsMap = getSpaceColorsMap(currentSpace.id);
+      colorsMap[data.tool.id] = toolPayload.color;
+      saveSpaceColorsMap(currentSpace.id, colorsMap);
+    }
+    if (toolPayload.section) {
+      const sectionsMap = getSpaceSectionsMap(currentSpace.id);
+      sectionsMap[data.tool.id] = toolPayload.section;
+      saveSpaceSectionsMap(currentSpace.id, sectionsMap);
     }
 
     setTools((prev) => [...prev, newTool]);
@@ -216,7 +343,7 @@ export default function App() {
     );
   };
 
-  // 10. 編輯工具 (就地更新代碼、標題、寬度、標籤)
+  // 10. 編輯工具 (就地更新代碼、標題、寬度、標籤、色彩、分欄)
   const handleUpdateTool = async (toolId, payload) => {
     if (!currentSpace) return;
     const data = await api.updateTool(currentSpace.id, toolId, payload);
@@ -226,6 +353,16 @@ export default function App() {
       tagsMap[toolId] = payload.tags;
       saveSpaceTagsMap(currentSpace.id, tagsMap);
     }
+    if (payload.color !== undefined) {
+      const colorsMap = getSpaceColorsMap(currentSpace.id);
+      colorsMap[toolId] = payload.color;
+      saveSpaceColorsMap(currentSpace.id, colorsMap);
+    }
+    if (payload.section !== undefined) {
+      const sectionsMap = getSpaceSectionsMap(currentSpace.id);
+      sectionsMap[toolId] = payload.section;
+      saveSpaceSectionsMap(currentSpace.id, sectionsMap);
+    }
 
     setTools((prev) =>
       prev.map((t) =>
@@ -234,6 +371,8 @@ export default function App() {
               ...t,
               ...data.tool,
               tags: payload.tags !== undefined ? payload.tags : t.tags,
+              color: payload.color !== undefined ? payload.color : (t.color || 'default'),
+              section: payload.section !== undefined ? payload.section : (t.section || '一般工具'),
             }
           : t
       )
@@ -288,11 +427,13 @@ export default function App() {
     }
   };
 
-  // 14. 批次匯入工具清單 (含標籤與置頂屬性)
+  // 14. 批次匯入工具清單 (含標籤、置頂、手帳色彩與分欄)
   const handleImportTools = async (spaceId, importedTools) => {
     let successCount = 0;
     const tagsMap = getSpaceTagsMap(spaceId);
     const pinnedIds = getSpacePinnedIds(spaceId);
+    const colorsMap = getSpaceColorsMap(spaceId);
+    const sectionsMap = getSpaceSectionsMap(spaceId);
 
     for (const tool of importedTools) {
       try {
@@ -309,6 +450,12 @@ export default function App() {
         if (tool.isPinned) {
           pinnedIds.push(data.tool.id);
         }
+        if (tool.color) {
+          colorsMap[data.tool.id] = tool.color;
+        }
+        if (tool.section) {
+          sectionsMap[data.tool.id] = tool.section;
+        }
         successCount++;
       } catch (err) {
         console.warn('匯入個別工具失敗:', tool.title, err);
@@ -317,6 +464,8 @@ export default function App() {
 
     saveSpaceTagsMap(spaceId, tagsMap);
     saveSpacePinnedIds(spaceId, pinnedIds);
+    saveSpaceColorsMap(spaceId, colorsMap);
+    saveSpaceSectionsMap(spaceId, sectionsMap);
     alert(`成功匯入 ${successCount} 個小工具！`);
     loadSpaceDetail(spaceId);
   };
@@ -335,8 +484,8 @@ export default function App() {
     );
   }
 
-  // 若尚未登入，顯示小本本風格登入卡片
-  if (!user) {
+  // 若尚未登入且並非訪客分享直達，顯示小本本風格登入卡片
+  if (!user && !isGuest) {
     return <LoginCard />;
   }
 
@@ -349,13 +498,18 @@ export default function App() {
         onSelectSpace={loadSpaceDetail}
         onCreateSpace={handleCreateSpace}
         onOpenJoinModal={() => setJoinModalOpen(true)}
-        onAddToolClick={() => setAddModalOpen(true)}
+        onAddToolClick={() => {
+          setAddModalSection('一般工具');
+          setAddModalOpen(true);
+        }}
         onOpenSettings={() => setSettingsModalOpen(true)}
+        onOpenQRCode={() => setQrModalOpen(true)}
         layout={layout}
         onToggleLayout={handleToggleLayout}
         onRegenerateCode={handleRegenerateCode}
         theme={theme}
         onSelectTheme={handleSelectTheme}
+        isGuest={isGuest}
       />
 
       {/* 主內容區塊 */}
@@ -371,11 +525,16 @@ export default function App() {
             layout={layout}
             onDeleteTool={handleDeleteTool}
             onEditTool={(tool) => setEditingTool(tool)}
-            onOpenAddModal={() => setAddModalOpen(true)}
+            onOpenAddModal={(section) => {
+              setAddModalSection(section || '一般工具');
+              setAddModalOpen(true);
+            }}
             onToggleColSpan={handleToggleColSpan}
             onTogglePin={handleTogglePin}
+            onChangeColor={handleUpdateToolColor}
+            onUpdateToolSection={handleUpdateToolSection}
             onReorderTools={handleReorderTools}
-            isOwner={isOwner}
+            isOwner={!isGuest && isOwner}
           />
         )}
       </main>
@@ -383,6 +542,7 @@ export default function App() {
       {/* 貼上 / 範本新增工具對話框 */}
       <AddToolModal
         isOpen={addModalOpen}
+        initialSection={addModalSection}
         onClose={() => setAddModalOpen(false)}
         onAddTool={handleAddTool}
       />
@@ -404,7 +564,7 @@ export default function App() {
         onUpdateSpace={handleUpdateSpace}
         onDeleteSpace={handleDeleteSpace}
         onImportTools={handleImportTools}
-        isOwner={isOwner}
+        isOwner={!isGuest && isOwner}
       />
 
       {/* 輸入邀請碼加入空間對話框 */}
@@ -412,6 +572,13 @@ export default function App() {
         isOpen={joinModalOpen}
         onClose={() => setJoinModalOpen(false)}
         onJoinSuccess={handleJoinSpace}
+      />
+
+      {/* Padlet 一鍵 QR Code 與訪客分享對話框 */}
+      <QRCodeModal
+        isOpen={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        space={currentSpace}
       />
     </div>
   );
