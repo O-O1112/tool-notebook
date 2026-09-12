@@ -20,7 +20,7 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
       setContent(tool.content || '');
       setColSpan(tool.col_span || 1);
       setColor(tool.color || 'default');
-      setSection(tool.section || '一般工具');
+      setSection(typeof tool.section === 'string' && tool.section.trim() ? tool.section.trim() : '一般工具');
       const initialTags = Array.isArray(tool.tags) ? tool.tags.join(', ') : (tool.tags || '');
       setTagsInput(initialTags);
       setPreviewActive(false);
@@ -45,6 +45,7 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
 
     setSubmitting(true);
     try {
+      const safeSection = typeof section === 'string' && section.trim() ? section.trim() : '一般工具';
       await onSaveTool(tool.id, {
         title: title.trim() || '未命名小工具',
         type: parsed.type,
@@ -52,7 +53,7 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
         colSpan: Number(colSpan),
         tags: parseTags(tagsInput),
         color,
-        section: section.trim() || '一般工具',
+        section: safeSection,
       });
       onClose();
     } catch (err) {

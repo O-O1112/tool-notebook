@@ -5,20 +5,22 @@ import { TOOL_TEMPLATES } from '../utils/toolTemplates';
 import SandboxedFrame from './SandboxedFrame';
 import { CARD_COLORS } from './ToolCard';
 
+const sanitizeSection = (val) => (typeof val === 'string' && val.trim() ? val.trim() : '一般工具');
+
 export default function AddToolModal({ isOpen, onClose, onAddTool, initialSection = '一般工具' }) {
   const [activeTab, setActiveTab] = useState('templates'); // 'templates' | 'custom'
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [color, setColor] = useState('default');
-  const [section, setSection] = useState(initialSection || '一般工具');
+  const [section, setSection] = useState(() => sanitizeSection(initialSection));
   const [previewActive, setPreviewActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [templatePreview, setTemplatePreview] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
-      setSection(initialSection || '一般工具');
+      setSection(sanitizeSection(initialSection));
     }
   }, [isOpen, initialSection]);
 
@@ -54,7 +56,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
         colSpan: 1,
         tags: parseTags(tagsInput),
         color,
-        section: section.trim() || '一般工具',
+        section: sanitizeSection(section),
       });
       handleClose();
     } catch (err) {
@@ -74,7 +76,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
         colSpan: tmpl.defaultColSpan || 1,
         tags: tmpl.category ? [tmpl.category] : [],
         color,
-        section: section.trim() || '一般工具',
+        section: sanitizeSection(section),
       });
       handleClose();
     } catch (err) {

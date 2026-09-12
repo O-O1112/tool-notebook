@@ -179,7 +179,7 @@ export default function SpaceLayout({
           </p>
           {isOwner && (
             <button
-              onClick={onOpenAddModal}
+              onClick={() => onOpenAddModal && onOpenAddModal('一般工具')}
               className="notebook-btn-primary w-full py-2.5 justify-center"
             >
               <Plus size={16} />

@@ -526,7 +526,8 @@ export default function App() {
             onDeleteTool={handleDeleteTool}
             onEditTool={(tool) => setEditingTool(tool)}
             onOpenAddModal={(section) => {
-              setAddModalSection(section || '一般工具');
+              const safeSection = typeof section === 'string' && section.trim() ? section.trim() : '一般工具';
+              setAddModalSection(safeSection);
               setAddModalOpen(true);
             }}
             onToggleColSpan={handleToggleColSpan}
