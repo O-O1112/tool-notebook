@@ -7,6 +7,7 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [colSpan, setColSpan] = useState(1);
+  const [tagsInput, setTagsInput] = useState('');
   const [previewActive, setPreviewActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -15,6 +16,8 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
       setTitle(tool.title || '');
       setContent(tool.content || '');
       setColSpan(tool.col_span || 1);
+      const initialTags = Array.isArray(tool.tags) ? tool.tags.join(', ') : (tool.tags || '');
+      setTagsInput(initialTags);
       setPreviewActive(false);
     }
   }, [tool, isOpen]);
@@ -22,6 +25,14 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
   const parsed = parseToolInput(content);
 
   if (!isOpen || !tool) return null;
+
+  const parseTags = (str) => {
+    if (!str) return [];
+    return str
+      .split(/[,，\s]+/)
+      .map((s) => s.replace(/^#/, '').trim())
+      .filter(Boolean);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,6 +45,7 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
         type: parsed.type,
         content: content.trim(),
         colSpan: Number(colSpan),
+        tags: parseTags(tagsInput),
       });
       onClose();
     } catch (err) {
@@ -99,6 +111,20 @@ export default function EditToolModal({ isOpen, tool, onClose, onSaveTool }) {
                 <option value={2}>2x 加寬展示</option>
               </select>
             </div>
+          </div>
+
+          {/* 工具標籤 */}
+          <div>
+            <label className="block text-xs font-semibold text-[#1f2a2e] mb-1.5">
+              自訂標籤 (以逗號或空格分隔)
+            </label>
+            <input
+              type="text"
+              value={tagsInput}
+              onChange={(e) => setTagsInput(e.target.value)}
+              placeholder="例如：筆記, 生產力, 常用"
+              className="notebook-input w-full"
+            />
           </div>
 
           {/* 程式碼 / iframe 輸入區 */}

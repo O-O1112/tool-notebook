@@ -14,8 +14,16 @@ import {
   ListCollapse,
   User,
   Settings,
+  Palette
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+
+const THEMES = [
+  { key: 'warm', name: '方眼米紙', desc: '預設手帳風格', color: '#fbfbf9', border: '#e4e8e5' },
+  { key: 'dark', name: '深邃夜墨', desc: '暗色護眼模式', color: '#12161c', border: '#2b3340' },
+  { key: 'kraft', name: '復古牛皮', desc: '質感牛皮紙風格', color: '#f4ecdc', border: '#ddcfb7' },
+  { key: 'minimal', name: '簡約素白', desc: '純淨極簡模式', color: '#ffffff', border: '#e8e8e8' },
+];
 
 export default function Navbar({
   spaces,
@@ -28,9 +36,12 @@ export default function Navbar({
   layout,
   onToggleLayout,
   onRegenerateCode,
+  theme = 'warm',
+  onSelectTheme,
 }) {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const [newSpaceModalOpen, setNewSpaceModalOpen] = useState(false);
   const [newSpaceName, setNewSpaceName] = useState('');
   const [copiedCode, setCopiedCode] = useState(false);
@@ -209,6 +220,53 @@ export default function Navbar({
               >
                 <ListCollapse size={15} />
               </button>
+            </div>
+
+            {/* 手帳紙質主題切換按鈕與下拉選單 */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
+                className="notebook-btn-secondary text-xs p-1.5 flex items-center justify-center"
+                title="切換手帳紙質主題 (米紙、夜墨、牛皮、素白)"
+              >
+                <Palette size={15} className="text-[#e17b62]" />
+              </button>
+
+              {themeDropdownOpen && (
+                <div className="absolute right-0 mt-1.5 w-48 notebook-card bg-white shadow-xl z-50 p-1.5 animate-fadeIn">
+                  <div className="px-2.5 py-1.5 text-[10px] font-semibold text-[#89959b] uppercase tracking-wider border-b border-[#e4e8e5] mb-1">
+                    手帳紙質主題
+                  </div>
+                  <div className="space-y-0.5">
+                    {THEMES.map((t) => (
+                      <button
+                        key={t.key}
+                        onClick={() => {
+                          if (onSelectTheme) onSelectTheme(t.key);
+                          setThemeDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 text-xs rounded-lg transition-colors flex items-center justify-between ${
+                          theme === t.key
+                            ? 'bg-[#fff0eb] text-[#e17b62] font-semibold'
+                            : 'text-[#1f2a2e] hover:bg-[#f5f7f6]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-3.5 h-3.5 rounded-full border shadow-xs"
+                            style={{ backgroundColor: t.color, borderColor: t.border }}
+                          />
+                          <div>
+                            <span className="block">{t.name}</span>
+                          </div>
+                        </div>
+                        {theme === t.key && <span className="text-xs font-bold text-[#e17b62]">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 加入空間按鈕 */}

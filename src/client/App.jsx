@@ -16,11 +16,51 @@ export default function App() {
   const [currentSpace, setCurrentSpace] = useState(null);
   const [tools, setTools] = useState([]);
   const [layout, setLayout] = useState('grid');
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('notebook_theme') || 'warm';
+  });
   const [loadingSpace, setLoadingSpace] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
+
+  // 主題切換與 DOM 根節點同步
+  useEffect(() => {
+    document.documentElement.className = `theme-${theme}`;
+  }, [theme]);
+
+  const handleSelectTheme = (newTheme) => {
+    setTheme(newTheme);
+    localStorage.setItem('notebook_theme', newTheme);
+  };
+
+  // 本地置頂與標籤存取輔助
+  const getSpacePinnedIds = (spaceId) => {
+    try {
+      const data = localStorage.getItem(`notebook_pinned_${spaceId}`);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const getSpaceTagsMap = (spaceId) => {
+    try {
+      const data = localStorage.getItem(`notebook_tags_${spaceId}`);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const saveSpacePinnedIds = (spaceId, ids) => {
+    localStorage.setItem(`notebook_pinned_${spaceId}`, JSON.stringify(ids));
+  };
+
+  const saveSpaceTagsMap = (spaceId, map) => {
+    localStorage.setItem(`notebook_tags_${spaceId}`, JSON.stringify(map));
+  };
 
   // 1. 使用者登入後載入其所有空間 (自建 + 透過邀請碼加入的)
   useEffect(() => {
@@ -41,19 +81,39 @@ export default function App() {
     fetchSpaces();
   }, [user]);
 
-  // 2. 載入特定空間的詳情與工具清單
+  // 2. 載入特定空間的詳情與工具清單 (同步附加置頂與標籤狀態)
   const loadSpaceDetail = async (spaceId) => {
     setLoadingSpace(true);
     try {
       const data = await api.getSpaceDetail(spaceId);
       setCurrentSpace(data.space);
-      setTools(data.tools || []);
+      const pinnedIds = getSpacePinnedIds(spaceId);
+      const tagsMap = getSpaceTagsMap(spaceId);
+
+      const enrichedTools = (data.tools || []).map((t) => ({
+        ...t,
+        isPinned: pinnedIds.includes(t.id),
+        tags: tagsMap[t.id] || t.tags || [],
+      }));
+
+      setTools(enrichedTools);
       setLayout(data.space.layout || 'grid');
     } catch (err) {
       console.error('載入空間工具失敗:', err);
     } finally {
       setLoadingSpace(false);
     }
+  };
+
+  // 切換置頂釘選狀態
+  const handleTogglePin = (toolId) => {
+    if (!currentSpace) return;
+    setTools((prev) => {
+      const updated = prev.map((t) => (t.id === toolId ? { ...t, isPinned: !t.isPinned } : t));
+      const pinnedIds = updated.filter((t) => t.isPinned).map((t) => t.id);
+      saveSpacePinnedIds(currentSpace.id, pinnedIds);
+      return updated;
+    });
   };
 
   // 3. 建立新空間
@@ -136,7 +196,19 @@ export default function App() {
   const handleAddTool = async (toolPayload) => {
     if (!currentSpace) return;
     const data = await api.addTool(currentSpace.id, toolPayload);
-    setTools((prev) => [...prev, data.tool]);
+    const newTool = {
+      ...data.tool,
+      isPinned: false,
+      tags: toolPayload.tags || [],
+    };
+
+    if (toolPayload.tags && toolPayload.tags.length > 0) {
+      const tagsMap = getSpaceTagsMap(currentSpace.id);
+      tagsMap[data.tool.id] = toolPayload.tags;
+      saveSpaceTagsMap(currentSpace.id, tagsMap);
+    }
+
+    setTools((prev) => [...prev, newTool]);
     setSpaces((prev) =>
       prev.map((s) =>
         s.id === currentSpace.id ? { ...s, tool_count: (s.tool_count || 0) + 1 } : s
@@ -144,12 +216,27 @@ export default function App() {
     );
   };
 
-  // 10. 編輯工具 (就地更新代碼、標題、寬度)
+  // 10. 編輯工具 (就地更新代碼、標題、寬度、標籤)
   const handleUpdateTool = async (toolId, payload) => {
     if (!currentSpace) return;
     const data = await api.updateTool(currentSpace.id, toolId, payload);
+
+    if (payload.tags !== undefined) {
+      const tagsMap = getSpaceTagsMap(currentSpace.id);
+      tagsMap[toolId] = payload.tags;
+      saveSpaceTagsMap(currentSpace.id, tagsMap);
+    }
+
     setTools((prev) =>
-      prev.map((t) => (t.id === toolId ? { ...t, ...data.tool } : t))
+      prev.map((t) =>
+        t.id === toolId
+          ? {
+              ...t,
+              ...data.tool,
+              tags: payload.tags !== undefined ? payload.tags : t.tags,
+            }
+          : t
+      )
     );
   };
 
@@ -201,23 +288,35 @@ export default function App() {
     }
   };
 
-  // 14. 批次匯入工具清單
+  // 14. 批次匯入工具清單 (含標籤與置頂屬性)
   const handleImportTools = async (spaceId, importedTools) => {
     let successCount = 0;
+    const tagsMap = getSpaceTagsMap(spaceId);
+    const pinnedIds = getSpacePinnedIds(spaceId);
+
     for (const tool of importedTools) {
       try {
-        await api.addTool(spaceId, {
+        const data = await api.addTool(spaceId, {
           title: tool.title || '匯入的小工具',
           type: tool.type || 'html',
           content: tool.content || '',
           colSpan: tool.col_span || 1,
         });
+
+        if (tool.tags && tool.tags.length > 0) {
+          tagsMap[data.tool.id] = tool.tags;
+        }
+        if (tool.isPinned) {
+          pinnedIds.push(data.tool.id);
+        }
         successCount++;
       } catch (err) {
         console.warn('匯入個別工具失敗:', tool.title, err);
       }
     }
 
+    saveSpaceTagsMap(spaceId, tagsMap);
+    saveSpacePinnedIds(spaceId, pinnedIds);
     alert(`成功匯入 ${successCount} 個小工具！`);
     loadSpaceDetail(spaceId);
   };
@@ -255,6 +354,8 @@ export default function App() {
         layout={layout}
         onToggleLayout={handleToggleLayout}
         onRegenerateCode={handleRegenerateCode}
+        theme={theme}
+        onSelectTheme={handleSelectTheme}
       />
 
       {/* 主內容區塊 */}
@@ -272,6 +373,7 @@ export default function App() {
             onEditTool={(tool) => setEditingTool(tool)}
             onOpenAddModal={() => setAddModalOpen(true)}
             onToggleColSpan={handleToggleColSpan}
+            onTogglePin={handleTogglePin}
             onReorderTools={handleReorderTools}
             isOwner={isOwner}
           />

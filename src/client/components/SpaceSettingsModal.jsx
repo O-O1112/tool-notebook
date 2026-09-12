@@ -48,7 +48,7 @@ export default function SpaceSettingsModal({
   // 匯出目前空間所有工具為 JSON
   const handleExportJSON = () => {
     const exportData = {
-      version: '1.0',
+      version: '2.0',
       exportedAt: new Date().toISOString(),
       spaceName: space.name,
       description: space.description,
@@ -57,6 +57,8 @@ export default function SpaceSettingsModal({
         type: t.type,
         content: t.content,
         col_span: t.col_span || 1,
+        tags: t.tags || [],
+        isPinned: Boolean(t.isPinned),
       })),
     };
 

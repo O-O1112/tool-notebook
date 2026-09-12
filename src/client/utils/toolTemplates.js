@@ -854,5 +854,926 @@ export const TOOL_TEMPLATES = [
   </script>
 </body>
 </html>`
+  },
+  {
+    id: 'markdown_editor',
+    title: 'Markdown 即時筆記',
+    description: '即時雙欄預覽 Markdown，支援標題、粗體、清單、引用與程式碼區塊，附一鍵複製。',
+    category: '文字與筆記',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e4e8e5;
+    }
+    .title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f2a2e;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      border: 1px solid #e4e8e5;
+      background: #ffffff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #526066;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #f0f2f1; color: #1f2a2e; }
+    .btn-coral { background: #e17b62; color: #ffffff; border-color: transparent; }
+    .btn-coral:hover { background: #cf674e; color: #ffffff; }
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+    }
+    @media (max-width: 600px) {
+      .editor-container { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    }
+    .pane {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+    .pane-header {
+      padding: 8px 12px;
+      background: #f7f9f8;
+      border-bottom: 1px solid #e4e8e5;
+      font-size: 11px;
+      font-weight: 700;
+      color: #89959b;
+      letter-spacing: 0.05em;
+    }
+    textarea {
+      flex: 1;
+      border: none;
+      padding: 12px;
+      font-family: Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      color: #1f2a2e;
+    }
+    .preview {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .preview h1 { font-size: 20px; border-bottom: 1px solid #e4e8e5; padding-bottom: 6px; margin-top: 0; }
+    .preview h2 { font-size: 16px; border-bottom: 1px solid #e4e8e5; padding-bottom: 4px; }
+    .preview h3 { font-size: 14px; }
+    .preview pre { background: #f0f4f3; padding: 10px; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 12px; }
+    .preview code { background: #f0f4f3; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+    .preview blockquote { border-left: 3px solid #e17b62; margin-left: 0; padding-left: 12px; color: #69787f; }
+    .preview ul { padding-left: 20px; }
+    .preview table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+    .preview th, .preview td { border: 1px solid #e4e8e5; padding: 6px 10px; text-align: left; }
+    .preview th { background: #f7f9f8; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">
+      <span style="color:#e17b62">📝</span> Markdown 即時筆記
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="insertSample()">範例內容</button>
+      <button class="btn" onclick="clearText()">清空</button>
+      <button class="btn btn-coral" onclick="copyHTML()">複製 HTML</button>
+    </div>
+  </div>
+  <div class="editor-container">
+    <div class="pane">
+      <div class="pane-header">MARKDOWN 原始碼</div>
+      <textarea id="editor" oninput="renderMD()" placeholder="在此輸入 Markdown 內容..."></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-header">即時預覽效果</div>
+      <div id="preview" class="preview"></div>
+    </div>
+  </div>
+
+  <script>
+    const sample = "# 工具小本本 備忘筆記\\n\\n這是一個簡潔高效的 Markdown 即時預覽工具。\\n\\n### 重點功能清單：\\n- **即時預覽**：打字同時同步解析\\n- *文字格式*：支援粗體、斜體與程式碼\\n- 引用區塊：\\n> 專注於當下的微小進展，日積月累終成大器。\\n\\n### 代碼展示：\\n\`\`\`javascript\\nfunction greet(name) {\\n  return 'Hello, ' + name;\\n}\\n\`\`\`\\n";
+
+    function simpleParse(md) {
+      let html = md
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+        .replace(/\\*\\*(.*?)\\*\\*/gim, '<strong>$1</strong>')
+        .replace(/\\*(.*?)\\*/gim, '<em>$1</em>')
+        .replace(/\`\`\`([\\s\\S]*?)\`\`\`/gim, '<pre><code>$1</code></pre>')
+        .replace(/\`(.*?)\`/gim, '<code>$1</code>')
+        .replace(/^\\- (.*$)/gim, '<li>$1</li>')
+        .replace(/\\n/g, '<br>');
+      return html;
+    }
+
+    function renderMD() {
+      const src = document.getElementById('editor').value;
+      document.getElementById('preview').innerHTML = simpleParse(src);
+    }
+
+    function insertSample() {
+      document.getElementById('editor').value = sample;
+      renderMD();
+    }
+
+    function clearText() {
+      document.getElementById('editor').value = '';
+      renderMD();
+    }
+
+    function copyHTML() {
+      const html = document.getElementById('preview').innerHTML;
+      navigator.clipboard.writeText(html).then(() => {
+        alert('HTML 已複製至剪貼簿！');
+      });
+    }
+
+    insertSample();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'password_generator',
+    title: '高強度隨機密碼產生器',
+    description: '自訂長度、字元類型與排除混淆字元，即時評估密碼強度並支援一鍵複製。',
+    category: '安全與實用',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      max-width: 440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .pw-box {
+      display: flex;
+      align-items: center;
+      background: #f7f9f8;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .pw-text {
+      flex: 1;
+      font-family: Menlo, Monaco, Consolas, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2a2e;
+      word-break: break-all;
+      letter-spacing: 0.05em;
+    }
+    .copy-btn {
+      background: #e17b62;
+      color: #ffffff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      shrink: 0;
+    }
+    .copy-btn:hover { background: #cf674e; }
+    .strength-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: #e4e8e5;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s;
+    }
+    .strength-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #89959b;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #1f2a2e;
+    }
+    .slider {
+      width: 60%;
+      accent-color: #e17b62;
+    }
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #526066;
+      cursor: pointer;
+    }
+    .checkbox-label input { accent-color: #e17b62; }
+    .gen-btn {
+      width: 100%;
+      background: #1f2a2e;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .gen-btn:hover { background: #354248; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div style="font-size:15px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+      <span>🔐</span> 高強度隨機密碼產生器
+    </div>
+    <div class="pw-box">
+      <div id="pwDisplay" class="pw-text">產生中...</div>
+      <button class="copy-btn" onclick="copyPassword()">複製</button>
+    </div>
+    <div class="strength-bar">
+      <div id="strengthFill" class="strength-fill"></div>
+    </div>
+    <div class="strength-text">
+      <span>安全強度</span>
+      <span id="strengthLabel">極高安全</span>
+    </div>
+
+    <div class="setting-row">
+      <span>密碼長度：<strong id="lenVal" style="color:#e17b62">16</strong></span>
+      <input type="range" id="length" min="6" max="32" value="16" class="slider" oninput="updateLen()">
+    </div>
+
+    <div class="checkbox-grid">
+      <label class="checkbox-label"><input type="checkbox" id="upper" checked onchange="generate()"> 大寫字母 (A-Z)</label>
+      <label class="checkbox-label"><input type="checkbox" id="lower" checked onchange="generate()"> 小寫字母 (a-z)</label>
+      <label class="checkbox-label"><input type="checkbox" id="numbers" checked onchange="generate()"> 數字 (0-9)</label>
+      <label class="checkbox-label"><input type="checkbox" id="symbols" checked onchange="generate()"> 特殊符號 (!@#)</label>
+    </div>
+
+    <button class="gen-btn" onclick="generate()">重新產生新密碼</button>
+  </div>
+
+  <script>
+    function updateLen() {
+      document.getElementById('lenVal').innerText = document.getElementById('length').value;
+      generate();
+    }
+
+    function generate() {
+      const len = parseInt(document.getElementById('length').value);
+      const useUpper = document.getElementById('upper').checked;
+      const useLower = document.getElementById('lower').checked;
+      const useNum = document.getElementById('numbers').checked;
+      const useSym = document.getElementById('symbols').checked;
+
+      let chars = '';
+      if (useUpper) chars += 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      if (useLower) chars += 'abcdefghijkmnopqrstuvwxyz';
+      if (useNum) chars += '23456789';
+      if (useSym) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+      if (!chars) chars = 'abcdefghijkmnpqrstuvwxyz23456789';
+
+      let result = '';
+      const array = new Uint32Array(len);
+      crypto.getRandomValues(array);
+      for (let i = 0; i < len; i++) {
+        result += chars[array[i] % chars.length];
+      }
+
+      document.getElementById('pwDisplay').innerText = result;
+
+      // 強度指示
+      const fill = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+      if (len < 10 || (!useSym && !useNum)) {
+        fill.style.width = '35%';
+        fill.style.background = '#e74c3c';
+        label.innerText = '弱 (易受暴力破解)';
+      } else if (len < 14) {
+        fill.style.width = '70%';
+        fill.style.background = '#f39c12';
+        label.innerText = '中等 (符合基本安全)';
+      } else {
+        fill.style.width = '100%';
+        fill.style.background = '#27ae60';
+        label.innerText = '極高強度 (極佳安全性)';
+      }
+    }
+
+    function copyPassword() {
+      const text = document.getElementById('pwDisplay').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('密碼已複製到剪貼簿！');
+      });
+    }
+
+    generate();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'json_formatter',
+    title: 'JSON 格式化與檢驗器',
+    description: 'JSON 語法驗證、2格/4格縮排美化與單行壓縮，語法錯誤精確定位。',
+    category: '開發輔助',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f2a2e;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn {
+      border: 1px solid #e4e8e5;
+      background: #ffffff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #526066;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #f0f2f1; color: #1f2a2e; }
+    .btn-coral { background: #e17b62; color: #ffffff; border-color: transparent; }
+    .btn-coral:hover { background: #cf674e; color: #ffffff; }
+    .editor-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+    textarea {
+      flex: 1;
+      border: none;
+      padding: 14px;
+      font-family: Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      color: #1f2a2e;
+    }
+    .status-bar {
+      padding: 8px 14px;
+      background: #f7f9f8;
+      border-top: 1px solid #e4e8e5;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .valid { color: #27ae60; font-weight: 600; }
+    .invalid { color: #e74c3c; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">
+      <span>⚙️</span> JSON 格式化與檢驗器
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="formatJSON(2)">2格縮排</button>
+      <button class="btn" onclick="formatJSON(4)">4格縮排</button>
+      <button class="btn" onclick="minifyJSON()">壓縮一行</button>
+      <button class="btn" onclick="clearAll()">清空</button>
+      <button class="btn btn-coral" onclick="copyResult()">複製結果</button>
+    </div>
+  </div>
+
+  <div class="editor-box">
+    <textarea id="jsonInput" placeholder="在此貼入待處理的 JSON 代碼..." oninput="validateJSON()"></textarea>
+    <div class="status-bar">
+      <span id="status" class="valid">狀態：準備就緒</span>
+      <span id="charCount" style="color:#89959b">0 字元</span>
+    </div>
+  </div>
+
+  <script>
+    const sample = JSON.stringify({
+      appName: "工具小本本",
+      version: "2.0.0",
+      features: ["手帳紙質主題", "自訂標籤", "置頂釘選", "獨立浮動視窗"],
+      author: { name: "Antigravity", isReady: true }
+    }, null, 2);
+
+    document.getElementById('jsonInput').value = sample;
+
+    function validateJSON() {
+      const val = document.getElementById('jsonInput').value.trim();
+      const status = document.getElementById('status');
+      const count = document.getElementById('charCount');
+      count.innerText = val.length + ' 字元';
+
+      if (!val) {
+        status.className = 'valid';
+        status.innerText = '狀態：請輸入 JSON 內容';
+        return false;
+      }
+      try {
+        JSON.parse(val);
+        status.className = 'valid';
+        status.innerText = '✔ 語法正確 (有效 JSON)';
+        return true;
+      } catch (err) {
+        status.className = 'invalid';
+        status.innerText = '✖ 語法錯誤：' + err.message;
+        return false;
+      }
+    }
+
+    function formatJSON(indent) {
+      const val = document.getElementById('jsonInput').value.trim();
+      try {
+        const obj = JSON.parse(val);
+        document.getElementById('jsonInput').value = JSON.stringify(obj, null, indent);
+        validateJSON();
+      } catch (e) {
+        alert('無法格式化，請先修正語法錯誤：' + e.message);
+      }
+    }
+
+    function minifyJSON() {
+      const val = document.getElementById('jsonInput').value.trim();
+      try {
+        const obj = JSON.parse(val);
+        document.getElementById('jsonInput').value = JSON.stringify(obj);
+        validateJSON();
+      } catch (e) {
+        alert('無法壓縮，請先修正語法錯誤：' + e.message);
+      }
+    }
+
+    function clearAll() {
+      document.getElementById('jsonInput').value = '';
+      validateJSON();
+    }
+
+    function copyResult() {
+      const val = document.getElementById('jsonInput').value;
+      navigator.clipboard.writeText(val).then(() => {
+        alert('已複製到剪貼簿！');
+      });
+    }
+
+    validateJSON();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'world_clock',
+    title: '世界時區時鐘',
+    description: '掌握台北、東京、倫敦、紐約全球主要城市即時時間、日期與相對時差。',
+    category: '時間與排程',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .clock-card {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .clock-card:hover { transform: translateY(-2px); border-color: #e1ac9e; }
+    .city-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #e17b62;
+      background: #fff0eb;
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .time-val {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1f2a2e;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .date-val {
+      font-size: 12px;
+      color: #69787f;
+      margin-bottom: 4px;
+    }
+    .offset-val {
+      font-size: 11px;
+      font-weight: 600;
+      color: #89959b;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <div class="clock-card">
+      <div class="city-badge">🇹🇼 台北 (Taipei)</div>
+      <div id="time-taipei" class="time-val">00:00:00</div>
+      <div id="date-taipei" class="date-val">載入中...</div>
+      <div class="offset-val">UTC +8 (本地基準)</div>
+    </div>
+
+    <div class="clock-card">
+      <div class="city-badge">🇯🇵 東京 (Tokyo)</div>
+      <div id="time-tokyo" class="time-val">00:00:00</div>
+      <div id="date-tokyo" class="date-val">載入中...</div>
+      <div class="offset-val">UTC +9 (快 1 小時)</div>
+    </div>
+
+    <div class="clock-card">
+      <div class="city-badge">🇬🇧 倫敦 (London)</div>
+      <div id="time-london" class="time-val">00:00:00</div>
+      <div id="date-london" class="date-val">載入中...</div>
+      <div class="offset-val">UTC +0 / +1 (格林威治)</div>
+    </div>
+
+    <div class="clock-card">
+      <div class="city-badge">🇺🇸 紐約 (New York)</div>
+      <div id="time-ny" class="time-val">00:00:00</div>
+      <div id="date-ny" class="date-val">載入中...</div>
+      <div class="offset-val">UTC -5 / -4 (美東時間)</div>
+    </div>
+  </div>
+
+  <script>
+    const zones = [
+      { id: 'taipei', timeZone: 'Asia/Taipei' },
+      { id: 'tokyo', timeZone: 'Asia/Tokyo' },
+      { id: 'london', timeZone: 'Europe/London' },
+      { id: 'ny', timeZone: 'America/New_York' }
+    ];
+
+    function updateClocks() {
+      const now = new Date();
+      zones.forEach(z => {
+        const timeStr = now.toLocaleTimeString('zh-TW', { timeZone: z.timeZone, hour12: false });
+        const dateStr = now.toLocaleDateString('zh-TW', {
+          timeZone: z.timeZone,
+          month: 'short',
+          day: 'numeric',
+          weekday: 'short'
+        });
+        const elTime = document.getElementById('time-' + z.id);
+        const elDate = document.getElementById('date-' + z.id);
+        if (elTime) elTime.innerText = timeStr;
+        if (elDate) elDate.innerText = dateStr;
+      });
+    }
+
+    setInterval(updateClocks, 1000);
+    updateClocks();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'text_tools',
+    title: '文字統計與編解碼',
+    description: '字數/字元/行數統計、Base64 與 URL 編解碼、大小寫轉換。',
+    category: '文字與筆記',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-item {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 10px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 18px;
+      font-weight: 800;
+      color: #e17b62;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #89959b;
+    }
+    .editor-box {
+      flex: 1;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      background: #ffffff;
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    textarea {
+      flex: 1;
+      border: none;
+      padding: 12px;
+      font-family: Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      outline: none;
+      resize: none;
+      color: #1f2a2e;
+    }
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .btn {
+      border: 1px solid #e4e8e5;
+      background: #ffffff;
+      padding: 8px 6px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #526066;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .btn:hover { background: #f0f2f1; color: #1f2a2e; }
+    .btn-coral { background: #e17b62; color: #ffffff; border-color: transparent; }
+    .btn-coral:hover { background: #cf674e; color: #ffffff; }
+  </style>
+</head>
+<body>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div id="stat-words" class="stat-num">0</div>
+      <div class="stat-label">字數</div>
+    </div>
+    <div class="stat-item">
+      <div id="stat-chars" class="stat-num">0</div>
+      <div class="stat-label">總字元</div>
+    </div>
+    <div class="stat-item">
+      <div id="stat-nonspace" class="stat-num">0</div>
+      <div class="stat-label">不含空格</div>
+    </div>
+    <div class="stat-item">
+      <div id="stat-lines" class="stat-num">0</div>
+      <div class="stat-label">行數</div>
+    </div>
+  </div>
+
+  <div class="editor-box">
+    <textarea id="textBox" placeholder="請在此輸入或貼上文字..." oninput="updateStats()"></textarea>
+  </div>
+
+  <div class="btn-grid">
+    <button class="btn" onclick="toBase64()">Base64 編碼</button>
+    <button class="btn" onclick="fromBase64()">Base64 解碼</button>
+    <button class="btn" onclick="toURL()">URL 編碼</button>
+    <button class="btn" onclick="fromURL()">URL 解碼</button>
+    <button class="btn" onclick="toUpperCase()">轉為大寫</button>
+    <button class="btn" onclick="toLowerCase()">轉為小寫</button>
+    <button class="btn" onclick="clearText()">清空內容</button>
+    <button class="btn btn-coral" style="grid-column: span 2" onclick="copyText()">複製文字內容</button>
+  </div>
+
+  <script>
+    function updateStats() {
+      const text = document.getElementById('textBox').value;
+      const chars = text.length;
+      const nonSpace = text.replace(/\\s/g, '').length;
+      const words = text.trim() ? text.trim().split(/\\s+/).length : 0;
+      const lines = text ? text.split('\\n').length : 0;
+
+      document.getElementById('stat-chars').innerText = chars;
+      document.getElementById('stat-nonspace').innerText = nonSpace;
+      document.getElementById('stat-words').innerText = words;
+      document.getElementById('stat-lines').innerText = lines;
+    }
+
+    function toBase64() {
+      try {
+        const text = document.getElementById('textBox').value;
+        document.getElementById('textBox').value = btoa(unescape(encodeURIComponent(text)));
+        updateStats();
+      } catch (e) { alert('Base64 編碼錯誤: ' + e.message); }
+    }
+
+    function fromBase64() {
+      try {
+        const text = document.getElementById('textBox').value;
+        document.getElementById('textBox').value = decodeURIComponent(escape(atob(text)));
+        updateStats();
+      } catch (e) { alert('Base64 解碼錯誤: ' + e.message); }
+    }
+
+    function toURL() {
+      const text = document.getElementById('textBox').value;
+      document.getElementById('textBox').value = encodeURIComponent(text);
+      updateStats();
+    }
+
+    function fromURL() {
+      try {
+        const text = document.getElementById('textBox').value;
+        document.getElementById('textBox').value = decodeURIComponent(text);
+        updateStats();
+      } catch (e) { alert('URL 解碼錯誤: ' + e.message); }
+    }
+
+    function toUpperCase() {
+      const box = document.getElementById('textBox');
+      box.value = box.value.toUpperCase();
+      updateStats();
+    }
+
+    function toLowerCase() {
+      const box = document.getElementById('textBox');
+      box.value = box.value.toLowerCase();
+      updateStats();
+    }
+
+    function clearText() {
+      document.getElementById('textBox').value = '';
+      updateStats();
+    }
+
+    function copyText() {
+      const text = document.getElementById('textBox').value;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('文字已複製到剪貼簿！');
+      });
+    }
+
+    updateStats();
+  </script>
+</body>
+</html>`
   }
 ];

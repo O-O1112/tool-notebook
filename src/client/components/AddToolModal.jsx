@@ -8,6 +8,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
   const [activeTab, setActiveTab] = useState('templates'); // 'templates' | 'custom'
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
+  const [tagsInput, setTagsInput] = useState('');
   const [previewActive, setPreviewActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [templatePreview, setTemplatePreview] = useState(null);
@@ -23,6 +24,14 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
 
   if (!isOpen) return null;
 
+  const parseTags = (str) => {
+    if (!str) return [];
+    return str
+      .split(/[,，\s]+/)
+      .map((s) => s.replace(/^#/, '').trim())
+      .filter(Boolean);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim() || parsed.isRawUrl) return;
@@ -34,6 +43,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
         type: parsed.type,
         content: content.trim(),
         colSpan: 1,
+        tags: parseTags(tagsInput),
       });
       handleClose();
     } catch (err) {
@@ -51,6 +61,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
         type: 'html',
         content: tmpl.content,
         colSpan: tmpl.defaultColSpan || 1,
+        tags: tmpl.category ? [tmpl.category] : [],
       });
       handleClose();
     } catch (err) {
@@ -63,6 +74,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
   const handleCustomizeTemplate = (tmpl) => {
     setTitle(tmpl.title);
     setContent(tmpl.content);
+    setTagsInput(tmpl.category || '');
     setActiveTab('custom');
     setPreviewActive(true);
   };
@@ -77,6 +89,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
   const handleClose = () => {
     setContent('');
     setTitle('');
+    setTagsInput('');
     setPreviewActive(false);
     setTemplatePreview(null);
     onClose();
@@ -215,19 +228,33 @@ export default function AddToolModal({ isOpen, onClose, onAddTool }) {
         {/* 分頁內容 2：自訂程式碼表單 */}
         {activeTab === 'custom' && (
           <form onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto space-y-4">
-            {/* 工具名稱 */}
-            <div>
-              <label className="block text-xs font-semibold text-[#1f2a2e] mb-1.5">
-                工具名稱
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="請輸入工具名稱"
-                className="notebook-input w-full"
-                required
-              />
+            {/* 工具名稱與標籤 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#1f2a2e] mb-1.5">
+                  工具名稱
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="請輸入工具名稱"
+                  className="notebook-input w-full"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#1f2a2e] mb-1.5">
+                  自訂標籤 (以逗號或空格分隔)
+                </label>
+                <input
+                  type="text"
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  placeholder="例如：筆記, 生產力, 常用"
+                  className="notebook-input w-full"
+                />
+              </div>
             </div>
 
             {/* 程式碼 / iframe 輸入區 */}
