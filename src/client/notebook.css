@@ -431,4 +431,144 @@ html, body, #root {
   box-shadow: 0 12px 28px rgba(225, 123, 98, 0.12);
 }
 
+/* ========================================================
+   深色模式全域適配強化 (Full Dark Mode Overhaul)
+   ======================================================== */
+.theme-dark {
+  color-scheme: dark;
+}
+
+/* 頂部導覽列暗色化 */
+.theme-dark header {
+  background-color: rgba(28, 34, 43, 0.92) !important;
+  border-bottom-color: var(--line) !important;
+}
+
+/* 空間大廳迎賓橫幅暗色化 */
+.theme-dark .dashboard-banner {
+  background-color: rgba(28, 34, 43, 0.85) !important;
+  border-color: var(--line) !important;
+}
+
+/* 全域卡片、貨架欄位與對話框背景 */
+.theme-dark .notebook-card,
+.theme-dark .dashboard-space-card,
+.theme-dark .shelf-column {
+  background-color: var(--card-bg) !important;
+  border-color: var(--line) !important;
+  color: var(--ink) !important;
+}
+
+/* 彈窗與浮動選單容器內的 white 覆蓋 */
+.theme-dark .bg-white {
+  background-color: var(--card-bg) !important;
+  color: var(--ink) !important;
+}
+
+.theme-dark .bg-white\/80,
+.theme-dark .bg-white\/90 {
+  background-color: rgba(28, 34, 43, 0.88) !important;
+}
+
+/* 次級背景區塊 (灰色塊、輸入背景) */
+.theme-dark .bg-\[\#f5f7f6\],
+.theme-dark .bg-gray-50 {
+  background-color: #161b22 !important;
+  border-color: var(--line) !important;
+}
+
+/* 邊框線條全面暗色適配 */
+.theme-dark .border-\[\#e4e8e5\],
+.theme-dark .border-\[\#f0f2f1\] {
+  border-color: var(--line) !important;
+}
+
+/* 主要與次要文字對比度強化 */
+.theme-dark .text-\[\#1f2a2e\] {
+  color: var(--ink) !important;
+}
+
+.theme-dark .text-\[\#526066\],
+.theme-dark .text-\[\#69787f\],
+.theme-dark .text-\[\#89959b\] {
+  color: var(--muted) !important;
+}
+
+.theme-dark .text-\[\#a2aaad\] {
+  color: var(--faint) !important;
+}
+
+/* 品牌小書本標章暗色微調 */
+.theme-dark .brand-mark {
+  background: var(--coral-light) !important;
+  border-color: var(--coral-border) !important;
+}
+
+/* 空間大廳卡片封面條紋暗色微調 */
+.theme-dark .dashboard-cover {
+  border-bottom-color: var(--line) !important;
+  filter: brightness(0.78) saturate(1.2);
+}
+
+/* 大廳新增空間虛線卡暗色微調 */
+.theme-dark .dashboard-create-card {
+  background: rgba(225, 123, 98, 0.04);
+}
+
+.theme-dark .dashboard-create-card:hover {
+  background: rgba(225, 123, 98, 0.12);
+}
+
+/* 便箋色紙低彩度暗色護眼適配 */
+.theme-dark .card-color-peach {
+  background: #281d19 !important;
+  border-color: #523127 !important;
+}
+
+.theme-dark .card-color-mint {
+  background: #152723 !important;
+  border-color: #21473f !important;
+}
+
+.theme-dark .card-color-lemon {
+  background: #282515 !important;
+  border-color: #524b21 !important;
+}
+
+.theme-dark .card-color-sky {
+  background: #152336 !important;
+  border-color: #254163 !important;
+}
+
+.theme-dark .card-color-lavender {
+  background: #241933 !important;
+  border-color: #452f63 !important;
+}
+
+/* 標籤與身分徽章暗色化 */
+.theme-dark .notebook-tag {
+  background: #161b22;
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.theme-dark .notebook-badge-teacher {
+  background: rgba(225, 123, 98, 0.15);
+  border-color: var(--coral-border);
+  color: var(--coral);
+}
+
+.theme-dark .notebook-badge-student {
+  background: rgba(59, 130, 126, 0.15);
+  border-color: rgba(59, 130, 126, 0.4);
+  color: #5eead4;
+}
+
+.theme-dark .notebook-badge {
+  background: rgba(28, 34, 43, 0.9);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+
 

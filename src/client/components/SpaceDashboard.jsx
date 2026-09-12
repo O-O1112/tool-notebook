@@ -92,18 +92,18 @@ export default function SpaceDashboard({
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* 頂部迎賓橫幅與快捷控制列 */}
-      <div className="bg-white p-6 md:p-8 rounded-2xl border border-[#e4e8e5] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="dashboard-banner bg-white p-6 md:p-8 rounded-2xl border border-[#e4e8e5] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="notebook-badge bg-[#fff0eb] text-[#e17b62] border-[#f7d2c8]">
               空間主頁大廳
             </span>
-            <span className="text-xs text-[#89959b]">共 {spaces.length} 個空間</span>
+            <span className="text-xs text-[var(--muted,#89959b)]">共 {spaces.length} 個空間</span>
           </div>
-          <h1 className="text-2xl font-extrabold text-[#1f2a2e] tracking-tight">
+          <h1 className="text-2xl font-extrabold text-[var(--ink,#1f2a2e)] tracking-tight">
             歡迎回來，{user?.displayName || '同學'}！
           </h1>
-          <p className="text-xs text-[#89959b] max-w-xl leading-relaxed">
+          <p className="text-xs text-[var(--muted,#89959b)] max-w-xl leading-relaxed">
             選擇任意空間卡片立即進入工作區；或是建立全新主題貨架、掃描 QR Code 共享小工具。
           </p>
         </div>
@@ -198,14 +198,14 @@ export default function SpaceDashboard({
           onClick={onCreateSpaceClick}
           className="dashboard-create-card p-6 min-h-[220px] flex flex-col items-center justify-center text-center gap-3 select-none group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-white border border-[#e1ac9e] text-[#e17b62] flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--card-bg)] border border-[#e1ac9e] text-[#e17b62] flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
             <Plus size={24} />
           </div>
           <div>
-            <div className="text-sm font-bold text-[#1f2a2e] group-hover:text-[#e17b62] transition-colors">
+            <div className="text-sm font-bold text-[var(--ink,#1f2a2e)] group-hover:text-[#e17b62] transition-colors">
               建立新空間
             </div>
-            <p className="text-[11px] text-[#89959b] mt-1 max-w-[180px]">
+            <p className="text-[11px] text-[var(--muted,#89959b)] mt-1 max-w-[180px]">
               自訂分欄貨架看板與微工具嵌入工作區
             </p>
           </div>
@@ -323,22 +323,22 @@ export default function SpaceDashboard({
               <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <h3 className="text-sm font-bold text-[#1f2a2e] truncate group-hover:text-[#e17b62] transition-colors" title={space.name}>
+                    <h3 className="text-sm font-bold text-[var(--ink,#1f2a2e)] truncate group-hover:text-[#e17b62] transition-colors" title={space.name}>
                       {space.name}
                     </h3>
                   </div>
-                  <p className="text-[11px] text-[#89959b] line-clamp-2 min-h-[30px] leading-relaxed">
+                  <p className="text-[11px] text-[var(--muted,#89959b)] line-clamp-2 min-h-[30px] leading-relaxed">
                     {space.description || '尚無描述備註'}
                   </p>
                 </div>
 
                 {/* 底部中繼資訊列 */}
-                <div className="pt-2.5 border-t border-[#f0f2f1] flex items-center justify-between text-[11px] gap-2">
-                  <span className="text-[#69787f] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
+                <div className="pt-2.5 border-t border-[var(--line,#f0f2f1)] flex items-center justify-between text-[11px] gap-2">
+                  <span className="text-[var(--muted,#69787f)] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
                     <span>{space.tool_count || 0} 個工具</span>
                   </span>
 
-                  <div className="flex items-center gap-1.5 text-[#89959b] min-w-0">
+                  <div className="flex items-center gap-1.5 text-[var(--muted,#89959b)] min-w-0">
                     {isOwner ? (
                       <span className="notebook-badge-teacher text-[10px] py-0.5 px-2 shrink-0 whitespace-nowrap">
                         我建立的

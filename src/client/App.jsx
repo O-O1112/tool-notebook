@@ -26,6 +26,12 @@ export default function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('notebook_theme') || 'warm';
   });
+  const [lastLightTheme, setLastLightTheme] = useState(() => {
+    const saved = localStorage.getItem('notebook_last_light_theme');
+    if (saved && saved !== 'dark') return saved;
+    const current = localStorage.getItem('notebook_theme');
+    return current && current !== 'dark' ? current : 'warm';
+  });
   const [loadingSpace, setLoadingSpace] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -38,12 +44,24 @@ export default function App() {
 
   // 主題切換與 DOM 根節點同步
   useEffect(() => {
-    document.documentElement.className = `theme-${theme}`;
+    document.documentElement.className = `theme-${theme}${theme === 'dark' ? ' dark' : ''}`;
   }, [theme]);
 
   const handleSelectTheme = (newTheme) => {
     setTheme(newTheme);
     localStorage.setItem('notebook_theme', newTheme);
+    if (newTheme !== 'dark') {
+      setLastLightTheme(newTheme);
+      localStorage.setItem('notebook_last_light_theme', newTheme);
+    }
+  };
+
+  const handleToggleDarkMode = () => {
+    if (theme === 'dark') {
+      handleSelectTheme(lastLightTheme || 'warm');
+    } else {
+      handleSelectTheme('dark');
+    }
   };
 
   // 本地置頂、標籤、便箋色彩與分欄貨架存取輔助
@@ -579,6 +597,7 @@ export default function App() {
         onRegenerateCode={handleRegenerateCode}
         theme={theme}
         onSelectTheme={handleSelectTheme}
+        onToggleDarkMode={handleToggleDarkMode}
         isGuest={isGuest}
       />
 
@@ -660,6 +679,10 @@ export default function App() {
         onDeleteSpace={handleDeleteSpace}
         onImportTools={handleImportTools}
         isOwner={!isGuest && isOwner}
+        theme={theme}
+        onSelectTheme={handleSelectTheme}
+        layout={layout}
+        onToggleLayout={handleToggleLayout}
       />
 
       {/* 輸入邀請碼加入空間對話框 */}

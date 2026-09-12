@@ -197,7 +197,7 @@ export default function SpaceLayout({
   return (
     <div className="space-y-4">
       {/* 頂部搜尋、標籤與過濾篩選工具列 */}
-      <div className="flex flex-col gap-2.5 bg-white px-4 py-3 rounded-notebook border border-[#e4e8e5] shadow-sm">
+      <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-notebook border border-[var(--line,#e4e8e5)] shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* 搜尋框 */}
           <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -226,8 +226,8 @@ export default function SpaceLayout({
               onClick={() => setFilterType('all')}
               className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'all'
-                  ? 'bg-[#1f2a2e] text-white font-semibold'
-                  : 'text-[#69787f] hover:bg-[#f5f7f6]'
+                  ? 'bg-[#e17b62] text-white font-semibold'
+                  : 'text-[var(--muted,#69787f)] hover:bg-[var(--paper,#f5f7f6)]'
               }`}
             >
               全部 ({tools.length})
@@ -237,8 +237,8 @@ export default function SpaceLayout({
               onClick={() => setFilterType('html')}
               className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'html'
-                  ? 'bg-[#1f2a2e] text-white font-semibold'
-                  : 'text-[#69787f] hover:bg-[#f5f7f6]'
+                  ? 'bg-[#e17b62] text-white font-semibold'
+                  : 'text-[var(--muted,#69787f)] hover:bg-[var(--paper,#f5f7f6)]'
               }`}
             >
               自訂程式
@@ -248,8 +248,8 @@ export default function SpaceLayout({
               onClick={() => setFilterType('iframe')}
               className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'iframe'
-                  ? 'bg-[#1f2a2e] text-white font-semibold'
-                  : 'text-[#69787f] hover:bg-[#f5f7f6]'
+                  ? 'bg-[#e17b62] text-white font-semibold'
+                  : 'text-[var(--muted,#69787f)] hover:bg-[var(--paper,#f5f7f6)]'
               }`}
             >
               Iframe 視窗
