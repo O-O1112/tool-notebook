@@ -915,9 +915,9 @@ export default function SpaceDashboard({
           )}
         </div>
 
-        {/* 底部精緻手繪風天際線浮水印 Line Art SVG (滿版寬度自適應) */}
-        <div className="pt-8 pb-2 w-full flex justify-center items-center pointer-events-none overflow-hidden">
-          <PanoramicSkyline className="w-full max-w-6xl h-16 sm:h-20 text-[var(--ink,#1f2a2e)] opacity-25 dark:opacity-15 pointer-events-none" />
+        {/* 底部精緻手繪風天際線浮水印 Line Art SVG (滿版寬度自適應、放大且細緻化) */}
+        <div className="pt-10 pb-4 w-full flex justify-center items-center pointer-events-none overflow-hidden">
+          <PanoramicSkyline className="w-full max-w-7xl h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink,#1f2a2e)] opacity-45 dark:opacity-30 pointer-events-none transition-opacity" />
         </div>
       </section>
     </div>
