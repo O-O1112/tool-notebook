@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './context/AuthContext';
 import LoginCard from './components/LoginCard';
 import Navbar from './components/Navbar';
+import SpaceDashboard from './components/SpaceDashboard';
 import SpaceLayout from './components/SpaceLayout';
 import AddToolModal from './components/AddToolModal';
 import EditToolModal from './components/EditToolModal';
+import CreateSpaceModal from './components/CreateSpaceModal';
 import SpaceSettingsModal from './components/SpaceSettingsModal';
 import JoinSpaceModal from './components/JoinSpaceModal';
 import QRCodeModal from './components/QRCodeModal';
@@ -13,6 +15,10 @@ import { api } from './utils/api';
 export default function App() {
   const { user, loading: authLoading } = useAuth();
 
+  const [currentView, setCurrentView] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('space') || params.get('share')) ? 'space' : 'dashboard';
+  });
   const [spaces, setSpaces] = useState([]);
   const [currentSpace, setCurrentSpace] = useState(null);
   const [tools, setTools] = useState([]);
@@ -21,6 +27,7 @@ export default function App() {
     return localStorage.getItem('notebook_theme') || 'warm';
   });
   const [loadingSpace, setLoadingSpace] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [addModalSection, setAddModalSection] = useState('一般工具');
   const [editingTool, setEditingTool] = useState(null);
@@ -92,6 +99,37 @@ export default function App() {
     localStorage.setItem(`notebook_sections_${spaceId}`, JSON.stringify(map));
   };
 
+  // 載入特定空間的詳情與工具清單 (同步附加置頂、標籤、手帳色與分欄狀態)
+  const loadSpaceDetail = useCallback(async (spaceId) => {
+    setLoadingSpace(true);
+    try {
+      const data = await api.getSpaceDetail(spaceId);
+      setCurrentSpace(data.space);
+      const pinnedIds = getSpacePinnedIds(spaceId);
+      const tagsMap = getSpaceTagsMap(spaceId);
+      const colorsMap = getSpaceColorsMap(spaceId);
+      const sectionsMap = getSpaceSectionsMap(spaceId);
+
+      const enrichedTools = (data.tools || []).map((t) => ({
+        ...t,
+        isPinned: pinnedIds.includes(t.id),
+        tags: tagsMap[t.id] || t.tags || [],
+        color: colorsMap[t.id] || t.color || 'default',
+        section: sectionsMap[t.id] || t.section || '一般工具',
+      }));
+
+      setTools(enrichedTools);
+      setLayout(data.space.layout || 'grid');
+      setIsGuest(false);
+      return data.space;
+    } catch (err) {
+      console.error('載入空間工具失敗:', err);
+      return null;
+    } finally {
+      setLoadingSpace(false);
+    }
+  }, []);
+
   // 檢測 URL 訪客分享連結 (?share=SPC-XXXX)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -121,6 +159,7 @@ export default function App() {
           setTools(enrichedTools);
           setLayout(data.space.layout || 'shelf');
           setIsGuest(true);
+          setCurrentView('space');
         }
       } catch (err) {
         console.error('載入訪客分享空間失敗:', err);
@@ -141,9 +180,20 @@ export default function App() {
     async function fetchSpaces() {
       try {
         const data = await api.getSpaces();
-        setSpaces(data.spaces || []);
-        if (data.spaces && data.spaces.length > 0) {
-          loadSpaceDetail(data.spaces[0].id);
+        const loadedSpaces = data.spaces || [];
+        setSpaces(loadedSpaces);
+
+        // 檢查網址是否有指定的 space 參數
+        const params = new URLSearchParams(window.location.search);
+        const targetSpaceId = params.get('space');
+        if (targetSpaceId) {
+          await loadSpaceDetail(targetSpaceId);
+          setCurrentView('space');
+        } else if (params.get('share')) {
+          // 訪客分享由 share effect 處理
+        } else {
+          // 預設進入 Padlet 空間主頁大廳
+          setCurrentView('dashboard');
         }
       } catch (err) {
         console.error('載入空間列表失敗:', err);
@@ -151,35 +201,47 @@ export default function App() {
     }
 
     fetchSpaces();
-  }, [user]);
+  }, [user, loadSpaceDetail]);
 
-  // 2. 載入特定空間的詳情與工具清單 (同步附加置頂、標籤、手帳色與分欄狀態)
-  const loadSpaceDetail = async (spaceId) => {
-    setLoadingSpace(true);
-    try {
-      const data = await api.getSpaceDetail(spaceId);
-      setCurrentSpace(data.space);
-      const pinnedIds = getSpacePinnedIds(spaceId);
-      const tagsMap = getSpaceTagsMap(spaceId);
-      const colorsMap = getSpaceColorsMap(spaceId);
-      const sectionsMap = getSpaceSectionsMap(spaceId);
+  // 瀏覽器上一頁/下一頁歷史監聽
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const spaceId = params.get('space');
+      const shareCode = params.get('share');
+      if (shareCode) {
+        setCurrentView('space');
+      } else if (spaceId) {
+        loadSpaceDetail(spaceId);
+        setCurrentView('space');
+      } else {
+        setCurrentView('dashboard');
+      }
+    };
 
-      const enrichedTools = (data.tools || []).map((t) => ({
-        ...t,
-        isPinned: pinnedIds.includes(t.id),
-        tags: tagsMap[t.id] || t.tags || [],
-        color: colorsMap[t.id] || t.color || 'default',
-        section: sectionsMap[t.id] || t.section || '一般工具',
-      }));
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [loadSpaceDetail]);
 
-      setTools(enrichedTools);
-      setLayout(data.space.layout || 'grid');
-      setIsGuest(false);
-    } catch (err) {
-      console.error('載入空間工具失敗:', err);
-    } finally {
-      setLoadingSpace(false);
+  // 空間切換：進入空間工作區並同步網址
+  const handleSelectSpace = async (spaceId) => {
+    const loaded = await loadSpaceDetail(spaceId);
+    if (loaded) {
+      setCurrentView('space');
+      const url = new URL(window.location);
+      url.searchParams.set('space', spaceId);
+      url.searchParams.delete('share');
+      window.history.pushState({ spaceId }, '', url.toString());
     }
+  };
+
+  // 返回大廳：切回主頁空間牆並清理網址參數
+  const handleNavigateHome = () => {
+    setCurrentView('dashboard');
+    const url = new URL(window.location);
+    url.searchParams.delete('space');
+    url.searchParams.delete('share');
+    window.history.pushState({}, '', url.toString());
   };
 
   // 切換置頂釘選狀態
@@ -194,11 +256,14 @@ export default function App() {
   };
 
   // 3. 建立新空間
-  const handleCreateSpace = async (name) => {
+  const handleCreateSpace = async (spaceData) => {
     try {
-      const data = await api.createSpace({ name, layout: 'grid' });
+      const payload = typeof spaceData === 'string'
+        ? { name: spaceData, layout: 'shelf' }
+        : spaceData;
+      const data = await api.createSpace(payload);
       setSpaces((prev) => [data.space, ...prev]);
-      loadSpaceDetail(data.space.id);
+      await handleSelectSpace(data.space.id);
     } catch (err) {
       alert(err.message || '建立空間失敗');
     }
@@ -210,7 +275,7 @@ export default function App() {
     alert(data.message || '成功加入空間！');
     const listRes = await api.getSpaces();
     setSpaces(listRes.spaces || []);
-    loadSpaceDetail(data.space.id);
+    await handleSelectSpace(data.space.id);
   };
 
   // 5. 重新產生邀請碼
@@ -228,13 +293,16 @@ export default function App() {
     }
   };
 
-  // 6. 切換佈局 (網格 | 分頁 | 折起專注)
+  // 6. 切換佈局 (貨架 | 瀑布流 | 網格 | 分頁 | 折起專注)
   const handleToggleLayout = async (newLayout) => {
     setLayout(newLayout);
     if (currentSpace && isOwner) {
       try {
         await api.updateSpace(currentSpace.id, { layout: newLayout });
         setCurrentSpace((prev) => ({ ...prev, layout: newLayout }));
+        setSpaces((prev) =>
+          prev.map((s) => (s.id === currentSpace.id ? { ...s, layout: newLayout } : s))
+        );
       } catch (err) {
         console.warn('儲存佈局設定失敗:', err);
       }
@@ -410,15 +478,15 @@ export default function App() {
 
   // 13. 刪除空間
   const handleDeleteSpace = async (spaceId) => {
+    if (!window.confirm('確定要刪除這個空間嗎？空間內的所有工具都將被刪除且無法復原。')) return;
     try {
       await api.deleteSpace(spaceId);
       const remainingSpaces = spaces.filter((s) => s.id !== spaceId);
       setSpaces(remainingSpaces);
       setSettingsModalOpen(false);
 
-      if (remainingSpaces.length > 0) {
-        loadSpaceDetail(remainingSpaces[0].id);
-      } else {
+      if (currentSpace?.id === spaceId) {
+        handleNavigateHome();
         setCurrentSpace(null);
         setTools([]);
       }
@@ -491,12 +559,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col notebook-grid-bg">
-      {/* 頂部導覽列 */}
+      {/* 頂部導覽列：Padlet 大廳 vs 空間工作區動態切換 */}
       <Navbar
+        currentView={currentView}
+        onNavigateHome={handleNavigateHome}
         spaces={spaces}
         currentSpace={currentSpace}
-        onSelectSpace={loadSpaceDetail}
-        onCreateSpace={handleCreateSpace}
+        onSelectSpace={handleSelectSpace}
+        onOpenCreateModal={() => setCreateModalOpen(true)}
         onOpenJoinModal={() => setJoinModalOpen(true)}
         onAddToolClick={() => {
           setAddModalSection('一般工具');
@@ -512,9 +582,26 @@ export default function App() {
         isGuest={isGuest}
       />
 
-      {/* 主內容區塊 */}
+      {/* 主內容區塊：大廳卡片牆 vs 空間小工具排版 */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
-        {loadingSpace ? (
+        {currentView === 'dashboard' ? (
+          <SpaceDashboard
+            spaces={spaces}
+            onSelectSpace={handleSelectSpace}
+            onCreateSpaceClick={() => setCreateModalOpen(true)}
+            onOpenJoinModal={() => setJoinModalOpen(true)}
+            onOpenQRCode={(space) => {
+              setCurrentSpace(space);
+              setQrModalOpen(true);
+            }}
+            onOpenSettings={(space) => {
+              setCurrentSpace(space);
+              setSettingsModalOpen(true);
+            }}
+            onDeleteSpace={handleDeleteSpace}
+            user={user}
+          />
+        ) : loadingSpace ? (
           <div className="py-24 flex items-center justify-center text-sm text-[#89959b] gap-2">
             <div className="w-5 h-5 border-2 border-[#e17b62] border-t-transparent rounded-full animate-spin" />
             <span>讀取工具中…</span>
@@ -539,6 +626,13 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* 建立新空間對話框 */}
+      <CreateSpaceModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreateSpace={handleCreateSpace}
+      />
 
       {/* 貼上 / 範本新增工具對話框 */}
       <AddToolModal
