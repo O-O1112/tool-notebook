@@ -31,6 +31,14 @@ import {
   Shield,
   FolderX,
 } from 'lucide-react';
+import {
+  TrashEmptyIllustration,
+  FavoritesEmptyIllustration,
+  SpacesEmptyIllustration,
+  SharedEmptyIllustration,
+  SearchEmptyIllustration,
+  PanoramicSkyline,
+} from './Illustrations';
 
 const COVER_COLORS = [
   { bg: '#fff0eb', border: '#f7d2c8', accent: '#e17b62' }, // 珊瑚蜜桃
@@ -201,24 +209,48 @@ export default function SpaceDashboard({
     }
   };
 
+  const renderEmptyIllustration = () => {
+    if (searchQuery.trim()) {
+      return <SearchEmptyIllustration className="w-72 sm:w-80 h-44 sm:h-48 mb-2" />;
+    }
+    switch (activeNav) {
+      case 'trash':
+        return <TrashEmptyIllustration className="w-72 sm:w-80 h-48 sm:h-52 mb-2" />;
+      case 'favorites':
+        return <FavoritesEmptyIllustration className="w-72 sm:w-80 h-48 sm:h-52 mb-2" />;
+      case 'shared':
+        return <SharedEmptyIllustration className="w-72 sm:w-80 h-48 sm:h-52 mb-2" />;
+      default:
+        return <SpacesEmptyIllustration className="w-72 sm:w-80 h-48 sm:h-52 mb-2" />;
+    }
+  };
+
   const getNavEmptyMessage = () => {
+    if (searchQuery.trim()) {
+      return {
+        title: `找不到相符於「${searchQuery.trim()}」的手帳空間`,
+        desc: '請嘗試檢查空間名稱、描述關鍵字，或是確認邀請碼無誤。',
+        action: () => setSearchQuery(''),
+        actionText: '清除搜尋關鍵字',
+      };
+    }
     switch (activeNav) {
       case 'favorites':
         return {
-          title: '尚無已加星號的空間',
-          desc: '點擊空間卡片右上角的 ⭐ 星星圖標，即可將常用空間加入我的最愛。',
+          title: '尚無已加星號的手帳空間',
+          desc: '點擊任何空間卡片右上角的 ⭐ 星號，即可將常用空間收入我的最愛。',
           action: null,
         };
       case 'trash':
         return {
-          title: '資源回收桶乾乾淨淨',
-          desc: '這裡沒有被移至垃圾桶的空間，安心創作無負擔。',
+          title: '您尚未將任何手帳空間丟入垃圾桶',
+          desc: '最近刪除的手帳空間將會列在此處，隨時可以安全還原。',
           action: null,
         };
       case 'shared':
         return {
-          title: '尚無他人共享的空間',
-          desc: '點擊「加入他人空間」，輸入好友或同事的邀請碼即可共同協作！',
+          title: '尚無他人共享的手帳空間',
+          desc: '輸入同伴分享的邀請碼即可共同協作，隨時激盪靈感！',
           action: onOpenJoinModal,
           actionText: '輸入邀請碼加入',
         };
@@ -231,7 +263,7 @@ export default function SpaceDashboard({
         };
       default:
         return {
-          title: '尚未有空間記錄',
+          title: '尚未有任何空間記錄',
           desc: '點擊下方按鈕建立全新空間，或是加入團隊分享的手帳本！',
           action: onCreateSpaceClick,
           actionText: '建立新空間',
@@ -844,20 +876,10 @@ export default function SpaceDashboard({
               )}
             </div>
           ) : (
-            /* 無資料時的手繪風空狀態卡片 */
-            <div className="p-12 notebook-card bg-[var(--card-bg)] text-center space-y-3 flex flex-col items-center justify-center min-h-[300px]">
-              <div className="w-14 h-14 rounded-2xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] shadow-xs">
-                {activeNav === 'favorites' ? (
-                  <Star size={24} className="fill-amber-400 text-amber-500" />
-                ) : activeNav === 'trash' ? (
-                  <Trash2 size={24} className="text-emerald-500" />
-                ) : activeNav === 'shared' ? (
-                  <Users size={24} className="text-[#3b827e]" />
-                ) : (
-                  <FolderPlus size={24} className="text-[#e17b62]" />
-                )}
-              </div>
-              <h3 className="text-sm font-bold text-[var(--ink,#1f2a2e)]">
+            /* 無資料時的手繪風空狀態插畫卡片 */
+            <div className="p-8 sm:p-14 notebook-card bg-[var(--card-bg)] text-center space-y-3 flex flex-col items-center justify-center min-h-[360px] animate-fadeIn">
+              {renderEmptyIllustration()}
+              <h3 className="text-base font-bold text-[var(--ink,#1f2a2e)]">
                 {getNavEmptyMessage().title}
               </h3>
               <p className="text-xs text-[var(--muted,#89959b)] max-w-md leading-relaxed">
@@ -867,7 +889,7 @@ export default function SpaceDashboard({
                 <button
                   type="button"
                   onClick={getNavEmptyMessage().action}
-                  className="notebook-btn-primary text-xs py-2 px-4 mt-2"
+                  className="notebook-btn-primary text-xs py-2 px-5 mt-2 shadow-xs hover:scale-105 transition-transform"
                 >
                   {getNavEmptyMessage().actionText}
                 </button>
@@ -877,40 +899,8 @@ export default function SpaceDashboard({
         </div>
 
         {/* 底部精緻手繪風天際線浮水印 Line Art SVG (滿版寬度自適應) */}
-        <div className="pt-8 pb-2 w-full flex justify-center items-center pointer-events-none opacity-20 dark:opacity-10 overflow-hidden">
-          <svg
-            className="w-full max-w-5xl h-16 text-[var(--ink,#1f2a2e)]"
-            viewBox="0 0 800 60"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            {/* 手繪風書本、筆記天際線與建築輪廓 */}
-            <path d="M 0 55 L 800 55" />
-            <path d="M 30 55 L 30 35 L 50 35 L 50 55" />
-            <path d="M 40 35 L 40 25 L 45 20 L 50 25" />
-            <path d="M 70 55 L 70 40 L 95 40 L 95 55" />
-            <path d="M 120 55 L 120 20 L 145 20 L 145 55" />
-            <path d="M 125 25 L 140 25 M 125 32 L 140 32 M 125 39 L 140 39" />
-            <path d="M 170 55 L 170 38 L 195 38 L 195 55" />
-            <path d="M 220 55 L 220 15 L 235 5 L 250 15 L 250 55" />
-            <circle cx="235" cy="25" r="4" />
-            <path d="M 270 55 L 270 42 L 300 42 L 300 55" />
-            <path d="M 320 55 L 340 30 L 360 55" />
-            <path d="M 380 55 L 380 25 L 415 25 L 415 55" />
-            <path d="M 390 32 L 405 32 M 390 40 L 405 40" />
-            <path d="M 440 55 L 440 35 L 470 35 L 470 55" />
-            <path d="M 490 55 L 500 18 L 515 18 L 525 55" />
-            <path d="M 505 18 L 508 10 L 512 18" />
-            <path d="M 550 55 L 550 30 L 580 30 L 580 55" />
-            <path d="M 605 55 L 605 22 L 635 22 L 635 55" />
-            <path d="M 615 30 L 625 30 M 615 38 L 625 38 M 615 46 L 625 46" />
-            <path d="M 660 55 L 660 40 L 690 40 L 690 55" />
-            <path d="M 710 55 L 725 28 L 740 55" />
-            <path d="M 760 55 L 760 36 L 785 36 L 785 55" />
-          </svg>
+        <div className="pt-8 pb-2 w-full flex justify-center items-center pointer-events-none overflow-hidden">
+          <PanoramicSkyline className="w-full max-w-6xl h-16 sm:h-20 text-[var(--ink,#1f2a2e)] opacity-25 dark:opacity-15 pointer-events-none" />
         </div>
       </section>
     </div>

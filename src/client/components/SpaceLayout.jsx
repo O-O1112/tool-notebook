@@ -22,6 +22,7 @@ import {
 import ToolCard from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
+import { ToolsEmptyIllustration, SearchEmptyIllustration } from './Illustrations';
 
 export default function SpaceLayout({
   tools = [],
@@ -166,21 +167,21 @@ export default function SpaceLayout({
 
   if (!tools || tools.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-        <div className="notebook-card p-8 max-w-md w-full flex flex-col items-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#fff0eb] text-[#e17b62] flex items-center justify-center mb-4 border border-[#e1ac9e]">
-            <Plus size={28} />
+      <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4 text-center animate-fadeIn">
+        <div className="notebook-card p-8 sm:p-12 max-w-lg w-full flex flex-col items-center shadow-lg space-y-4">
+          <ToolsEmptyIllustration className="w-72 sm:w-80 h-48 sm:h-52 mb-1" />
+          <div className="space-y-1.5">
+            <h3 className="text-base font-bold text-[var(--ink,#1f2a2e)]">
+              這個手帳空間還沒有任何小工具
+            </h3>
+            <p className="text-xs text-[var(--muted,#89959b)] leading-relaxed max-w-sm mx-auto">
+              點擊下方按鈕，挑選現成高質感範本或貼上代碼，立即開啟專屬手帳儀表板！
+            </p>
           </div>
-          <h3 className="text-lg font-semibold text-[#1f2a2e] mb-1">
-            這個空間還沒有任何小工具
-          </h3>
-          <p className="text-xs text-[#89959b] mb-6 leading-relaxed">
-            點擊下方按鈕，直接挑選實用範本或貼上代碼，即可在空間中開始使用！
-          </p>
           {isOwner && (
             <button
               onClick={() => onOpenAddModal && onOpenAddModal('一般工具')}
-              className="notebook-btn-primary w-full py-2.5 justify-center"
+              className="notebook-btn-primary w-full py-2.5 justify-center shadow-xs hover:scale-[1.02] transition-transform"
             >
               <Plus size={16} />
               <span>挑選範本或貼上工具代碼</span>
@@ -291,10 +292,27 @@ export default function SpaceLayout({
         )}
       </div>
 
-      {/* 搜尋無結果提示 */}
+      {/* 搜尋無結果提示插畫 */}
       {sortedAndFilteredTools.length === 0 && (
-        <div className="notebook-card p-8 text-center text-[#89959b] text-xs">
-          找不到符合「{searchQuery || selectedTag}」的小工具，請嘗試其他關鍵字或清除篩選。
+        <div className="notebook-card p-8 sm:p-12 text-center flex flex-col items-center justify-center space-y-3 animate-fadeIn">
+          <SearchEmptyIllustration className="w-64 sm:w-72 h-40 sm:h-44 mb-1" />
+          <h3 className="text-sm font-bold text-[var(--ink,#1f2a2e)]">找不到相符的小工具</h3>
+          <p className="text-xs text-[var(--muted,#89959b)] max-w-sm leading-relaxed">
+            找不到符合「{searchQuery || selectedTag}」的小工具，請嘗試其他關鍵字或清除篩選。
+          </p>
+          {(searchQuery || selectedTag) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedTag(null);
+                setFilterType('all');
+              }}
+              className="notebook-btn-secondary text-xs py-1.5 px-3 mt-1"
+            >
+              清除所有搜尋與篩選
+            </button>
+          )}
         </div>
       )}
 
