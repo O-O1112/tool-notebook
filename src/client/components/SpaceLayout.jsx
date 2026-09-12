@@ -268,8 +268,8 @@ export default function SpaceLayout({
               onClick={() => setSelectedTag(null)}
               className={`px-2.5 py-0.5 rounded-full text-[11px] transition-all shrink-0 ${
                 !selectedTag
-                  ? 'bg-[#1f2a2e] text-white font-semibold shadow-xs'
-                  : 'notebook-tag hover:text-[#1f2a2e]'
+                  ? 'bg-[var(--ink,#1f2a2e)] text-[var(--paper,#ffffff)] font-semibold shadow-xs'
+                  : 'notebook-tag hover:text-[var(--ink,#1f2a2e)]'
               }`}
             >
               全部

@@ -632,13 +632,9 @@ export default function SpaceDashboard({
                     }}
                     className={`dashboard-space-card group ${isTrashItem ? 'opacity-70 hover:opacity-100' : ''}`}
                   >
-                    {/* 卡片頂部封面底紋 */}
+                    {/* 卡片頂部封面底紋 (支援深淺自適應，深色模式低飽和沉穩優雅) */}
                     <div
-                      className="dashboard-cover dashboard-cover-pattern"
-                      style={{
-                        backgroundColor: isTrashItem ? '#f0f2f1' : coverStyle.bg,
-                        borderBottom: `1px solid ${isTrashItem ? '#dbe0dd' : coverStyle.border}`,
-                      }}
+                      className={`dashboard-cover dashboard-cover-pattern cover-theme-${isTrashItem ? 'trash' : idx % 6}`}
                     >
                       {/* 佈局模式徽章 */}
                       <span className="notebook-badge bg-white/90 backdrop-blur text-[11px] shadow-xs flex items-center gap-1">

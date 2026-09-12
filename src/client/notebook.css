@@ -18,17 +18,17 @@
 }
 
 .theme-dark {
-  --paper: #12161c;
-  --card-bg: #1c222b;
-  --line: #2b3340;
-  --ink: #e6edf3;
-  --muted: #8a96a4;
-  --faint: #4c5765;
-  --coral: #e57d66;
-  --coral-hover: #f18e77;
-  --coral-light: #2d201e;
-  --coral-border: #754035;
-  --grid-line: #ffffff0a;
+  --paper: #11151a;
+  --card-bg: #1a212a;
+  --line: #293442;
+  --ink: #f0f6fc;
+  --muted: #9eabb8;
+  --faint: #657487;
+  --coral: #f08b73;
+  --coral-hover: #f99c87;
+  --coral-light: rgba(225, 123, 98, 0.15);
+  --coral-border: rgba(225, 123, 98, 0.35);
+  --grid-line: rgba(255, 255, 255, 0.035);
 }
 
 .theme-kraft {
@@ -443,6 +443,26 @@ html, body, #root {
 }
 
 /* ========================================================
+   手帳空間卡片封面主題配色 (Space Cover Themes)
+   ======================================================== */
+.cover-theme-0 { background-color: #fff0eb; border-bottom: 1px solid #f7d2c8; }
+.cover-theme-1 { background-color: #f1f9f6; border-bottom: 1px solid #c7eadc; }
+.cover-theme-2 { background-color: #f0f7ff; border-bottom: 1px solid #cce1ff; }
+.cover-theme-3 { background-color: #f7f2fd; border-bottom: 1px solid #e5d3f8; }
+.cover-theme-4 { background-color: #fefde8; border-bottom: 1px solid #fae99f; }
+.cover-theme-5 { background-color: #fbf4ee; border-bottom: 1px solid #ecd9c8; }
+.cover-theme-trash { background-color: #f0f2f1; border-bottom: 1px solid #dbe0dd; }
+
+/* 深色模式專用低彩度寶石墨色封面 (柔和護眼，徹底解決刺眼浮誇問題) */
+.theme-dark .cover-theme-0 { background-color: #271e1c !important; border-bottom: 1px solid #422d27 !important; }
+.theme-dark .cover-theme-1 { background-color: #162421 !important; border-bottom: 1px solid #233e38 !important; }
+.theme-dark .cover-theme-2 { background-color: #16212e !important; border-bottom: 1px solid #233852 !important; }
+.theme-dark .cover-theme-3 { background-color: #221a2d !important; border-bottom: 1px solid #37254d !important; }
+.theme-dark .cover-theme-4 { background-color: #262215 !important; border-bottom: 1px solid #41371e !important; }
+.theme-dark .cover-theme-5 { background-color: #241c18 !important; border-bottom: 1px solid #3c2c23 !important; }
+.theme-dark .cover-theme-trash { background-color: #181d24 !important; border-bottom: 1px solid #283342 !important; }
+
+/* ========================================================
    深色模式全域適配強化 (Full Dark Mode Overhaul)
    ======================================================== */
 .theme-dark {
@@ -451,13 +471,13 @@ html, body, #root {
 
 /* 頂部導覽列暗色化 */
 .theme-dark header {
-  background-color: rgba(28, 34, 43, 0.92) !important;
+  background-color: rgba(26, 33, 42, 0.92) !important;
   border-bottom-color: var(--line) !important;
 }
 
 /* 空間大廳迎賓橫幅暗色化 */
 .theme-dark .dashboard-banner {
-  background-color: rgba(28, 34, 43, 0.85) !important;
+  background-color: rgba(26, 33, 42, 0.85) !important;
   border-color: var(--line) !important;
 }
 
@@ -476,27 +496,91 @@ html, body, #root {
   color: var(--ink) !important;
 }
 
+.theme-dark .bg-white\/70,
 .theme-dark .bg-white\/80,
 .theme-dark .bg-white\/90 {
-  background-color: rgba(28, 34, 43, 0.88) !important;
+  background-color: rgba(36, 44, 56, 0.88) !important;
+  color: var(--ink) !important;
 }
 
 /* 次級背景區塊 (灰色塊、輸入背景) */
 .theme-dark .bg-\[\#f5f7f6\],
-.theme-dark .bg-gray-50 {
-  background-color: #161b22 !important;
+.theme-dark .bg-gray-50,
+.theme-dark .bg-\[\#fdfdfc\] {
+  background-color: #14181f !important;
+  border-color: var(--line) !important;
+}
+
+/* 佈局切換器與次級控制列中作用中按鈕微調 */
+.theme-dark .bg-\[\#f5f7f6\] .bg-white {
+  background-color: #27313f !important;
+  color: #f08b73 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 貨架分欄背景微調 */
+.theme-dark .shelf-column-card {
+  background: #171c24 !important;
   border-color: var(--line) !important;
 }
 
 /* 邊框線條全面暗色適配 */
 .theme-dark .border-\[\#e4e8e5\],
-.theme-dark .border-\[\#f0f2f1\] {
+.theme-dark .border-\[\#f0f2f1\],
+.theme-dark .border-\[\#d8dedb\],
+.theme-dark .border-\[\#cbd4d0\] {
   border-color: var(--line) !important;
 }
 
-/* 主要與次要文字對比度強化 */
+.theme-dark .border-\[\#f7d2c8\],
+.theme-dark .border-\[\#e1ac9e\],
+.theme-dark .border-\[\#f7d2c8\]\/60 {
+  border-color: rgba(225, 123, 98, 0.35) !important;
+}
+
+.theme-dark .border-\[\#c7eadc\] {
+  border-color: rgba(56, 178, 172, 0.35) !important;
+}
+
+.theme-dark .border-\[\#cce1ff\] {
+  border-color: rgba(96, 165, 250, 0.35) !important;
+}
+
+.theme-dark .border-\[\#e5d3f8\] {
+  border-color: rgba(167, 139, 250, 0.35) !important;
+}
+
+.theme-dark .border-\[\#fae99f\] {
+  border-color: rgba(251, 191, 36, 0.35) !important;
+}
+
+.theme-dark .border-\[\#ecd9c8\] {
+  border-color: rgba(224, 139, 104, 0.35) !important;
+}
+
+.theme-dark .border-amber-200\/60,
+.theme-dark .border-amber-200 {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+.theme-dark .border-red-200\/60,
+.theme-dark .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+.theme-dark .border-emerald-200,
+.theme-dark .border-\[\#b8dfd9\],
+.theme-dark .border-\[\#bce1dd\] {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+/* 主要與次要文字對比度強化 (消除不明顯/死灰字體) */
 .theme-dark .text-\[\#1f2a2e\] {
   color: var(--ink) !important;
+}
+
+.theme-dark .text-\[\#57767f\] {
+  color: #9cb1b8 !important;
 }
 
 .theme-dark .text-\[\#526066\],
@@ -509,16 +593,37 @@ html, body, #root {
   color: var(--faint) !important;
 }
 
+.theme-dark .text-\[\#3b827e\] {
+  color: #4fd1c5 !important;
+}
+
+.theme-dark .text-\[\#e17b62\] {
+  color: #f08b73 !important;
+}
+
+.theme-dark .text-amber-600 {
+  color: #fbbf24 !important;
+}
+
+.theme-dark .text-red-600 {
+  color: #f87171 !important;
+}
+
+.theme-dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
 /* 品牌小書本標章暗色微調 */
 .theme-dark .brand-mark {
   background: var(--coral-light) !important;
   border-color: var(--coral-border) !important;
 }
 
-/* 空間大廳卡片封面條紋暗色微調 */
-.theme-dark .dashboard-cover {
-  border-bottom-color: var(--line) !important;
-  filter: brightness(0.78) saturate(1.2);
+/* 空間卡片封面條紋暗色微調 (改為柔和網格，移除高亮光濾鏡) */
+.theme-dark .dashboard-cover-pattern {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
 }
 
 /* 大廳新增空間虛線卡暗色微調 */
@@ -581,10 +686,14 @@ html, body, #root {
   border: 1px solid var(--line);
 }
 
-/* 側邊欄與頁籤暗色適配 */
-.theme-dark .bg-\[\#fff0eb\] {
+/* 柔和彩色背景在深色模式下轉換為半透明溫潤色調，解決太突出問題 */
+.theme-dark .bg-\[\#fff0eb\],
+.theme-dark .bg-\[\#fff9f6\],
+.theme-dark .bg-\[\#fff4f0\],
+.theme-dark .bg-\[\#fff5f2\],
+.theme-dark .bg-\[\#fff9f7\] {
   background-color: rgba(225, 123, 98, 0.15) !important;
-  color: #e57d66 !important;
+  color: #f08b73 !important;
 }
 
 .theme-dark .bg-amber-50 {
@@ -598,22 +707,46 @@ html, body, #root {
 }
 
 .theme-dark .bg-emerald-50,
-.theme-dark .bg-emerald-50\/50 {
-  background-color: rgba(16, 185, 129, 0.12) !important;
+.theme-dark .bg-emerald-50\/50,
+.theme-dark .bg-\[\#f0f7f6\] {
+  background-color: rgba(16, 185, 129, 0.15) !important;
   color: #34d399 !important;
 }
 
-.theme-dark .border-amber-200\/60 {
-  border-color: rgba(245, 158, 11, 0.3) !important;
+/* 懸浮互動狀態修復 (防止文字變黑消失，或背景反白刺眼) */
+.theme-dark .hover\:text-\[\#1f2a2e\]:hover {
+  color: #f0f6fc !important;
 }
 
-.theme-dark .border-red-200\/60,
-.theme-dark .border-red-200 {
-  border-color: rgba(239, 68, 68, 0.3) !important;
+.theme-dark .hover\:text-\[\#e17b62\]:hover {
+  color: #f08b73 !important;
 }
 
-.theme-dark .border-emerald-200 {
-  border-color: rgba(16, 185, 129, 0.3) !important;
+.theme-dark .hover\:text-amber-500:hover {
+  color: #fbbf24 !important;
+}
+
+.theme-dark .hover\:bg-\[\#f5f7f6\]:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.theme-dark .hover\:bg-\[\#fff0eb\]:hover,
+.theme-dark .hover\:bg-\[\#fff9f7\]:hover,
+.theme-dark .hover\:bg-\[\#fff9f6\]:hover {
+  background-color: rgba(225, 123, 98, 0.18) !important;
+}
+
+.theme-dark .hover\:bg-white\/90:hover,
+.theme-dark .hover\:bg-white:hover {
+  background-color: rgba(45, 55, 70, 0.95) !important;
+}
+
+.theme-dark .hover\:bg-red-50:hover {
+  background-color: rgba(239, 68, 68, 0.18) !important;
+}
+
+.theme-dark .hover\:border-\[\#f7d2c8\]:hover {
+  border-color: rgba(225, 123, 98, 0.45) !important;
 }
 
 .scrollbar-none::-webkit-scrollbar {
