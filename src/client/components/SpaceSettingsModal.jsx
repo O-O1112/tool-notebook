@@ -55,6 +55,8 @@ export default function SpaceSettingsModal({
   onSelectTheme,
   layout = 'shelf',
   onToggleLayout,
+  isArchived = false,
+  onToggleArchive,
 }) {
   const { user: authUser, updateProfile, logout } = useAuth();
   const currentUser = propUser || authUser;
@@ -577,6 +579,29 @@ export default function SpaceSettingsModal({
                     <span className="text-[11px] text-[var(--muted)] block">空間邀請碼</span>
                     <span className="font-mono font-bold text-sm text-[var(--coral)] tracking-wider">{space.invite_code}</span>
                   </div>
+                </div>
+              )}
+
+              {/* 空間封存狀態設定 */}
+              {isOwner && onToggleArchive && (
+                <div className="p-3.5 rounded-xl bg-[var(--paper)] border border-[var(--line)] flex items-center justify-between gap-3">
+                  <div className="space-y-0.5 min-w-0">
+                    <span className="text-xs font-bold text-[var(--ink)] block">封存此手帳空間</span>
+                    <span className="text-[10px] text-[var(--muted)] block leading-relaxed">
+                      封存後此空間將於空間列表標記為「已封存」，便於封存過去學期或已完成的專案看板。
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onToggleArchive(space.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 border ${
+                      isArchived
+                        ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 shadow-xs'
+                        : 'bg-[var(--card-bg)] text-[var(--muted)] border-[var(--line)] hover:text-[var(--ink)]'
+                    }`}
+                  >
+                    {isArchived ? '已封存 (點擊解封)' : '封存空間'}
+                  </button>
                 </div>
               )}
 

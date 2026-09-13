@@ -8,8 +8,8 @@ import authRoutes from '../src/server/routes/auth.js';
 import spacesRoutes from '../src/server/routes/spaces.js';
 import { TOOL_TEMPLATES } from '../src/client/utils/toolTemplates.js';
 
-test('templates: 應內建 10 款實用高質感小工具範本', () => {
-  assert.strictEqual(TOOL_TEMPLATES.length, 10);
+test('templates: 應內建 15 款實用高質感小工具範本', () => {
+  assert.strictEqual(TOOL_TEMPLATES.length, 15);
   const ids = TOOL_TEMPLATES.map(t => t.id);
   assert.ok(ids.includes('pomodoro'));
   assert.ok(ids.includes('decision_wheel'));
@@ -21,6 +21,11 @@ test('templates: 應內建 10 款實用高質感小工具範本', () => {
   assert.ok(ids.includes('json_formatter'));
   assert.ok(ids.includes('world_clock'));
   assert.ok(ids.includes('text_tools'));
+  assert.ok(ids.includes('white_noise'));
+  assert.ok(ids.includes('habit_tracker'));
+  assert.ok(ids.includes('unit_converter'));
+  assert.ok(ids.includes('lucky_picker'));
+  assert.ok(ids.includes('countdown_board'));
 
   TOOL_TEMPLATES.forEach(t => {
     assert.ok(t.title, '範本應有標題');

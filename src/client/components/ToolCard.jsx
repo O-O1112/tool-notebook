@@ -12,7 +12,13 @@ import {
   Pencil,
   Pin,
   ExternalLink,
-  Palette
+  Palette,
+  Copy,
+  Download,
+  Send,
+  MoreVertical,
+  CheckSquare,
+  Square,
 } from 'lucide-react';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput } from '../utils/codeParser';
@@ -28,6 +34,11 @@ export default function ToolCard({
   onToggleColSpan,
   onTogglePin,
   onChangeColor,
+  onDuplicate,
+  onCloneToSpace,
+  isBatchMode = false,
+  isSelected = false,
+  onToggleSelect,
   layout = 'grid',
   draggable = true,
   onDragStart,
@@ -38,6 +49,32 @@ export default function ToolCard({
 }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+
+  const handleExportTool = (e) => {
+    e.stopPropagation();
+    const exportData = {
+      version: '2.2.0-tool',
+      exportedAt: new Date().toISOString(),
+      tool: {
+        title: tool.title,
+        type: tool.type,
+        content: tool.content,
+        col_span: tool.col_span || 1,
+        tags: tool.tags || [],
+        color: tool.color || 'default',
+        section: tool.section || '一般工具',
+      }
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `小工具_${tool.title.replace(/[\\/:*?"<>|]/g, '_')}.tool.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setMoreMenuOpen(false);
+  };
 
   const parsed = parseToolInput(tool.content);
   const colSpan = tool.col_span || 1;
@@ -115,8 +152,23 @@ export default function ToolCard({
       {/* 工具卡片頂部控制列 */}
       <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--line)] bg-inherit select-none gap-2">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
+          {/* 批次選取框 */}
+          {isBatchMode && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSelect && onToggleSelect(tool.id);
+              }}
+              className="p-0.5 text-[var(--coral)] hover:scale-110 transition-transform shrink-0"
+              title={isSelected ? '取消選取' : '選取此工具'}
+            >
+              {isSelected ? <CheckSquare size={16} className="fill-[var(--coral-light)]" /> : <Square size={16} className="text-[var(--muted)]" />}
+            </button>
+          )}
+
           {/* 拖曳把手 */}
-          {isOwner && (
+          {isOwner && !isBatchMode && (
             <div
               className="cursor-grab active:cursor-grabbing p-1 text-[var(--faint)] hover:text-[var(--ink)] rounded-lg transition-colors shrink-0"
               title="拖曳以重新排列工具順序"
@@ -159,30 +211,90 @@ export default function ToolCard({
               </button>
 
               {colorMenuOpen && (
-                <div className="absolute right-0 mt-1 w-36 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn">
-                  <div className="text-[10px] font-semibold text-[var(--muted)] px-2 py-1 uppercase tracking-wider">
-                    便箋底色
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setColorMenuOpen(false)} />
+                  <div className="absolute right-0 mt-1 w-36 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn">
+                    <div className="text-[10px] font-semibold text-[var(--muted)] px-2 py-1 uppercase tracking-wider">
+                      便箋底色
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5 p-1">
+                      {CARD_COLORS.map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => {
+                            onChangeColor(tool.id, c.id);
+                            setColorMenuOpen(false);
+                          }}
+                          className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-transform hover:scale-110 ${
+                            (tool.color || 'default') === c.id ? 'ring-2 ring-[var(--coral)]' : ''
+                          }`}
+                          style={{ backgroundColor: c.bg, borderColor: c.border }}
+                          title={c.label}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-1.5 p-1">
-                    {CARD_COLORS.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => {
-                          onChangeColor(tool.id, c.id);
-                          setColorMenuOpen(false);
-                        }}
-                        className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-transform hover:scale-110 ${
-                          (tool.color || 'default') === c.id ? 'ring-2 ring-[var(--coral)]' : ''
-                        }`}
-                        style={{ backgroundColor: c.bg, borderColor: c.border }}
-                        title={c.label}
-                      />
-                    ))}
-                  </div>
-                </div>
+                </>
               )}
             </div>
           )}
+
+          {/* 更多操作選單 (建立副本、複製至其他空間、匯出 JSON) */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+              className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
+              title="更多小工具動作"
+            >
+              <MoreVertical size={14} />
+            </button>
+
+            {moreMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
+                <div
+                  className="absolute right-0 mt-1 w-44 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn text-xs"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {isOwner && onDuplicate && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenuOpen(false);
+                        onDuplicate(tool);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                    >
+                      <Copy size={13} className="text-[var(--coral)]" />
+                      <span>建立副本</span>
+                    </button>
+                  )}
+                  {onCloneToSpace && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenuOpen(false);
+                        onCloneToSpace(tool);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                    >
+                      <Send size={13} className="text-blue-500" />
+                      <span>複製到其他空間...</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleExportTool}
+                    className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                  >
+                    <Download size={13} className="text-emerald-500" />
+                    <span>匯出小工具 (.json)</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* 置頂釘選按鈕 */}
           {onTogglePin && (

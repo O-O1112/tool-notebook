@@ -74,7 +74,12 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: '空間名稱為必填' });
     }
 
-    const inviteCode = generateInviteCode();
+    let inviteCode = generateInviteCode();
+    for (let r = 0; r < 10; r++) {
+      const existing = db.prepare('SELECT id FROM spaces WHERE invite_code = ?').get(inviteCode);
+      if (!existing) break;
+      inviteCode = generateInviteCode();
+    }
     const insert = db.prepare(`
       INSERT INTO spaces (user_id, name, description, layout, invite_code)
       VALUES (?, ?, ?, ?, ?)

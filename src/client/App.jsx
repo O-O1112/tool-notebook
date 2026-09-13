@@ -62,6 +62,15 @@ export default function App() {
     }
   });
 
+  const [archivedSpaceIds, setArchivedSpaceIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('notebook_archived_spaces');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [recentAccessMap, setRecentAccessMap] = useState(() => {
     try {
       const saved = localStorage.getItem('notebook_recent_access');
@@ -70,6 +79,8 @@ export default function App() {
       return {};
     }
   });
+
+  const [addModalTab, setAddModalTab] = useState('templates');
 
   // 主題切換與 DOM 根節點同步
   useEffect(() => {
@@ -637,6 +648,236 @@ export default function App() {
     loadSpaceDetail(spaceId);
   };
 
+  // 15. 封存 / 解除封存空間
+  const handleToggleArchiveSpace = (spaceId) => {
+    setArchivedSpaceIds((prev) => {
+      const next = prev.includes(spaceId) ? prev.filter((id) => id !== spaceId) : [...prev, spaceId];
+      localStorage.setItem('notebook_archived_spaces', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  // 16. 建立工具副本 (Duplicate)
+  const handleDuplicateTool = async (tool) => {
+    if (!currentSpace || !tool) return;
+    try {
+      const data = await api.addTool(currentSpace.id, {
+        title: `${tool.title} (副本)`,
+        type: tool.type || 'html',
+        content: tool.content || '',
+        colSpan: tool.col_span || 1,
+      });
+
+      const tagsMap = getSpaceTagsMap(currentSpace.id);
+      const colorsMap = getSpaceColorsMap(currentSpace.id);
+      const sectionsMap = getSpaceSectionsMap(currentSpace.id);
+
+      if (tool.tags) tagsMap[data.tool.id] = tool.tags;
+      if (tool.color) colorsMap[data.tool.id] = tool.color;
+      if (tool.section) sectionsMap[data.tool.id] = tool.section;
+
+      saveSpaceTagsMap(currentSpace.id, tagsMap);
+      saveSpaceColorsMap(currentSpace.id, colorsMap);
+      saveSpaceSectionsMap(currentSpace.id, sectionsMap);
+
+      const enriched = {
+        ...data.tool,
+        tags: tool.tags || [],
+        color: tool.color || 'default',
+        section: tool.section || '一般工具',
+        isPinned: false,
+      };
+
+      setTools((prev) => [...prev, enriched]);
+      setSpaces((prev) =>
+        prev.map((s) => (s.id === currentSpace.id ? { ...s, tool_count: (s.tool_count || 0) + 1 } : s))
+      );
+    } catch (err) {
+      alert(err.message || '建立副本失敗');
+    }
+  };
+
+  // 17. 複製工具至其他空間 (Clone to Space)
+  const handleCloneToolToSpace = async (tool, targetSpaceId) => {
+    if (!tool || !targetSpaceId) return;
+    try {
+      const data = await api.addTool(targetSpaceId, {
+        title: tool.title,
+        type: tool.type || 'html',
+        content: tool.content || '',
+        colSpan: tool.col_span || 1,
+      });
+
+      const tagsMap = getSpaceTagsMap(targetSpaceId);
+      const colorsMap = getSpaceColorsMap(targetSpaceId);
+      const sectionsMap = getSpaceSectionsMap(targetSpaceId);
+
+      if (tool.tags) tagsMap[data.tool.id] = tool.tags;
+      if (tool.color) colorsMap[data.tool.id] = tool.color;
+      if (tool.section) sectionsMap[data.tool.id] = tool.section;
+
+      saveSpaceTagsMap(targetSpaceId, tagsMap);
+      saveSpaceColorsMap(targetSpaceId, colorsMap);
+      saveSpaceSectionsMap(targetSpaceId, sectionsMap);
+
+      setSpaces((prev) =>
+        prev.map((s) => (s.id === targetSpaceId ? { ...s, tool_count: (s.tool_count || 0) + 1 } : s))
+      );
+      alert('已成功將小工具複製至指定空間！');
+    } catch (err) {
+      alert(err.message || '複製工具失敗');
+    }
+  };
+
+  // 18. 從大廳範本專區加入至指定空間
+  const handleAddTemplateToSpace = async (targetSpaceId, template) => {
+    if (!targetSpaceId || !template) return;
+    try {
+      const data = await api.addTool(targetSpaceId, {
+        title: template.title,
+        type: 'html',
+        content: template.content,
+        colSpan: template.defaultColSpan || 1,
+      });
+
+      const tagsMap = getSpaceTagsMap(targetSpaceId);
+      if (template.category) {
+        tagsMap[data.tool.id] = [template.category];
+        saveSpaceTagsMap(targetSpaceId, tagsMap);
+      }
+
+      setSpaces((prev) =>
+        prev.map((s) => (s.id === targetSpaceId ? { ...s, tool_count: (s.tool_count || 0) + 1 } : s))
+      );
+      alert(`已將「${template.title}」加入至該手帳空間！`);
+    } catch (err) {
+      alert(err.message || '加入範本失敗');
+    }
+  };
+
+  // 19. 從大廳以此範本新建空間
+  const handleCreateSpaceFromTemplate = async (template) => {
+    if (!template) return;
+    try {
+      const newSpaceData = await api.createSpace({
+        name: `${template.title} 空間`,
+        description: `以此範本建立之專屬空間：${template.description}`,
+      });
+      const newSpace = newSpaceData.space;
+
+      const toolData = await api.addTool(newSpace.id, {
+        title: template.title,
+        type: 'html',
+        content: template.content,
+        colSpan: template.defaultColSpan || 1,
+      });
+
+      const tagsMap = {};
+      if (template.category) {
+        tagsMap[toolData.tool.id] = [template.category];
+        saveSpaceTagsMap(newSpace.id, tagsMap);
+      }
+
+      newSpace.tool_count = 1;
+      newSpace.is_owner = 1;
+      setSpaces((prev) => [newSpace, ...prev]);
+
+      await handleSelectSpace(newSpace);
+    } catch (err) {
+      alert(err.message || '以此範本新建空間失敗');
+    }
+  };
+
+  // 20. 批次更新工具 (色彩、分欄、標籤)
+  const handleBatchUpdateTools = async (toolIds, patch) => {
+    if (!currentSpace || !toolIds || toolIds.length === 0) return;
+    const tagsMap = getSpaceTagsMap(currentSpace.id);
+    const colorsMap = getSpaceColorsMap(currentSpace.id);
+    const sectionsMap = getSpaceSectionsMap(currentSpace.id);
+
+    toolIds.forEach((tid) => {
+      if (patch.tags !== undefined) tagsMap[tid] = patch.tags;
+      if (patch.color !== undefined) colorsMap[tid] = patch.color;
+      if (patch.section !== undefined) sectionsMap[tid] = patch.section;
+    });
+
+    if (patch.tags !== undefined) saveSpaceTagsMap(currentSpace.id, tagsMap);
+    if (patch.color !== undefined) saveSpaceColorsMap(currentSpace.id, colorsMap);
+    if (patch.section !== undefined) saveSpaceSectionsMap(currentSpace.id, sectionsMap);
+
+    setTools((prev) =>
+      prev.map((t) => {
+        if (!toolIds.includes(t.id)) return t;
+        return {
+          ...t,
+          tags: patch.tags !== undefined ? patch.tags : t.tags,
+          color: patch.color !== undefined ? patch.color : t.color,
+          section: patch.section !== undefined ? patch.section : t.section,
+        };
+      })
+    );
+  };
+
+  // 21. 批次刪除工具
+  const handleBatchDeleteTools = async (toolIds) => {
+    if (!currentSpace || !toolIds || toolIds.length === 0) return;
+    if (!window.confirm(`確定要批次刪除選取的 ${toolIds.length} 個小工具嗎？`)) return;
+
+    for (const tid of toolIds) {
+      try {
+        await api.deleteTool(currentSpace.id, tid);
+      } catch (err) {
+        console.warn('批次刪除工具失敗:', tid, err);
+      }
+    }
+    setTools((prev) => prev.filter((t) => !toolIds.includes(t.id)));
+    setSpaces((prev) =>
+      prev.map((s) =>
+        s.id === currentSpace.id
+          ? { ...s, tool_count: Math.max(0, (s.tool_count || 0) - toolIds.length) }
+          : s
+      )
+    );
+  };
+
+  // 22. 重新命名分欄
+  const handleRenameSection = (oldSection, newSection) => {
+    if (!currentSpace || !oldSection || !newSection || oldSection === newSection) return;
+    const sectionsMap = getSpaceSectionsMap(currentSpace.id);
+    let changed = false;
+    Object.keys(sectionsMap).forEach((tid) => {
+      if (sectionsMap[tid] === oldSection) {
+        sectionsMap[tid] = newSection;
+        changed = true;
+      }
+    });
+    if (changed) {
+      saveSpaceSectionsMap(currentSpace.id, sectionsMap);
+    }
+    setTools((prev) =>
+      prev.map((t) => ((t.section || '一般工具') === oldSection ? { ...t, section: newSection } : t))
+    );
+  };
+
+  // 23. 刪除分欄 (內含工具歸入一般工具)
+  const handleDeleteSection = (sectionName) => {
+    if (!currentSpace || !sectionName || sectionName === '一般工具') return;
+    const sectionsMap = getSpaceSectionsMap(currentSpace.id);
+    let changed = false;
+    Object.keys(sectionsMap).forEach((tid) => {
+      if (sectionsMap[tid] === sectionName) {
+        sectionsMap[tid] = '一般工具';
+        changed = true;
+      }
+    });
+    if (changed) {
+      saveSpaceSectionsMap(currentSpace.id, sectionsMap);
+    }
+    setTools((prev) =>
+      prev.map((t) => ((t.section || '一般工具') === sectionName ? { ...t, section: '一般工具' } : t))
+    );
+  };
+
   const isOwner = currentSpace?.is_owner === 1 || currentSpace?.user_id === user?.id;
 
   // 驗證載入中狀態
@@ -690,11 +931,13 @@ export default function App() {
             spaces={spaces}
             favoriteSpaceIds={favoriteSpaceIds}
             trashSpaceIds={trashSpaceIds}
+            archivedSpaceIds={archivedSpaceIds}
             recentAccessMap={recentAccessMap}
             onSelectSpace={handleSelectSpace}
             onCreateSpaceClick={() => setCreateModalOpen(true)}
             onOpenJoinModal={() => setJoinModalOpen(true)}
             onToggleFavorite={handleToggleFavoriteSpace}
+            onToggleArchive={handleToggleArchiveSpace}
             onMoveToTrash={handleMoveToTrash}
             onRestoreFromTrash={handleRestoreFromTrash}
             onOpenQRCode={(space) => {
@@ -703,6 +946,8 @@ export default function App() {
             }}
             onOpenSettings={(space, tab) => handleOpenSettings(tab || 'info', space)}
             onDeleteSpace={handleDeleteSpace}
+            onAddTemplateToSpace={handleAddTemplateToSpace}
+            onCreateSpaceFromTemplate={handleCreateSpaceFromTemplate}
             user={user}
           />
         ) : loadingSpace ? (
@@ -716,9 +961,10 @@ export default function App() {
             layout={layout}
             onDeleteTool={handleDeleteTool}
             onEditTool={(tool) => setEditingTool(tool)}
-            onOpenAddModal={(section) => {
+            onOpenAddModal={(section, tab) => {
               const safeSection = typeof section === 'string' && section.trim() ? section.trim() : '一般工具';
               setAddModalSection(safeSection);
+              if (tab) setAddModalTab(tab);
               setAddModalOpen(true);
             }}
             onToggleColSpan={handleToggleColSpan}
@@ -726,6 +972,13 @@ export default function App() {
             onChangeColor={handleUpdateToolColor}
             onUpdateToolSection={handleUpdateToolSection}
             onReorderTools={handleReorderTools}
+            onDuplicateTool={handleDuplicateTool}
+            onCloneToolToSpace={handleCloneToolToSpace}
+            onBatchUpdateTools={handleBatchUpdateTools}
+            onBatchDeleteTools={handleBatchDeleteTools}
+            onRenameSection={handleRenameSection}
+            onDeleteSection={handleDeleteSection}
+            availableSpaces={spaces.filter((s) => s.id !== currentSpace?.id && !trashSpaceIds.includes(s.id))}
             isOwner={!isGuest && isOwner}
           />
         )}
@@ -742,6 +995,7 @@ export default function App() {
       <AddToolModal
         isOpen={addModalOpen}
         initialSection={addModalSection}
+        initialTab={addModalTab}
         onClose={() => setAddModalOpen(false)}
         onAddTool={handleAddTool}
       />
@@ -770,6 +1024,8 @@ export default function App() {
         onSelectTheme={handleSelectTheme}
         layout={layout}
         onToggleLayout={handleToggleLayout}
+        isArchived={Boolean(currentSpace && archivedSpaceIds.includes(currentSpace.id))}
+        onToggleArchive={handleToggleArchiveSpace}
       />
 
       {/* 輸入邀請碼加入空間對話框 */}

@@ -1775,5 +1775,1169 @@ export const TOOL_TEMPLATES = [
   </script>
 </body>
 </html>`
+  },
+  {
+    id: 'white_noise',
+    title: '白噪音專注放鬆器',
+    description: '合成雨聲、海浪、森林風聲與溫潤白噪音，助於提升專注力與冥想放鬆。',
+    category: '效能與專注',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .header-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #3b827e;
+      background: #f1f9f6;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+    }
+    h2 { margin: 0 0 4px; font-size: 18px; font-weight: 800; color: #1f2a2e; }
+    p { margin: 0 0 20px; font-size: 12px; color: #6b7c85; }
+    .noise-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 20px;
+    }
+    .noise-card {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .noise-card.playing {
+      border-color: #3b827e;
+      background: #f4faf8;
+    }
+    .noise-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .noise-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f2a2e;
+    }
+    .play-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: #e4e8e5;
+      color: #526066;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .noise-card.playing .play-btn {
+      background: #3b827e;
+      color: #ffffff;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    input[type=range] {
+      flex: 1;
+      accent-color: #3b827e;
+      cursor: pointer;
+    }
+    .volume-label {
+      font-size: 10px;
+      color: #89959b;
+      font-family: monospace;
+      width: 26px;
+      text-align: right;
+    }
+    .master-controls {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .btn-action {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-stop {
+      background: #f0f2f1;
+      color: #526066;
+    }
+    .btn-stop:hover { background: #e4e8e5; }
+  </style>
+</head>
+<body>
+  <div class="header-tag">專注空間</div>
+  <h2>環境聲音生成器</h2>
+  <p>可自由疊加多種白噪音與自然頻率</p>
+
+  <div class="noise-grid">
+    <div class="noise-card" id="card-rain">
+      <div class="noise-top">
+        <span class="noise-title">細雨落葉</span>
+        <button class="play-btn" onclick="toggleNoise('rain')">播放</button>
+      </div>
+      <div class="slider-row">
+        <input type="range" min="0" max="1" step="0.05" value="0.5" oninput="setGain('rain', this.value)">
+        <span class="volume-label" id="label-rain">50%</span>
+      </div>
+    </div>
+
+    <div class="noise-card" id="card-waves">
+      <div class="noise-top">
+        <span class="noise-title">平緩海潮</span>
+        <button class="play-btn" onclick="toggleNoise('waves')">播放</button>
+      </div>
+      <div class="slider-row">
+        <input type="range" min="0" max="1" step="0.05" value="0.5" oninput="setGain('waves', this.value)">
+        <span class="volume-label" id="label-waves">50%</span>
+      </div>
+    </div>
+
+    <div class="noise-card" id="card-wind">
+      <div class="noise-top">
+        <span class="noise-title">林間微風</span>
+        <button class="play-btn" onclick="toggleNoise('wind')">播放</button>
+      </div>
+      <div class="slider-row">
+        <input type="range" min="0" max="1" step="0.05" value="0.5" oninput="setGain('wind', this.value)">
+        <span class="volume-label" id="label-wind">50%</span>
+      </div>
+    </div>
+
+    <div class="noise-card" id="card-cafe">
+      <div class="noise-top">
+        <span class="noise-title">溫暖啡館</span>
+        <button class="play-btn" onclick="toggleNoise('cafe')">播放</button>
+      </div>
+      <div class="slider-row">
+        <input type="range" min="0" max="1" step="0.05" value="0.5" oninput="setGain('cafe', this.value)">
+        <span class="volume-label" id="label-cafe">50%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="master-controls">
+    <button class="btn-action btn-stop" onclick="stopAll()">全部靜音停止</button>
+  </div>
+
+  <script>
+    let audioCtx = null;
+    const channels = {};
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function createNoiseNode(type) {
+      initAudio();
+      const bufferSize = audioCtx.sampleRate * 2;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      let lastOut = 0.0;
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        if (type === 'rain') {
+          // Pink noise filter
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+          b6 = white * 0.115926;
+        } else if (type === 'waves' || type === 'wind') {
+          // Brown noise filter
+          data[i] = (lastOut + (0.02 * white)) / 1.02;
+          lastOut = data[i];
+          data[i] *= 3.5;
+        } else {
+          // Soft pink
+          data[i] = (lastOut + (0.05 * white)) / 1.05;
+          lastOut = data[i];
+          data[i] *= 2.0;
+        }
+      }
+
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
+      whiteNoise.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      if (type === 'rain') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 1800;
+      } else if (type === 'waves') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 650;
+      } else if (type === 'wind') {
+        filter.type = 'bandpass';
+        filter.frequency.value = 450;
+        filter.Q.value = 1.2;
+      } else {
+        filter.type = 'lowpass';
+        filter.frequency.value = 1200;
+      }
+
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.5;
+
+      whiteNoise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      return { source: whiteNoise, gain: gainNode, playing: false };
+    }
+
+    function toggleNoise(type) {
+      initAudio();
+      const card = document.getElementById('card-' + type);
+      const btn = card.querySelector('.play-btn');
+
+      if (!channels[type]) {
+        channels[type] = createNoiseNode(type);
+      }
+
+      const ch = channels[type];
+      if (!ch.playing) {
+        try {
+          ch.source.start(0);
+        } catch (e) {
+          channels[type] = createNoiseNode(type);
+          channels[type].source.start(0);
+        }
+        ch.playing = true;
+        card.classList.add('playing');
+        btn.textContent = '暫停';
+      } else {
+        ch.gain.gain.value = 0;
+        ch.playing = false;
+        card.classList.remove('playing');
+        btn.textContent = '播放';
+      }
+    }
+
+    function setGain(type, val) {
+      initAudio();
+      document.getElementById('label-' + type).textContent = Math.round(val * 100) + '%';
+      if (channels[type]) {
+        channels[type].gain.gain.value = parseFloat(val);
+      }
+    }
+
+    function stopAll() {
+      ['rain', 'waves', 'wind', 'cafe'].forEach(type => {
+        if (channels[type] && channels[type].playing) {
+          toggleNoise(type);
+        }
+      });
+    }
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'habit_tracker',
+    title: '手帳習慣打卡與目標追蹤器',
+    description: '每日待辦習慣打卡與每週完成率動態進度條，培養持之以恆的自律生活。',
+    category: '生活日常',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e4e8e5;
+      padding-bottom: 12px;
+    }
+    h2 { margin: 0; font-size: 16px; font-weight: 800; color: #1f2a2e; }
+    .week-info { font-size: 12px; color: #e17b62; font-weight: 700; }
+    .progress-box {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .progress-track {
+      height: 8px;
+      background: #f0f2f1;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #e17b62;
+      border-radius: 4px;
+      transition: width 0.3s;
+      width: 0%;
+    }
+    .table-container {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #f0f2f1;
+    }
+    th {
+      background: #fafafa;
+      color: #69787f;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    th.habit-col, td.habit-col {
+      text-align: left;
+      padding-left: 14px;
+      font-weight: 700;
+      color: #1f2a2e;
+    }
+    .check-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid #d3d9d5;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .check-btn.done {
+      background: #e17b62;
+      border-color: #e17b62;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    input[type=text] {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d3d9d5;
+      font-size: 12px;
+      outline: none;
+    }
+    input[type=text]:focus { border-color: #e17b62; }
+    .btn-add {
+      background: #e17b62;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-del {
+      background: transparent;
+      border: none;
+      color: #a0acb2;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-del:hover { color: #e15241; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>習慣養成追蹤卡</h2>
+    <span class="week-info">本週目標進度</span>
+  </div>
+
+  <div class="progress-box">
+    <div class="progress-top">
+      <span>達成率</span>
+      <span id="rateLabel">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th class="habit-col">習慣項目</th>
+          <th>週一</th>
+          <th>週二</th>
+          <th>週三</th>
+          <th>週四</th>
+          <th>週五</th>
+          <th>週六</th>
+          <th>週日</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="habitRows"></tbody>
+    </table>
+  </div>
+
+  <div class="action-row">
+    <input type="text" id="habitInput" placeholder="新增自訂習慣，例如：閱讀 30 分鐘、喝水 2000cc…">
+    <button class="btn-add" onclick="addHabit()">新增項目</button>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'notebook_habit_tracker_data';
+    let habits = [
+      { id: 1, name: '晨間閱讀 20 分鐘', days: [false, false, false, false, false, false, false] },
+      { id: 2, name: '喝足 2000cc 水', days: [false, false, false, false, false, false, false] },
+      { id: 3, name: '每日伸展運動', days: [false, false, false, false, false, false, false] }
+    ];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) habits = JSON.parse(saved);
+    } catch(e) {}
+
+    function save() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+      } catch(e) {}
+      render();
+    }
+
+    function toggleDay(habitId, dayIndex) {
+      const h = habits.find(x => x.id === habitId);
+      if (h) {
+        h.days[dayIndex] = !h.days[dayIndex];
+        save();
+      }
+    }
+
+    function addHabit() {
+      const input = document.getElementById('habitInput');
+      const val = input.value.trim();
+      if (!val) return;
+      habits.push({ id: Date.now(), name: val, days: [false, false, false, false, false, false, false] });
+      input.value = '';
+      save();
+    }
+
+    function deleteHabit(habitId) {
+      habits = habits.filter(x => x.id !== habitId);
+      save();
+    }
+
+    function render() {
+      const tbody = document.getElementById('habitRows');
+      tbody.innerHTML = '';
+
+      let totalSlots = habits.length * 7;
+      let checkedSlots = 0;
+
+      habits.forEach(h => {
+        const tr = document.createElement('tr');
+        let daysHtml = '';
+        h.days.forEach((done, i) => {
+          if (done) checkedSlots++;
+          daysHtml += \`<td><button class="check-btn \${done ? 'done' : ''}" onclick="toggleDay(\${h.id}, \${i})">\${done ? '✓' : ''}</button></td>\`;
+        });
+
+        tr.innerHTML = \`
+          <td class="habit-col">\${h.name}</td>
+          \${daysHtml}
+          <td><button class="btn-del" onclick="deleteHabit(\${h.id})" title="刪除">✕</button></td>
+        \`;
+        tbody.appendChild(tr);
+      });
+
+      const rate = totalSlots > 0 ? Math.round((checkedSlots / totalSlots) * 100) : 0;
+      document.getElementById('rateLabel').textContent = rate + '%';
+      document.getElementById('progressFill').style.width = rate + '%';
+    }
+
+    render();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'unit_converter',
+    title: '多功能通用單位換算器',
+    description: '長度、重量、溫度、面積與數據容量即時互轉計算。',
+    category: '實用工具',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 380px;
+    }
+    .type-tabs {
+      display: flex;
+      gap: 4px;
+      background: #f0f2f1;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+    .type-btn {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      color: #69787f;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .type-btn.active {
+      background: #ffffff;
+      color: #1f2a2e;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #69787f;
+    }
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+    input[type=number] {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d3d9d5;
+      font-size: 15px;
+      font-weight: 700;
+      outline: none;
+      color: #1f2a2e;
+    }
+    input[type=number]:focus { border-color: #3b82f6; }
+    select {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d3d9d5;
+      background: #fafafa;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1f2a2e;
+      outline: none;
+    }
+    .swap-btn {
+      align-self: center;
+      background: #f0f2f1;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #526066;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .swap-btn:hover { background: #e4e8e5; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="type-tabs">
+      <button class="type-btn active" onclick="switchType('length')">長度</button>
+      <button class="type-btn" onclick="switchType('weight')">重量</button>
+      <button class="type-btn" onclick="switchType('temperature')">溫度</button>
+      <button class="type-btn" onclick="switchType('area')">面積</button>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <label>來源數值與單位</label>
+        <div class="input-group">
+          <input type="number" id="fromValue" value="1" oninput="convert(true)">
+          <select id="fromUnit" onchange="convert(true)"></select>
+        </div>
+      </div>
+
+      <button class="swap-btn" onclick="swapUnits()">⇅</button>
+
+      <div class="row">
+        <label>目標轉換結果</label>
+        <div class="input-group">
+          <input type="number" id="toValue" oninput="convert(false)">
+          <select id="toUnit" onchange="convert(true)"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const UNITS = {
+      length: {
+        units: [
+          { key: 'm', label: '公尺 (m)', rate: 1 },
+          { key: 'cm', label: '公分 (cm)', rate: 0.01 },
+          { key: 'mm', label: '公釐 (mm)', rate: 0.001 },
+          { key: 'km', label: '公里 (km)', rate: 1000 },
+          { key: 'in', label: '英吋 (in)', rate: 0.0254 },
+          { key: 'ft', label: '英呎 (ft)', rate: 0.3048 }
+        ]
+      },
+      weight: {
+        units: [
+          { key: 'kg', label: '公斤 (kg)', rate: 1 },
+          { key: 'g', label: '公克 (g)', rate: 0.001 },
+          { key: 'mg', label: '毫克 (mg)', rate: 0.000001 },
+          { key: 'lb', label: '磅 (lb)', rate: 0.45359237 },
+          { key: 'oz', label: '盎司 (oz)', rate: 0.02834952 }
+        ]
+      },
+      temperature: {
+        special: true,
+        units: [
+          { key: 'c', label: '攝氏 (°C)' },
+          { key: 'f', label: '華氏 (°F)' },
+          { key: 'k', label: '克氏 (K)' }
+        ]
+      },
+      area: {
+        units: [
+          { key: 'sqm', label: '平方公尺 (m²)', rate: 1 },
+          { key: 'sqft', label: '平方英呎 (ft²)', rate: 0.092903 },
+          { key: 'ping', label: '台灣坪', rate: 3.305785 },
+          { key: 'ha', label: '公頃 (ha)', rate: 10000 }
+        ]
+      }
+    };
+
+    let currentCategory = 'length';
+
+    function switchType(type) {
+      currentCategory = type;
+      document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const u = UNITS[type].units;
+      const fromSel = document.getElementById('fromUnit');
+      const toSel = document.getElementById('toUnit');
+      fromSel.innerHTML = '';
+      toSel.innerHTML = '';
+
+      u.forEach((item, i) => {
+        fromSel.add(new Option(item.label, item.key, i === 0, i === 0));
+        toSel.add(new Option(item.label, item.key, i === 1, i === 1));
+      });
+
+      convert(true);
+    }
+
+    function convert(fromSource) {
+      const fromKey = document.getElementById('fromUnit').value;
+      const toKey = document.getElementById('toUnit').value;
+      const fromVal = parseFloat(document.getElementById('fromValue').value) || 0;
+
+      if (currentCategory === 'temperature') {
+        let celsius = fromVal;
+        if (fromKey === 'f') celsius = (fromVal - 32) * (5 / 9);
+        else if (fromKey === 'k') celsius = fromVal - 273.15;
+
+        let result = celsius;
+        if (toKey === 'f') result = (celsius * 9 / 5) + 32;
+        else if (toKey === 'k') result = celsius + 273.15;
+
+        document.getElementById('toValue').value = parseFloat(result.toFixed(4));
+        return;
+      }
+
+      const list = UNITS[currentCategory].units;
+      const rFrom = list.find(x => x.key === fromKey).rate;
+      const rTo = list.find(x => x.key === toKey).rate;
+
+      const baseVal = fromVal * rFrom;
+      const targetVal = baseVal / rTo;
+      document.getElementById('toValue').value = parseFloat(targetVal.toFixed(6));
+    }
+
+    function swapUnits() {
+      const fromSel = document.getElementById('fromUnit');
+      const toSel = document.getElementById('toUnit');
+      const tmp = fromSel.value;
+      fromSel.value = toSel.value;
+      toSel.value = tmp;
+      convert(true);
+    }
+
+    switchType('length');
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'lucky_picker',
+    title: '幸運雙骰與隨機名單抽籤器',
+    description: '支援自訂名單隨機抽選、擲雙骰點數動畫，教學抽問與會議破冰利器。',
+    category: '靈感與創意',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .tab-row {
+      display: flex;
+      gap: 6px;
+      background: #f0f2f1;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      padding: 6px 16px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      color: #69787f;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      color: #1f2a2e;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .section { display: none; width: 100%; max-width: 360px; }
+    .section.active { display: block; }
+    .dice-stage {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 24px 0 16px;
+    }
+    .die {
+      width: 70px;
+      height: 70px;
+      background: #ffffff;
+      border: 2px solid #e4e8e5;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 800;
+      color: #e17b62;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.06);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .sum-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: #69787f;
+      margin-bottom: 18px;
+    }
+    .sum-text b { color: #1f2a2e; font-size: 18px; }
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #d3d9d5;
+      font-size: 12px;
+      margin-bottom: 12px;
+      outline: none;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .result-display {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: #e17b62;
+      margin: 12px 0;
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .btn-roll {
+      background: #e17b62;
+      color: #ffffff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .btn-roll:hover { background: #cf674e; }
+  </style>
+</head>
+<body>
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchSection('dice')">搖雙骰子</button>
+    <button class="tab-btn" onclick="switchSection('picker')">自訂名單抽籤</button>
+  </div>
+
+  <div class="section active" id="sec-dice">
+    <div class="dice-stage">
+      <div class="die" id="die1">3</div>
+      <div class="die" id="die2">4</div>
+    </div>
+    <div class="sum-text">總點數：<b id="diceSum">7</b></div>
+    <button class="btn-roll" onclick="rollDice()">擲骰子</button>
+  </div>
+
+  <div class="section" id="sec-picker">
+    <textarea id="nameList" placeholder="輸入抽籤候選名單，以換行或逗號分隔，例如：\n王小明\n李小華\n張大成\n林佳佳"></textarea>
+    <div class="result-display" id="pickerResult">點擊下方按鈕開始抽選</div>
+    <button class="btn-roll" onclick="pickName()">隨機抽出一位</button>
+  </div>
+
+  <script>
+    function switchSection(sec) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + sec).classList.add('active');
+    }
+
+    function rollDice() {
+      const d1 = document.getElementById('die1');
+      const d2 = document.getElementById('die2');
+      d1.style.transform = 'rotate(' + (Math.random() * 360) + 'deg) scale(0.9)';
+      d2.style.transform = 'rotate(' + (Math.random() * 360) + 'deg) scale(0.9)';
+
+      setTimeout(() => {
+        const v1 = Math.floor(Math.random() * 6) + 1;
+        const v2 = Math.floor(Math.random() * 6) + 1;
+        d1.textContent = v1;
+        d2.textContent = v2;
+        d1.style.transform = 'none';
+        d2.style.transform = 'none';
+        document.getElementById('diceSum').textContent = v1 + v2;
+      }, 200);
+    }
+
+    function pickName() {
+      const text = document.getElementById('nameList').value.trim();
+      const items = text.split(/[\\n,，]+/).map(s => s.trim()).filter(Boolean);
+      const res = document.getElementById('pickerResult');
+      if (items.length === 0) {
+        res.textContent = '請先在上方輸入名單！';
+        return;
+      }
+      let counter = 0;
+      const interval = setInterval(() => {
+        const randomItem = items[Math.floor(Math.random() * items.length)];
+        res.textContent = randomItem;
+        counter++;
+        if (counter > 12) {
+          clearInterval(interval);
+          const finalItem = items[Math.floor(Math.random() * items.length)];
+          res.textContent = finalItem;
+        }
+      }, 50);
+    }
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'countdown_board',
+    title: '重大紀念日倒數計時卡',
+    description: '考試、專案截止日或重要節慶天數倒數，動態比例進度條。',
+    category: '效能與專注',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #e17b62;
+      background: #fff0eb;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .event-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1f2a2e;
+      margin-bottom: 8px;
+    }
+    .days-box {
+      margin: 16px 0;
+    }
+    .days-num {
+      font-size: 68px;
+      font-weight: 900;
+      color: #e17b62;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .days-unit {
+      font-size: 13px;
+      color: #69787f;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .sub-timer {
+      font-size: 13px;
+      font-family: monospace;
+      color: #526066;
+      background: #f0f2f1;
+      padding: 6px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .settings-card {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      padding: 14px;
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+    label { font-size: 11px; font-weight: 700; color: #69787f; }
+    input[type=text], input[type=date] {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d3d9d5;
+      font-size: 12px;
+      outline: none;
+      font-family: inherit;
+    }
+    .btn-save {
+      background: #e17b62;
+      color: #ffffff;
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="badge">紀念日倒數</div>
+  <div class="event-title" id="displayTitle">專案發表會</div>
+  
+  <div class="days-box">
+    <div class="days-num" id="daysNum">0</div>
+    <div class="days-unit">天 剩餘</div>
+  </div>
+
+  <div class="sub-timer" id="subTimer">00 時 00 分 00 秒</div>
+
+  <div class="settings-card">
+    <label>事件名稱</label>
+    <input type="text" id="titleInput" value="專案發表會">
+    <label>目標日期</label>
+    <input type="date" id="dateInput">
+    <button class="btn-save" onclick="saveSettings()">更新設定</button>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'notebook_countdown_event';
+    let config = { title: '期末成果發表會', targetDate: '' };
+
+    const today = new Date();
+    const future = new Date(today.getTime() + 14 * 86400000);
+    config.targetDate = future.toISOString().slice(0, 10);
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) config = JSON.parse(saved);
+    } catch(e) {}
+
+    document.getElementById('titleInput').value = config.title;
+    document.getElementById('dateInput').value = config.targetDate;
+
+    function saveSettings() {
+      config.title = document.getElementById('titleInput').value.trim() || '未命名事件';
+      config.targetDate = document.getElementById('dateInput').value;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      } catch(e) {}
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById('displayTitle').textContent = config.title;
+      const target = new Date(config.targetDate + 'T00:00:00').getTime();
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        document.getElementById('daysNum').textContent = '0';
+        document.getElementById('subTimer').textContent = '目標日已達成！';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('daysNum').textContent = days;
+      document.getElementById('subTimer').textContent =
+        String(hours).padStart(2, '0') + ' 時 ' +
+        String(minutes).padStart(2, '0') + ' 分 ' +
+        String(seconds).padStart(2, '0') + ' 秒';
+    }
+
+    updateDisplay();
+    setInterval(updateDisplay, 1000);
+  </script>
+</body>
+</html>`
   }
 ];
+

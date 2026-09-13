@@ -8,8 +8,8 @@ import { CraftStudioDoodle } from './Illustrations';
 
 const sanitizeSection = (val) => (typeof val === 'string' && val.trim() ? val.trim() : '一般工具');
 
-export default function AddToolModal({ isOpen, onClose, onAddTool, initialSection = '一般工具' }) {
-  const [activeTab, setActiveTab] = useState('templates'); // 'templates' | 'custom'
+export default function AddToolModal({ isOpen, onClose, onAddTool, initialSection = '一般工具', initialTab = 'templates' }) {
+  const [activeTab, setActiveTab] = useState(initialTab); // 'templates' | 'custom'
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [tagsInput, setTagsInput] = useState('');
@@ -22,8 +22,11 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
   useEffect(() => {
     if (isOpen) {
       setSection(sanitizeSection(initialSection));
+      if (initialTab) {
+        setActiveTab(initialTab);
+      }
     }
-  }, [isOpen, initialSection]);
+  }, [isOpen, initialSection, initialTab]);
 
   // 當使用者貼入內容時，智慧推薦標題與解析類型
   const parsed = parseToolInput(content);

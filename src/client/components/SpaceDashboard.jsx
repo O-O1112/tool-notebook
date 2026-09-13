@@ -30,7 +30,14 @@ import {
   Smile,
   Shield,
   FolderX,
+  X,
+  Play,
+  Send,
+  BookTemplate,
+  Archive,
 } from 'lucide-react';
+import { TOOL_TEMPLATES } from '../utils/toolTemplates';
+import SandboxedFrame from './SandboxedFrame';
 import {
   TrashEmptyIllustration,
   FavoritesEmptyIllustration,
@@ -59,26 +66,48 @@ export default function SpaceDashboard({
   spaces = [],
   favoriteSpaceIds = [],
   trashSpaceIds = [],
+  archivedSpaceIds = [],
   recentAccessMap = {},
   onSelectSpace,
   onCreateSpaceClick,
   onOpenJoinModal,
   onToggleFavorite,
+  onToggleArchive,
   onMoveToTrash,
   onRestoreFromTrash,
   onOpenQRCode,
   onOpenSettings,
   onDeleteSpace,
+  onAddTemplateToSpace,
+  onCreateSpaceFromTemplate,
   user,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeNav, setActiveNav] = useState('recent'); // 'recent' | 'owned' | 'shared' | 'favorites' | 'trash'
+  const [activeNav, setActiveNav] = useState('recent'); // 'recent' | 'templates' | 'owned' | 'shared' | 'favorites' | 'trash'
   const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'name'
   const [activeMenuSpaceId, setActiveMenuSpaceId] = useState(null);
   const [copiedCodeSpaceId, setCopiedCodeSpaceId] = useState(null);
 
+  // 範本專區狀態
+  const [templateCategory, setTemplateCategory] = useState('all');
+  const [templateSearch, setTemplateSearch] = useState('');
+  const [previewingTemplate, setPreviewingTemplate] = useState(null);
+  const [targetSpaceSelectTmpl, setTargetSpaceSelectTmpl] = useState(null);
+
   const displayName = user?.displayName || user?.display_name || user?.username || '同學';
   const todayGreeting = `${WEEKDAYS[new Date().getDay()]}快樂！`;
+
+  // 範本過濾清單
+  const filteredTemplates = useMemo(() => {
+    return TOOL_TEMPLATES.filter((t) => {
+      const matchCat = templateCategory === 'all' || t.category === templateCategory;
+      const matchQuery =
+        !templateSearch.trim() ||
+        t.title.toLowerCase().includes(templateSearch.trim().toLowerCase()) ||
+        t.description.toLowerCase().includes(templateSearch.trim().toLowerCase());
+      return matchCat && matchQuery;
+    });
+  }, [templateCategory, templateSearch]);
 
   // 1. 空間分類與統計 (垃圾桶隔離)
   const activeSpaces = useMemo(
@@ -198,6 +227,8 @@ export default function SpaceDashboard({
 
   const getNavTitle = () => {
     switch (activeNav) {
+      case 'templates':
+        return '精選小工具範本專區';
       case 'recent':
         return '最近使用';
       case 'owned':
@@ -242,7 +273,7 @@ export default function SpaceDashboard({
       case 'favorites':
         return {
           title: '尚無已加星號的手帳空間',
-          desc: '點擊任何空間卡片右上角的 ⭐ 星號，即可將常用空間收入我的最愛。',
+          desc: '點擊任何空間卡片右上角的星號標記，即可將常用空間收入我的最愛。',
           action: null,
         };
       case 'trash':
@@ -350,7 +381,7 @@ export default function SpaceDashboard({
           />
         </div>
 
-        {/* 5 分類橫向切換藥丸列 */}
+        {/* 核心分類橫向切換藥丸列 */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
           <button
             type="button"
@@ -363,6 +394,18 @@ export default function SpaceDashboard({
           >
             <Clock size={13} />
             <span>最近 ({recentSpaces.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNav('templates')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
+              activeNav === 'templates'
+                ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                : 'bg-[var(--paper)] text-[var(--ink)]'
+            }`}
+          >
+            <BookTemplate size={13} />
+            <span>範本專區 ({TOOL_TEMPLATES.length})</span>
           </button>
           <button
             type="button"
@@ -482,6 +525,25 @@ export default function SpaceDashboard({
               </div>
               <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--card-bg)]/80 border border-current/20 text-current">
                 {recentSpaces.length}
+              </span>
+            </button>
+
+            {/* 範本專區 */}
+            <button
+              type="button"
+              onClick={() => setActiveNav('templates')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                activeNav === 'templates'
+                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                  : 'text-[var(--ink)] hover:bg-[var(--paper)]'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <BookTemplate size={15} className={activeNav === 'templates' ? 'text-[var(--coral)]' : 'text-[var(--muted)]'} />
+                <span>範本專區</span>
+              </div>
+              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--card-bg)]/80 border border-current/20 text-current">
+                {TOOL_TEMPLATES.length}
               </span>
             </button>
 
@@ -629,39 +691,143 @@ export default function SpaceDashboard({
                 <span>{getNavTitle()}</span>
               </h1>
               <span className="notebook-badge text-xs">
-                {displayedSpaces.length} 個手帳空間
+                {activeNav === 'templates' ? `${filteredTemplates.length} 款小工具範本` : `${displayedSpaces.length} 個手帳空間`}
               </span>
             </div>
 
-            {/* 排序方式切換 */}
-            <div className="flex items-center gap-1 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--line)] text-xs">
-              <button
-                type="button"
-                onClick={() => setSortBy('recent')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  sortBy === 'recent'
-                    ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
-                    : 'text-[var(--muted)] hover:text-[var(--ink)]'
-                }`}
-              >
-                修改日期
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortBy('name')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  sortBy === 'name'
-                    ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
-                    : 'text-[var(--muted)] hover:text-[var(--ink)]'
-                }`}
-              >
-                名稱 A-Z
-              </button>
-            </div>
+            {activeNav === 'templates' ? (
+              /* 範本分類切換藥丸 */
+              <div className="flex items-center gap-1.5 overflow-x-auto text-xs py-1 scrollbar-none">
+                {['all', '效能與專注', '靈感與創意', '實用工具', '生活日常'].map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setTemplateCategory(cat)}
+                    className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap ${
+                      templateCategory === cat
+                        ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                        : 'bg-[var(--card-bg)] text-[var(--muted)] hover:text-[var(--ink)] border border-[var(--line)]'
+                    }`}
+                  >
+                    {cat === 'all' ? '全部範本' : cat}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              /* 排序方式切換 */
+              <div className="flex items-center gap-1 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--line)] text-xs">
+                <button
+                  type="button"
+                  onClick={() => setSortBy('recent')}
+                  className={`px-2.5 py-1 rounded-lg transition-all ${
+                    sortBy === 'recent'
+                      ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                      : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                  }`}
+                >
+                  修改日期
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortBy('name')}
+                  className={`px-2.5 py-1 rounded-lg transition-all ${
+                    sortBy === 'name'
+                      ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                      : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                  }`}
+                >
+                  名稱 A-Z
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* 空間卡片自適應滿版網格清單 */}
-          {displayedSpaces.length > 0 ? (
+          {/* 範本專區視圖 vs 空間卡片視圖 */}
+          {activeNav === 'templates' ? (
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[var(--card-bg)] p-4 rounded-2xl border border-[var(--line)] shadow-xs">
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--ink)]">手帳小工具範本工坊</h3>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">
+                    點擊試玩可即時在隔離沙盒中操作，亦可一鍵分派至任何手帳空間或以此範本建立新空間。
+                  </p>
+                </div>
+                <div className="relative w-full sm:w-64 shrink-0">
+                  <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none" />
+                  <input
+                    type="text"
+                    value={templateSearch}
+                    onChange={(e) => setTemplateSearch(e.target.value)}
+                    placeholder="搜尋範本名稱或描述…"
+                    className="notebook-input w-full text-xs pl-7 py-1.5"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                {filteredTemplates.map((tmpl) => (
+                  <div
+                    key={tmpl.id}
+                    className="notebook-card p-5 flex flex-col justify-between hover:shadow-md transition-all group border border-[var(--line)] bg-[var(--card-bg)] relative"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="notebook-badge bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)] text-[10px]">
+                          {tmpl.category}
+                        </span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[var(--paper)] text-[var(--muted)] border border-[var(--line)]">
+                          {tmpl.defaultColSpan === 2 ? '寬欄 2x' : '標準 1x'}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-[var(--ink)] group-hover:text-[var(--coral)] transition-colors">
+                          {tmpl.title}
+                        </h3>
+                        <p className="text-xs text-[var(--muted)] mt-1.5 line-clamp-2 leading-relaxed">
+                          {tmpl.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 mt-4 border-t border-[var(--line)] flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewingTemplate(tmpl)}
+                        className="notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1 text-[var(--ink)]"
+                        title="即時在沙盒中預覽操作"
+                      >
+                        <Play size={12} className="text-[#3b827e]" />
+                        <span>試玩預覽</span>
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setTargetSpaceSelectTmpl(tmpl)}
+                          className="notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1 text-[var(--coral)]"
+                          title="加入至現有空間"
+                        >
+                          <Plus size={12} />
+                          <span>加入空間</span>
+                        </button>
+                        {onCreateSpaceFromTemplate && (
+                          <button
+                            type="button"
+                            onClick={() => onCreateSpaceFromTemplate(tmpl)}
+                            className="notebook-btn-primary text-xs py-1.5 px-3 flex items-center gap-1"
+                            title="以此範本建立新空間"
+                          >
+                            <FolderPlus size={12} />
+                            <span>以此建空間</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : displayedSpaces.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
               {displayedSpaces.map((sp, idx) => {
                 const isFavorite = favoriteSpaceIds.includes(sp.id);
@@ -687,13 +853,20 @@ export default function SpaceDashboard({
                         <CoverDoodle themeIndex={idx} isTrash={isTrashItem} className="w-full h-full" />
                       </div>
 
-                      {/* 佈局模式徽章 */}
-                      <span className="notebook-badge bg-[var(--card-bg)]/90 backdrop-blur text-[11px] shadow-xs flex items-center gap-1 z-10">
-                        {layoutInfo.icon}
-                        <span>{layoutInfo.label}</span>
-                      </span>
+                      {/* 佈局模式徽章與封存徽章 */}
+                      <div className="flex items-center gap-1.5 z-10">
+                        <span className="notebook-badge bg-[var(--card-bg)]/90 backdrop-blur text-[11px] shadow-xs flex items-center gap-1">
+                          {layoutInfo.icon}
+                          <span>{layoutInfo.label}</span>
+                        </span>
+                        {archivedSpaceIds.includes(sp.id) && (
+                          <span className="notebook-badge bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[10px] shadow-xs font-semibold">
+                            已封存
+                          </span>
+                        )}
+                      </div>
 
-                      {/* 右上角快捷操作：加星號 ⭐、空間設定 ⚙️ 或更多選單 */}
+                      {/* 右上角快捷操作：加星號、空間設定或更多選單 */}
                       <div className="flex items-center gap-1.5 z-10" onClick={(e) => e.stopPropagation()}>
                         {!isTrashItem && (
                           <>
@@ -765,6 +938,20 @@ export default function SpaceDashboard({
                                     >
                                       <Settings size={13} className="text-[var(--coral)]" />
                                       <span>空間設定</span>
+                                    </button>
+                                  )}
+
+                                  {isOwner && onToggleArchive && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setActiveMenuSpaceId(null);
+                                        onToggleArchive(sp.id);
+                                      }}
+                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-[var(--paper)] flex items-center gap-2 text-[var(--ink)]"
+                                    >
+                                      <Archive size={13} className="text-amber-500" />
+                                      <span>{archivedSpaceIds.includes(sp.id) ? '解除空間封存' : '封存空間'}</span>
                                     </button>
                                   )}
 
@@ -923,6 +1110,116 @@ export default function SpaceDashboard({
     <div className="pt-6 w-full -mb-4 sm:-mb-6 flex justify-center items-end pointer-events-none overflow-hidden">
       <PanoramicSkyline className="w-full max-w-[1700px] h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink)] opacity-45 dark:opacity-30 pointer-events-none transition-opacity" />
     </div>
+
+    {/* 範本小工具即時試玩預覽彈窗 */}
+    {previewingTemplate && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#11151a]/60 backdrop-blur-sm animate-fadeIn">
+        <div className="notebook-modal-box w-full max-w-3xl h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--line)] bg-[var(--paper)]/40">
+            <div className="flex items-center gap-3">
+              <div className="notebook-modal-badge text-[var(--coral)]">
+                <BookTemplate size={18} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[var(--ink)]">{previewingTemplate.title}</h3>
+                <p className="text-[11px] text-[var(--muted)]">{previewingTemplate.category} - 獨立沙盒即時試玩</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPreviewingTemplate(null)}
+              className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--card-bg)] rounded-lg transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="flex-1 w-full bg-[var(--paper)] p-3 overflow-hidden">
+            <SandboxedFrame htmlContent={previewingTemplate.content} title={previewingTemplate.title} />
+          </div>
+          <div className="px-6 py-3 border-t border-[var(--line)] bg-[var(--card-bg)] flex items-center justify-between">
+            <span className="text-[11px] text-[var(--muted)]">試玩中所有操作皆在隔離沙盒中運行</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const tmpl = previewingTemplate;
+                  setPreviewingTemplate(null);
+                  setTargetSpaceSelectTmpl(tmpl);
+                }}
+                className="notebook-btn-secondary text-xs py-1.5 px-3"
+              >
+                加入至手帳空間...
+              </button>
+              {onCreateSpaceFromTemplate && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const tmpl = previewingTemplate;
+                    setPreviewingTemplate(null);
+                    onCreateSpaceFromTemplate(tmpl);
+                  }}
+                  className="notebook-btn-primary text-xs py-1.5 px-3"
+                >
+                  以此範本新建空間
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* 將範本分派至指定手帳空間彈窗 */}
+    {targetSpaceSelectTmpl && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#11151a]/60 backdrop-blur-sm animate-fadeIn">
+        <div className="notebook-modal-box w-full max-w-md p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="notebook-modal-badge text-[var(--coral)]">
+                <Send size={18} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[var(--ink)]">加入至手帳空間</h3>
+                <p className="text-[11px] text-[var(--muted)]">選擇將「{targetSpaceSelectTmpl.title}」放入哪一個空間</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTargetSpaceSelectTmpl(null)}
+              className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+            {activeSpaces.length === 0 ? (
+              <p className="text-xs text-[var(--muted)] text-center py-4">目前尚無可用的手帳空間</p>
+            ) : (
+              activeSpaces.map((sp) => (
+                <button
+                  key={sp.id}
+                  type="button"
+                  onClick={async () => {
+                    if (onAddTemplateToSpace) {
+                      await onAddTemplateToSpace(sp.id, targetSpaceSelectTmpl);
+                      setTargetSpaceSelectTmpl(null);
+                    }
+                  }}
+                  className="w-full p-3 rounded-xl border border-[var(--line)] bg-[var(--paper)]/50 hover:bg-[var(--coral-light)] hover:border-[var(--coral-border)] text-left flex items-center justify-between transition-all group"
+                >
+                  <div className="min-w-0 flex-1 pr-2">
+                    <div className="text-xs font-bold text-[var(--ink)] group-hover:text-[var(--coral)] truncate">{sp.name}</div>
+                    <div className="text-[10px] text-[var(--muted)] truncate">{sp.description || '無備註說明'}</div>
+                  </div>
+                  <span className="notebook-badge text-[10px] bg-[var(--card-bg)] text-[var(--muted)] shrink-0">加入</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    )}
   </div>
 );
 }
