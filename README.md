@@ -51,7 +51,11 @@
   - **滑動視窗速率限制 (Sliding-window Rate Limiting)**：自主實作無外部依賴之記憶體速率限制中介層，針對認證登入 (15次/15分)、邀請碼探索 (30次/分) 與全域 API (300次/分) 提供細緻防護。
   - **全方位 HTTP 安全防護標頭 (Security Headers)**：主動注入 `X-Content-Type-Options: nosniff`、`X-Frame-Options: SAMEORIGIN`、`Referrer-Policy`、`Cross-Origin-Opener-Policy` 與 `Permissions-Policy`。
   - **邊界驗證與防 DoS**：限制密碼最大長度 (128 字元) 防範 Scrypt 演算法 CPU 耗竭攻擊，並限制名稱、代碼長度與內容上限。
-- **雲端與邊緣整合**：支援 **GitHub Pages** 靜態託管 + **Cloudflare D1 (Serverless SQLite)** 邊緣資料庫。
+- **全大眾公開與免阻力體驗**：
+  - **一鍵快速體驗 (Quick Demo Access)**：登入畫面支援「一鍵以體驗帳號快速進入」，大眾訪客無需耗時註冊即可在 1 秒內載入預設手帳空間與示範工具，完整探索 15 款範本與手帳功能。
+  - **PWA (Progressive Web App) 離線安裝**：支援標準 `manifest.webmanifest`、高解析度向量圖示與離線樣式快取，可於手機（iOS / Android）或電腦（Chrome / Edge）直接「安裝至主畫面」，啟動全螢幕手帳應用。
+  - **全域錯誤邊界 (React Error Boundary)**：包裹核心介面，當任何第三方嵌入程式發生未預期語法或執行期錯誤時，自動攔截並渲染手帳風格錯誤卡，防止全站白屏崩潰。
+- **雲端與邊緣整合 (Serverless Edge)**：支援 **GitHub Pages / Cloudflare Pages** 靜態託管 + **Cloudflare Workers** 邊緣函式 + **Cloudflare D1 (Serverless SQLite)** 邊緣資料庫，享受全球 Anycast CDN 快取與零伺服器維護成本。
 
 ---
 

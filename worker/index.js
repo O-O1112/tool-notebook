@@ -9,14 +9,43 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-function jsonResponse(data, status = 200) {
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'X-XSS-Protection': '0',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+};
+
+function jsonResponse(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       'Content-Type': 'application/json',
+      ...SECURITY_HEADERS,
       ...CORS_HEADERS,
+      ...extraHeaders,
     },
   });
+}
+
+// 邊緣滑動視窗速率限制 (Edge Sliding Window Rate Limiter)
+const edgeHits = new Map();
+function checkEdgeRateLimit(key, limit = 60, windowMs = 60000) {
+  const now = Date.now();
+  let record = edgeHits.get(key);
+  if (!record || now - record.startTime > windowMs) {
+    record = { count: 1, startTime: now };
+    edgeHits.set(key, record);
+    return { allowed: true };
+  }
+  record.count += 1;
+  if (record.count > limit) {
+    const retryAfter = Math.ceil((record.startTime + windowMs - now) / 1000);
+    return { allowed: false, retryAfter };
+  }
+  return { allowed: true };
 }
 
 function generateInviteCode() {
@@ -193,20 +222,36 @@ export default {
 
     // 1. 註冊帳號
     if (path === '/api/auth/register' && method === 'POST') {
+      const clientIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'edge-client';
+      const rl = checkEdgeRateLimit(`auth:${clientIp}`, 15, 15 * 60 * 1000);
+      if (!rl.allowed) return jsonResponse({ error: '請求過於頻繁，請稍後再試' }, 429, { 'Retry-After': rl.retryAfter });
+
       const body = await request.json().catch(() => ({}));
       const { username, password, displayName } = body;
-      if (!username || !password) return jsonResponse({ error: '帳號與密碼為必填' }, 400);
+      if (!username || typeof username !== 'string' || !password || typeof password !== 'string') {
+        return jsonResponse({ error: '帳號與密碼為必填' }, 400);
+      }
+      const cleanUsername = username.trim();
+      if (cleanUsername.length < 3 || cleanUsername.length > 50) {
+        return jsonResponse({ error: '帳號長度需介於 3 至 50 個字元' }, 400);
+      }
+      if (!/^[a-zA-Z0-9_\u4e00-\u9fa5-]+$/.test(cleanUsername)) {
+        return jsonResponse({ error: '帳號僅支援中英文字母、數字、底線與連字號' }, 400);
+      }
+      if (password.length < 4 || password.length > 128) {
+        return jsonResponse({ error: '密碼長度需介於 4 至 128 個字元' }, 400);
+      }
 
-      const existing = await env.DB.prepare('SELECT id FROM users WHERE username = ?').bind(username).first();
+      const existing = await env.DB.prepare('SELECT id FROM users WHERE username = ?').bind(cleanUsername).first();
       if (existing) return jsonResponse({ error: '此帳號已存在' }, 409);
 
       const { hash, salt } = await hashPassword(password);
-      const name = displayName?.trim() || username;
+      const name = (typeof displayName === 'string' ? displayName.trim().slice(0, 50) : '') || cleanUsername;
 
       const res = await env.DB.prepare(`
         INSERT INTO users (username, password_hash, salt, display_name, role)
         VALUES (?, ?, ?, ?, 'user')
-      `).bind(username, hash, salt, name).run();
+      `).bind(cleanUsername, hash, salt, name).run();
 
       const userId = res.meta.last_row_id;
       // 建立預設空間
@@ -215,16 +260,44 @@ export default {
         VALUES (?, ?, ?, 'grid', ?)
       `).bind(userId, `${name} 的工具本`, '個人工具空間', generateInviteCode()).run();
 
-      const userPayload = { id: userId, username, displayName: name };
+      const userPayload = { id: userId, username: cleanUsername, displayName: name };
       const token = await signToken(userPayload, secret);
       return jsonResponse({ token, user: userPayload }, 201);
     }
 
     // 2. 登入帳號
     if (path === '/api/auth/login' && method === 'POST') {
+      const clientIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'edge-client';
+      const rl = checkEdgeRateLimit(`auth:${clientIp}`, 15, 15 * 60 * 1000);
+      if (!rl.allowed) return jsonResponse({ error: '登入嘗試過於頻繁，請稍後再試' }, 429, { 'Retry-After': rl.retryAfter });
+
       const body = await request.json().catch(() => ({}));
       const { username, password } = body;
       if (!username || !password) return jsonResponse({ error: '請輸入有效的帳號與密碼' }, 400);
+      if (username.length > 50 || password.length > 128) {
+        return jsonResponse({ error: '帳號或密碼格式不符規範' }, 400);
+      }
+
+      // 支援體驗訪客帳號快速自動建立或就地登入
+      if (username === 'demo' && password === 'demo1234') {
+        let demoUser = await env.DB.prepare('SELECT * FROM users WHERE username = ?').bind('demo').first();
+        if (!demoUser) {
+          const { hash, salt } = await hashPassword('demo1234');
+          const res = await env.DB.prepare(`
+            INSERT INTO users (username, password_hash, salt, display_name, role)
+            VALUES (?, ?, ?, '體驗訪客', 'demo')
+          `).bind('demo', hash, salt).run();
+          const demoUserId = res.meta.last_row_id;
+          await env.DB.prepare(`
+            INSERT INTO spaces (user_id, name, description, layout, invite_code)
+            VALUES (?, '體驗訪客的手帳空間', '預載實用小工具範本，自由探索與使用', 'grid', 'SPC-DEMO')
+          `).bind(demoUserId).run();
+          demoUser = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(demoUserId).first();
+        }
+        const userPayload = { id: demoUser.id, username: 'demo', displayName: demoUser.display_name };
+        const token = await signToken(userPayload, secret);
+        return jsonResponse({ token, user: userPayload });
+      }
 
       const user = await env.DB.prepare('SELECT * FROM users WHERE username = ?').bind(username).first();
       if (!user) return jsonResponse({ error: '帳號或密碼不正確' }, 401);
@@ -240,6 +313,10 @@ export default {
     // 2.5 免登入訪客透過邀請碼 / QR Code 查看空間 (公開唯讀)
     const shareMatch = path.match(/^\/api\/spaces\/share\/([A-Za-z0-9\-]+)$/);
     if (shareMatch && method === 'GET') {
+      const clientIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'edge-client';
+      const rl = checkEdgeRateLimit(`invite:${clientIp}`, 30, 60 * 1000);
+      if (!rl.allowed) return jsonResponse({ error: '請求過於頻繁，請稍後再試' }, 429, { 'Retry-After': rl.retryAfter });
+
       const cleanCode = decodeURIComponent(shareMatch[1]).trim().toUpperCase();
       const space = await env.DB.prepare(`
         SELECT s.id, s.name, s.description, s.layout, s.invite_code, s.created_at,
@@ -326,13 +403,18 @@ export default {
     if (path === '/api/spaces' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
       const { name, description = '', layout = 'grid' } = body;
-      if (!name) return jsonResponse({ error: '空間名稱為必填' }, 400);
+      if (!name || typeof name !== 'string' || !name.trim()) return jsonResponse({ error: '空間名稱為必填' }, 400);
+      const cleanName = name.trim();
+      if (cleanName.length > 100) return jsonResponse({ error: '空間名稱不可超過 100 個字元' }, 400);
+      const cleanDesc = (typeof description === 'string' ? description.trim() : '').slice(0, 1000);
+      const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+      const safeLayout = validLayouts.includes(layout) ? layout : 'grid';
 
       const code = generateInviteCode();
       const res = await env.DB.prepare(`
         INSERT INTO spaces (user_id, name, description, layout, invite_code)
         VALUES (?, ?, ?, ?, ?)
-      `).bind(user.id, name.trim(), description.trim(), layout, code).run();
+      `).bind(user.id, cleanName, cleanDesc, safeLayout, code).run();
 
       const newSpace = await env.DB.prepare(`
         SELECT s.*, u.display_name as owner_name, 1 as is_owner, 0 as tool_count
@@ -346,9 +428,13 @@ export default {
 
     // 7. 輸入邀請碼加入空間
     if (path === '/api/spaces/join' && method === 'POST') {
+      const clientIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'edge-client';
+      const rl = checkEdgeRateLimit(`invite:${clientIp}`, 30, 60 * 1000);
+      if (!rl.allowed) return jsonResponse({ error: '請求過於頻繁，請稍後再試' }, 429, { 'Retry-After': rl.retryAfter });
+
       const body = await request.json().catch(() => ({}));
       const { inviteCode } = body;
-      if (!inviteCode) return jsonResponse({ error: '請提供邀請碼' }, 400);
+      if (!inviteCode || typeof inviteCode !== 'string' || !inviteCode.trim()) return jsonResponse({ error: '請提供邀請碼' }, 400);
 
       const cleanCode = inviteCode.trim().toUpperCase();
       const space = await env.DB.prepare(`
@@ -398,9 +484,21 @@ export default {
         const check = await env.DB.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?').bind(spaceId, user.id).first();
         if (!check) return jsonResponse({ error: '無權限修改' }, 403);
 
-        if (layout) await env.DB.prepare('UPDATE spaces SET layout = ? WHERE id = ?').bind(layout, spaceId).run();
-        if (name) await env.DB.prepare('UPDATE spaces SET name = ? WHERE id = ?').bind(name, spaceId).run();
-        if (description !== undefined) await env.DB.prepare('UPDATE spaces SET description = ? WHERE id = ?').bind(description, spaceId).run();
+        if (name !== undefined) {
+          if (typeof name !== 'string' || !name.trim()) return jsonResponse({ error: '空間名稱不可為空' }, 400);
+          const cleanName = name.trim();
+          if (cleanName.length > 100) return jsonResponse({ error: '空間名稱不可超過 100 個字元' }, 400);
+          await env.DB.prepare('UPDATE spaces SET name = ? WHERE id = ?').bind(cleanName, spaceId).run();
+        }
+        if (description !== undefined) {
+          const cleanDesc = (typeof description === 'string' ? description.trim() : '').slice(0, 1000);
+          await env.DB.prepare('UPDATE spaces SET description = ? WHERE id = ?').bind(cleanDesc, spaceId).run();
+        }
+        if (layout !== undefined) {
+          const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+          if (!validLayouts.includes(layout)) return jsonResponse({ error: '無效的排版格式' }, 400);
+          await env.DB.prepare('UPDATE spaces SET layout = ? WHERE id = ?').bind(layout, spaceId).run();
+        }
 
         const updated = await env.DB.prepare('SELECT * FROM spaces WHERE id = ?').bind(spaceId).first();
         return jsonResponse({ space: updated });
@@ -432,6 +530,18 @@ export default {
       const body = await request.json().catch(() => ({}));
       const { title, type = 'html', content, colSpan = 1 } = body;
 
+      if (!title || typeof title !== 'string' || !title.trim()) return jsonResponse({ error: '工具名稱為必填' }, 400);
+      const cleanTitle = title.trim();
+      if (cleanTitle.length > 100) return jsonResponse({ error: '工具名稱不可超過 100 個字元' }, 400);
+
+      if (!content || typeof content !== 'string' || !content.trim()) return jsonResponse({ error: '請貼入程式碼、iframe 或網址' }, 400);
+      const cleanContent = content.trim();
+      if (cleanContent.length > 1048576) return jsonResponse({ error: '工具內容大小不可超過 1MB' }, 400);
+
+      const validTypes = ['html', 'iframe', 'url'];
+      const safeType = validTypes.includes(type) ? type : 'html';
+      const safeColSpan = Number(colSpan) === 2 ? 2 : 1;
+
       const check = await env.DB.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?').bind(spaceId, user.id).first();
       if (!check) return jsonResponse({ error: '只有建立者可新增工具' }, 403);
 
@@ -441,7 +551,7 @@ export default {
       const res = await env.DB.prepare(`
         INSERT INTO tools (space_id, title, type, content, sort_order, col_span)
         VALUES (?, ?, ?, ?, ?, ?)
-      `).bind(spaceId, title, type, content, sortOrder, colSpan).run();
+      `).bind(spaceId, cleanTitle, safeType, cleanContent, sortOrder, safeColSpan).run();
 
       const newTool = await env.DB.prepare('SELECT * FROM tools WHERE id = ?').bind(res.meta.last_row_id).first();
       return jsonResponse({ tool: newTool }, 201);
@@ -453,6 +563,8 @@ export default {
       const spaceId = Number(reorderMatch[1]);
       const body = await request.json().catch(() => ({}));
       const { toolIds } = body;
+
+      if (!Array.isArray(toolIds)) return jsonResponse({ error: 'toolIds 必須為陣列' }, 400);
 
       const check = await env.DB.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?').bind(spaceId, user.id).first();
       if (!check) return jsonResponse({ error: '只有建立者可排序' }, 403);
@@ -477,10 +589,31 @@ export default {
         const body = await request.json().catch(() => ({}));
         const updates = [];
         const bindings = [];
-        if (body.colSpan !== undefined) { updates.push('col_span = ?'); bindings.push(Number(body.colSpan)); }
-        if (body.title !== undefined) { updates.push('title = ?'); bindings.push(body.title.trim()); }
-        if (body.content !== undefined) { updates.push('content = ?'); bindings.push(body.content.trim()); }
-        if (body.type !== undefined) { updates.push('type = ?'); bindings.push(body.type.trim()); }
+        if (body.colSpan !== undefined) {
+          const parsedColSpan = Number(body.colSpan);
+          updates.push('col_span = ?');
+          bindings.push(parsedColSpan === 2 ? 2 : 1);
+        }
+        if (body.title !== undefined) {
+          if (typeof body.title !== 'string' || !body.title.trim()) return jsonResponse({ error: '工具名稱不可為空' }, 400);
+          const cleanTitle = body.title.trim();
+          if (cleanTitle.length > 100) return jsonResponse({ error: '工具名稱不可超過 100 個字元' }, 400);
+          updates.push('title = ?');
+          bindings.push(cleanTitle);
+        }
+        if (body.content !== undefined) {
+          if (typeof body.content !== 'string' || !body.content.trim()) return jsonResponse({ error: '工具內容不可為空' }, 400);
+          const cleanContent = body.content.trim();
+          if (cleanContent.length > 1048576) return jsonResponse({ error: '工具內容大小不可超過 1MB' }, 400);
+          updates.push('content = ?');
+          bindings.push(cleanContent);
+        }
+        if (body.type !== undefined) {
+          const validTypes = ['html', 'iframe', 'url'];
+          if (!validTypes.includes(body.type)) return jsonResponse({ error: '無效的工具類型' }, 400);
+          updates.push('type = ?');
+          bindings.push(body.type);
+        }
 
         if (updates.length > 0) {
           bindings.push(toolId, spaceId);
