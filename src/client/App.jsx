@@ -643,8 +643,8 @@ export default function App() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center notebook-grid-bg">
-        <div className="flex items-center gap-2.5 text-sm text-[#89959b]">
-          <div className="w-5 h-5 border-2 border-[#e17b62] border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-2.5 text-sm text-[var(--muted)]">
+          <div className="w-5 h-5 border-2 border-[var(--coral)] border-t-transparent rounded-full animate-spin" />
           <span>載入空間工作區…</span>
         </div>
       </div>
@@ -706,8 +706,8 @@ export default function App() {
             user={user}
           />
         ) : loadingSpace ? (
-          <div className="py-24 flex items-center justify-center text-sm text-[#89959b] gap-2">
-            <div className="w-5 h-5 border-2 border-[#e17b62] border-t-transparent rounded-full animate-spin" />
+          <div className="py-24 flex items-center justify-center text-sm text-[var(--muted)] gap-2">
+            <div className="w-5 h-5 border-2 border-[var(--coral)] border-t-transparent rounded-full animate-spin" />
             <span>讀取工具中…</span>
           </div>
         ) : (

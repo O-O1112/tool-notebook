@@ -44,40 +44,40 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreateSpace }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1f2a2e]/50 backdrop-blur-sm animate-fadeIn">
-      <div className="notebook-card w-full max-w-md p-6 bg-white shadow-2xl relative overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#11151a]/60 backdrop-blur-sm animate-fadeIn">
+      <div className="notebook-modal-box w-full max-w-md p-6 relative">
         {/* 背景方格藍圖草稿飾紋 */}
-        <div className="absolute right-12 top-3 pointer-events-none opacity-30 dark:opacity-20">
+        <div className="absolute right-12 top-3 pointer-events-none opacity-25 dark:opacity-15">
           <DraftingNotebookDoodle className="w-16 h-13 text-[#60a5fa]" />
         </div>
 
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors z-10"
+          className="absolute right-4 top-4 p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors z-10"
         >
           <X size={16} />
         </button>
 
-        <div className="w-12 h-12 rounded-xl bg-[#fff0eb] text-[#e17b62] flex items-center justify-center mb-3.5 border border-[#e1ac9e]">
+        <div className="notebook-modal-badge mb-3.5">
           <FolderPlus size={22} />
         </div>
 
-        <h3 className="text-base font-bold text-[#1f2a2e] mb-1">建立新工具空間</h3>
-        <p className="text-xs text-[#89959b] mb-4 leading-relaxed">
+        <h3 className="text-base font-bold text-[var(--ink)] mb-1">建立新工具空間</h3>
+        <p className="text-xs text-[var(--muted)] mb-4 leading-relaxed">
           建立專屬的小工具嵌入工作區，系統將自動產生邀請碼與 QR Code 供快速分享。
         </p>
 
         {error && (
-          <div className="mb-3.5 p-2.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-notebook-sm">
+          <div className="mb-3.5 p-2.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 text-xs rounded-xl">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-[#1f2a2e] mb-1">
-              空間名稱 <span className="text-[#e17b62]">*</span>
+            <label className="block text-xs font-semibold text-[var(--ink)] mb-1">
+              空間名稱 <span className="text-[var(--coral)]">*</span>
             </label>
             <input
               type="text"
@@ -91,7 +91,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreateSpace }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#1f2a2e] mb-1">
+            <label className="block text-xs font-semibold text-[var(--ink)] mb-1">
               說明備註 (選填)
             </label>
             <input
@@ -104,7 +104,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreateSpace }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#1f2a2e] mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--ink)] mb-1.5">
               預設佈局模式
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -118,18 +118,18 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreateSpace }) {
                     onClick={() => setLayout(opt.key)}
                     className={`p-2.5 rounded-xl border text-left transition-all flex items-start gap-2 ${
                       isSelected
-                        ? 'border-[#e17b62] bg-[#fff9f6] shadow-xs'
-                        : 'border-[#e4e8e5] hover:border-[#89959b]/50 bg-white'
+                        ? 'border-[var(--coral)] bg-[var(--coral-light)] shadow-xs'
+                        : 'border-[var(--line)] hover:border-[var(--coral-border)] bg-[var(--card-bg)]'
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? 'bg-[#fff0eb] text-[#e17b62]' : 'bg-[#f5f7f6] text-[#89959b]'}`}>
+                    <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? 'bg-[var(--coral-light)] text-[var(--coral)]' : 'bg-[var(--paper)] text-[var(--muted)]'}`}>
                       <Icon size={15} />
                     </div>
                     <div className="min-w-0">
-                      <div className={`text-xs font-bold ${isSelected ? 'text-[#e17b62]' : 'text-[#1f2a2e]'}`}>
+                      <div className={`text-xs font-bold ${isSelected ? 'text-[var(--coral)]' : 'text-[var(--ink)]'}`}>
                         {opt.label}
                       </div>
-                      <div className="text-[10px] text-[#89959b] truncate">
+                      <div className="text-[10px] text-[var(--muted)] truncate">
                         {opt.desc}
                       </div>
                     </div>
@@ -139,18 +139,18 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreateSpace }) {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#f0f2f1]">
+          <div className="flex items-center justify-end gap-2.5 pt-4 mt-2 border-t border-[var(--line)]">
             <button
               type="button"
               onClick={onClose}
-              className="notebook-btn-secondary text-xs"
+              className="notebook-btn-secondary text-xs py-2 px-4"
             >
               取消
             </button>
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="notebook-btn-primary text-xs"
+              className="notebook-btn-primary text-xs py-2 px-4"
             >
               <span>{loading ? '建立中…' : '確認建立'}</span>
               <ArrowRight size={14} />

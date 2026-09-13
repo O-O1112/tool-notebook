@@ -280,9 +280,9 @@ export default function SpaceDashboard({
       {/* 頂部主體：側邊欄導覽與工作空間內容區 */}
       <div className="flex-1 w-full flex flex-col md:flex-row items-stretch gap-5 lg:gap-7">
         {/* ========================================================
-            行動端快速導覽分類條 (Mobile Adaptive Category Bar)
-            ======================================================== */}
-      <div className="md:hidden space-y-3 bg-[var(--card-bg)] p-3.5 rounded-2xl border border-[var(--line,#e4e8e5)] shadow-xs">
+          行動端快速導覽分類條 (Mobile Adaptive Category Bar)
+          ======================================================== */}
+      <div className="md:hidden space-y-3 bg-[var(--card-bg)] p-3.5 rounded-2xl border border-[var(--line)] shadow-xs">
         {/* 行動端名片與問候 (點擊可開啟帳號設定) */}
         <div className="flex items-center justify-between gap-3">
           <div
@@ -292,17 +292,17 @@ export default function SpaceDashboard({
             className="flex items-center gap-2.5 min-w-0 cursor-pointer group"
             title="點擊前往個人帳號設定"
           >
-            <div className="w-8 h-8 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-sm shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-[var(--coral-light)] border border-[var(--coral-border)] flex items-center justify-center text-[var(--coral)] font-bold text-sm shadow-xs shrink-0 group-hover:scale-105 transition-transform">
               {displayName.slice(0, 1)}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1">
-                <h2 className="text-xs font-bold text-[var(--ink,#1f2a2e)] truncate group-hover:text-[var(--coral,#e17b62)] transition-colors">
+                <h2 className="text-xs font-bold text-[var(--ink)] truncate group-hover:text-[var(--coral)] transition-colors">
                   您好，{displayName}
                 </h2>
-                <User size={11} className="text-[var(--muted,#89959b)] group-hover:text-[var(--coral,#e17b62)] shrink-0" />
+                <User size={11} className="text-[var(--muted)] group-hover:text-[var(--coral)] shrink-0" />
               </div>
-              <span className="text-[10px] text-[var(--coral,#e17b62)] font-medium">{todayGreeting}</span>
+              <span className="text-[10px] text-[var(--coral)] font-medium">{todayGreeting}</span>
             </div>
           </div>
 
@@ -340,7 +340,7 @@ export default function SpaceDashboard({
 
         {/* 搜尋空間輸入框 */}
         <div className="relative">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted,#89959b)] pointer-events-none shrink-0" />
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none shrink-0" />
           <input
             type="text"
             value={searchQuery}
@@ -357,8 +357,8 @@ export default function SpaceDashboard({
             onClick={() => setActiveNav('recent')}
             className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
               activeNav === 'recent'
-                ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+                ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                : 'bg-[var(--paper)] text-[var(--ink)]'
             }`}
           >
             <Clock size={13} />
@@ -369,8 +369,8 @@ export default function SpaceDashboard({
             onClick={() => setActiveNav('owned')}
             className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
               activeNav === 'owned'
-                ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+                ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                : 'bg-[var(--paper)] text-[var(--ink)]'
             }`}
           >
             <FolderHeart size={13} />
@@ -381,8 +381,8 @@ export default function SpaceDashboard({
             onClick={() => setActiveNav('shared')}
             className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
               activeNav === 'shared'
-                ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+                ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                : 'bg-[var(--paper)] text-[var(--ink)]'
             }`}
           >
             <Users size={13} />
@@ -393,8 +393,8 @@ export default function SpaceDashboard({
             onClick={() => setActiveNav('favorites')}
             className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
               activeNav === 'favorites'
-                ? 'bg-amber-50 text-amber-600 font-bold shadow-xs'
-                : 'bg-[var(--paper,#f5f7f6)] text-[var(--ink,#1f2a2e)]'
+                ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 font-bold shadow-xs border border-amber-200/50'
+                : 'bg-[var(--paper)] text-[var(--ink)]'
             }`}
           >
             <Star size={13} className={activeNav === 'favorites' ? 'fill-amber-400 text-amber-500' : ''} />
@@ -405,8 +405,8 @@ export default function SpaceDashboard({
             onClick={() => setActiveNav('trash')}
             className={`px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
               activeNav === 'trash'
-                ? 'bg-red-50 text-red-600 font-bold shadow-xs'
-                : 'bg-[var(--paper,#f5f7f6)] text-[var(--muted,#89959b)]'
+                ? 'bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 font-bold shadow-xs border border-red-200/50'
+                : 'bg-[var(--paper)] text-[var(--muted)]'
             }`}
           >
             <Trash2 size={13} />
@@ -425,7 +425,7 @@ export default function SpaceDashboard({
             onClick={() => onOpenSettings && onOpenSettings(null, 'account')}
             role="button"
             tabIndex={0}
-            className="notebook-card p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#f7d2c8] hover:bg-[#fff9f7] transition-all group shadow-xs relative overflow-hidden"
+            className="notebook-card p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[var(--coral-border)] hover:bg-[var(--coral-light)] transition-all group shadow-xs relative overflow-hidden"
             title="點擊前往個人帳號設定"
           >
             {/* 背景手帳火漆封蠟飾紋 */}
@@ -434,19 +434,19 @@ export default function SpaceDashboard({
             </div>
 
             <div className="flex items-center gap-3 min-w-0 z-10">
-              <div className="w-10 h-10 rounded-xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-bold text-base shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-[var(--coral-light)] border border-[var(--coral-border)] flex items-center justify-center text-[var(--coral)] font-bold text-base shadow-xs shrink-0 group-hover:scale-105 transition-transform">
                 {displayName.slice(0, 1)}
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-sm font-bold text-[var(--ink,#1f2a2e)] truncate group-hover:text-[var(--coral,#e17b62)] transition-colors">
+                <h2 className="text-sm font-bold text-[var(--ink)] truncate group-hover:text-[var(--coral)] transition-colors">
                   您好，{displayName}
                 </h2>
-                <p className="text-[11px] text-[var(--coral,#e17b62)] font-medium flex items-center gap-1">
+                <p className="text-[11px] text-[var(--coral)] font-medium flex items-center gap-1">
                   <span>{todayGreeting}</span>
                 </p>
               </div>
             </div>
-            <span className="text-[11px] px-2 py-1 rounded-lg bg-[var(--paper,#f5f7f6)] text-[var(--muted,#89959b)] group-hover:bg-[#fff0eb] group-hover:text-[#e17b62] transition-colors flex items-center gap-1 shrink-0">
+            <span className="text-[11px] px-2 py-1 rounded-lg bg-[var(--paper)] text-[var(--muted)] group-hover:bg-[var(--card-bg)] group-hover:text-[var(--coral)] transition-colors flex items-center gap-1 shrink-0">
               <User size={12} />
               <span>帳號</span>
             </span>
@@ -454,7 +454,7 @@ export default function SpaceDashboard({
 
           {/* 搜尋空間輸入框 */}
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted,#89959b)] pointer-events-none shrink-0" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none shrink-0" />
             <input
               type="text"
               value={searchQuery}
@@ -465,22 +465,22 @@ export default function SpaceDashboard({
           </div>
 
           {/* 5 大核心分類導覽清單 */}
-          <nav className="space-y-1 bg-[var(--card-bg)] p-2 rounded-2xl border border-[var(--line,#e4e8e5)] shadow-xs">
+          <nav className="space-y-1 bg-[var(--card-bg)] p-2 rounded-2xl border border-[var(--line)] shadow-xs">
             {/* 1. 最近使用 */}
             <button
               type="button"
               onClick={() => setActiveNav('recent')}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeNav === 'recent'
-                  ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                  : 'text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)]'
+                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                  : 'text-[var(--ink)] hover:bg-[var(--paper)]'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Clock size={15} className={activeNav === 'recent' ? 'text-[#e17b62]' : 'text-[var(--muted,#89959b)]'} />
+                <Clock size={15} className={activeNav === 'recent' ? 'text-[var(--coral)]' : 'text-[var(--muted)]'} />
                 <span>最近使用</span>
               </div>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-white/70 border border-current/20 text-current">
+              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--card-bg)]/80 border border-current/20 text-current">
                 {recentSpaces.length}
               </span>
             </button>
@@ -491,15 +491,15 @@ export default function SpaceDashboard({
               onClick={() => setActiveNav('owned')}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeNav === 'owned'
-                  ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                  : 'text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)]'
+                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                  : 'text-[var(--ink)] hover:bg-[var(--paper)]'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <FolderHeart size={15} className={activeNav === 'owned' ? 'text-[#e17b62]' : 'text-[var(--muted,#89959b)]'} />
+                <FolderHeart size={15} className={activeNav === 'owned' ? 'text-[var(--coral)]' : 'text-[var(--muted)]'} />
                 <span>由我建立</span>
               </div>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-white/70 border border-current/20 text-current">
+              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--card-bg)]/80 border border-current/20 text-current">
                 {ownedSpaces.length}
               </span>
             </button>
@@ -510,15 +510,15 @@ export default function SpaceDashboard({
               onClick={() => setActiveNav('shared')}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeNav === 'shared'
-                  ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                  : 'text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)]'
+                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                  : 'text-[var(--ink)] hover:bg-[var(--paper)]'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Users size={15} className={activeNav === 'shared' ? 'text-[#e17b62]' : 'text-[var(--muted,#89959b)]'} />
+                <Users size={15} className={activeNav === 'shared' ? 'text-[var(--coral)]' : 'text-[var(--muted)]'} />
                 <span>他人共享</span>
               </div>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-white/70 border border-current/20 text-current">
+              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--card-bg)]/80 border border-current/20 text-current">
                 {sharedSpaces.length}
               </span>
             </button>
@@ -529,18 +529,18 @@ export default function SpaceDashboard({
               onClick={() => setActiveNav('favorites')}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeNav === 'favorites'
-                  ? 'bg-amber-50 text-amber-600 font-bold shadow-xs border border-amber-200/60'
-                  : 'text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)]'
+                  ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 font-bold shadow-xs border border-amber-200/50'
+                  : 'text-[var(--ink)] hover:bg-[var(--paper)]'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Star
                   size={15}
-                  className={activeNav === 'favorites' ? 'text-amber-500 fill-amber-500' : 'text-[var(--muted,#89959b)]'}
+                  className={activeNav === 'favorites' ? 'text-amber-500 fill-amber-500' : 'text-[var(--muted)]'}
                 />
                 <span>我的最愛</span>
               </div>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-white/70 border border-current/20 text-current">
+              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--card-bg)]/80 border border-current/20 text-current">
                 {favoriteSpaces.length}
               </span>
             </button>
@@ -551,23 +551,23 @@ export default function SpaceDashboard({
               onClick={() => setActiveNav('trash')}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeNav === 'trash'
-                  ? 'bg-red-50 text-red-600 font-bold shadow-xs border border-red-200/60'
-                  : 'text-[var(--muted,#89959b)] hover:text-red-500 hover:bg-red-50/50'
+                  ? 'bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 font-bold shadow-xs border border-red-200/50'
+                  : 'text-[var(--muted)] hover:text-red-500 hover:bg-red-50/50'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Trash2 size={15} className={activeNav === 'trash' ? 'text-red-500' : 'text-[var(--muted,#89959b)]'} />
+                <Trash2 size={15} className={activeNav === 'trash' ? 'text-red-500' : 'text-[var(--muted)]'} />
                 <span>資源回收桶</span>
               </div>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-white/70 border border-current/20 text-current">
+              <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--card-bg)]/80 border border-current/20 text-current">
                 {trashSpaces.length}
               </span>
             </button>
 
             {/* 分隔線與偏好設定群組 */}
             <div className="pt-2 pb-1 px-3">
-              <div className="h-[1px] bg-[var(--line,#e4e8e5)] mb-2" />
-              <span className="text-[10px] font-bold tracking-wider text-[var(--muted,#89959b)] uppercase">
+              <div className="h-[1px] bg-[var(--line)] mb-2" />
+              <span className="text-[10px] font-bold tracking-wider text-[var(--muted)] uppercase">
                 偏好與管理
               </span>
             </div>
@@ -576,43 +576,43 @@ export default function SpaceDashboard({
             <button
               type="button"
               onClick={() => onOpenSettings && onOpenSettings(null, 'account')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)] hover:text-[#e17b62] transition-all"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[var(--ink)] hover:bg-[var(--paper)] hover:text-[var(--coral)] transition-all"
               title="修改顯示暱稱與帳號資訊"
             >
               <div className="flex items-center gap-2.5">
                 <User size={15} className="text-[#3b827e]" />
                 <span>帳號設定</span>
               </div>
-              <span className="text-[10px] text-[var(--muted,#89959b)]">個人資料</span>
+              <span className="text-[10px] text-[var(--muted)]">個人資料</span>
             </button>
 
             {/* 偏好與外觀入口 */}
             <button
               type="button"
               onClick={() => onOpenSettings && onOpenSettings(null, 'appearance')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)] hover:text-[#e17b62] transition-all"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-[var(--ink)] hover:bg-[var(--paper)] hover:text-[var(--coral)] transition-all"
               title="主題紙質與預設偏好"
             >
               <div className="flex items-center gap-2.5">
-                <Settings size={15} className="text-[#e17b62]" />
+                <Settings size={15} className="text-[var(--coral)]" />
                 <span>偏好與外觀</span>
               </div>
-              <span className="text-[10px] text-[var(--muted,#89959b)]">主題紙質</span>
+              <span className="text-[10px] text-[var(--muted)]">主題紙質</span>
             </button>
           </nav>
         </div>
 
         {/* 側邊欄底部配額卡片 */}
-        <div className="p-3.5 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] text-xs space-y-1.5 overflow-hidden">
+        <div className="p-3.5 rounded-2xl bg-[var(--paper)] border border-[var(--line)] text-xs space-y-1.5 overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="font-bold text-[var(--ink,#1f2a2e)]">手帳工作空間</span>
-            <span className="notebook-badge bg-white text-[10px] text-[var(--muted,#89959b)]">已啟用</span>
+            <span className="font-bold text-[var(--ink)]">手帳工作空間</span>
+            <span className="notebook-badge bg-[var(--card-bg)] text-[10px] text-[var(--muted)]">已啟用</span>
           </div>
-          <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
+          <p className="text-[11px] text-[var(--muted)] leading-relaxed">
             已使用 {ownedSpaces.length} 個由您建立的空間，無限無拘束自由編排。
           </p>
           <div className="pt-0.5 flex justify-center">
-            <BookshelfDoodle className="w-full h-8 opacity-65 dark:opacity-45 text-[var(--ink,#1f2a2e)]" />
+            <BookshelfDoodle className="w-full h-8 opacity-65 dark:opacity-45 text-[var(--ink)]" />
           </div>
         </div>
       </aside>
@@ -623,9 +623,9 @@ export default function SpaceDashboard({
       <section className="flex-1 min-w-0 flex flex-col justify-between space-y-6">
         <div className="space-y-6">
           {/* 主標題與排序切換列 */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-[var(--line,#e4e8e5)]">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-[var(--line)]">
             <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-bold text-[var(--ink,#1f2a2e)] flex items-center gap-2">
+              <h1 className="text-xl font-bold text-[var(--ink)] flex items-center gap-2">
                 <span>{getNavTitle()}</span>
               </h1>
               <span className="notebook-badge text-xs">
@@ -634,14 +634,14 @@ export default function SpaceDashboard({
             </div>
 
             {/* 排序方式切換 */}
-            <div className="flex items-center gap-1 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--line,#e4e8e5)] text-xs">
+            <div className="flex items-center gap-1 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--line)] text-xs">
               <button
                 type="button"
                 onClick={() => setSortBy('recent')}
                 className={`px-2.5 py-1 rounded-lg transition-all ${
                   sortBy === 'recent'
-                    ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                    : 'text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]'
+                    ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                    : 'text-[var(--muted)] hover:text-[var(--ink)]'
                 }`}
               >
                 修改日期
@@ -651,8 +651,8 @@ export default function SpaceDashboard({
                 onClick={() => setSortBy('name')}
                 className={`px-2.5 py-1 rounded-lg transition-all ${
                   sortBy === 'name'
-                    ? 'bg-[#fff0eb] text-[#e17b62] font-bold shadow-xs'
-                    : 'text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]'
+                    ? 'bg-[var(--coral-light)] text-[var(--coral)] font-bold shadow-xs'
+                    : 'text-[var(--muted)] hover:text-[var(--ink)]'
                 }`}
               >
                 名稱 A-Z
@@ -688,7 +688,7 @@ export default function SpaceDashboard({
                       </div>
 
                       {/* 佈局模式徽章 */}
-                      <span className="notebook-badge bg-white/90 backdrop-blur text-[11px] shadow-xs flex items-center gap-1 z-10">
+                      <span className="notebook-badge bg-[var(--card-bg)]/90 backdrop-blur text-[11px] shadow-xs flex items-center gap-1 z-10">
                         {layoutInfo.icon}
                         <span>{layoutInfo.label}</span>
                       </span>
@@ -702,8 +702,8 @@ export default function SpaceDashboard({
                               onClick={() => onToggleFavorite && onToggleFavorite(sp.id)}
                               className={`p-1.5 rounded-lg transition-all ${
                                 isFavorite
-                                  ? 'text-amber-500 bg-white/90 shadow-xs'
-                                  : 'text-slate-400 hover:text-amber-500 hover:bg-white/90'
+                                  ? 'text-amber-500 bg-[var(--card-bg)]/90 shadow-xs'
+                                  : 'text-[var(--muted)] hover:text-amber-500 hover:bg-[var(--card-bg)]/90'
                               }`}
                               title={isFavorite ? '從我的最愛移除' : '加入我的最愛'}
                             >
@@ -714,7 +714,7 @@ export default function SpaceDashboard({
                               <button
                                 type="button"
                                 onClick={() => onOpenSettings(sp, 'info')}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-[#e17b62] hover:bg-white/90 transition-all shadow-xs"
+                                className="p-1.5 rounded-lg text-[var(--muted)] hover:text-[var(--coral)] hover:bg-[var(--card-bg)]/90 transition-all shadow-xs"
                                 title="手帳空間設定 (名稱、描述、備份等)"
                               >
                                 <Settings size={15} />
@@ -728,14 +728,14 @@ export default function SpaceDashboard({
                           <button
                             type="button"
                             onClick={() => setActiveMenuSpaceId(activeMenuSpaceId === sp.id ? null : sp.id)}
-                            className="p-1.5 rounded-lg bg-white/80 hover:bg-white text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)] shadow-xs transition-colors"
+                            className="p-1.5 rounded-lg bg-[var(--card-bg)]/80 hover:bg-[var(--card-bg)] text-[var(--muted)] hover:text-[var(--ink)] shadow-xs transition-colors"
                           >
                             <MoreVertical size={14} />
                           </button>
 
                           {activeMenuSpaceId === sp.id && (
                             <div
-                              className="absolute right-0 mt-1 w-44 bg-[var(--card-bg)] rounded-xl border border-[var(--line,#e4e8e5)] shadow-xl z-30 p-1 animate-fadeIn text-xs"
+                              className="absolute right-0 mt-1 w-44 bg-[var(--card-bg)] rounded-xl border border-[var(--line)] shadow-xl z-30 p-1 animate-fadeIn text-xs"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {!isTrashItem ? (
@@ -747,7 +747,7 @@ export default function SpaceDashboard({
                                         setActiveMenuSpaceId(null);
                                         onOpenQRCode(sp);
                                       }}
-                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-[var(--paper,#f5f7f6)] flex items-center gap-2 text-[var(--ink,#1f2a2e)]"
+                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-[var(--paper)] flex items-center gap-2 text-[var(--ink)]"
                                     >
                                       <QrCode size={13} className="text-[#3b827e]" />
                                       <span>分享 QR Code</span>
@@ -761,9 +761,9 @@ export default function SpaceDashboard({
                                         setActiveMenuSpaceId(null);
                                         onOpenSettings(sp, 'info');
                                       }}
-                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-[var(--paper,#f5f7f6)] flex items-center gap-2 text-[var(--ink,#1f2a2e)]"
+                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-[var(--paper)] flex items-center gap-2 text-[var(--ink)]"
                                     >
-                                      <Settings size={13} className="text-[#e17b62]" />
+                                      <Settings size={13} className="text-[var(--coral)]" />
                                       <span>空間設定</span>
                                     </button>
                                   )}
@@ -775,7 +775,7 @@ export default function SpaceDashboard({
                                         setActiveMenuSpaceId(null);
                                         onMoveToTrash(sp.id);
                                       }}
-                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-red-50 text-red-600 flex items-center gap-2"
+                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 flex items-center gap-2"
                                     >
                                       <Trash2 size={13} />
                                       <span>移至回收桶</span>
@@ -791,7 +791,7 @@ export default function SpaceDashboard({
                                         setActiveMenuSpaceId(null);
                                         onRestoreFromTrash(sp.id);
                                       }}
-                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 flex items-center gap-2 font-medium"
+                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-600 flex items-center gap-2 font-medium"
                                     >
                                       <RefreshCw size={13} />
                                       <span>還原此空間</span>
@@ -805,7 +805,7 @@ export default function SpaceDashboard({
                                         setActiveMenuSpaceId(null);
                                         onDeleteSpace(sp.id);
                                       }}
-                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-red-50 text-red-600 flex items-center gap-2 font-medium"
+                                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 flex items-center gap-2 font-medium"
                                     >
                                       <Trash2 size={13} />
                                       <span>永久銷毀</span>
@@ -823,19 +823,19 @@ export default function SpaceDashboard({
                     <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <h3 className="font-bold text-sm text-[var(--ink,#1f2a2e)] group-hover:text-[var(--coral,#e17b62)] transition-colors truncate">
+                          <h3 className="font-bold text-sm text-[var(--ink)] group-hover:text-[var(--coral)] transition-colors truncate">
                             {sp.name}
                           </h3>
                         </div>
-                        <p className="text-xs text-[var(--muted,#89959b)] line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[var(--muted)] line-clamp-2 leading-relaxed">
                           {sp.description || '點擊進入空間查看自訂工具與手帳內容…'}
                         </p>
                       </div>
 
                       {/* 底部元數據與快捷邀請碼 */}
-                      <div className="pt-2 border-t border-[var(--line,#e4e8e5)]/60 flex items-center justify-between text-[11px] text-[var(--muted,#89959b)]">
+                      <div className="pt-2 border-t border-[var(--line)]/60 flex items-center justify-between text-[11px] text-[var(--muted)]">
                         <div className="flex items-center gap-2">
-                          <span className="notebook-badge bg-[var(--paper,#f5f7f6)] border-none text-[10px] px-1.5 py-0.5">
+                          <span className="notebook-badge bg-[var(--paper)] border-none text-[10px] px-1.5 py-0.5">
                             {sp.tool_count || 0} 個工具
                           </span>
                           <span>{isOwner ? '我建立的' : `由 ${sp.owner_name || '同伴'} 共享`}</span>
@@ -851,7 +851,7 @@ export default function SpaceDashboard({
                             >
                               還原
                             </button>
-                            <span className="text-[var(--line,#e4e8e5)]">|</span>
+                            <span className="text-[var(--line)]">|</span>
                             <button
                               type="button"
                               onClick={() => onDeleteSpace && onDeleteSpace(sp.id)}
@@ -864,7 +864,7 @@ export default function SpaceDashboard({
                           <button
                             type="button"
                             onClick={(e) => handleCopyCode(e, sp.invite_code, sp.id)}
-                            className="flex items-center gap-1 hover:text-[var(--coral,#e17b62)] transition-colors font-mono"
+                            className="flex items-center gap-1 hover:text-[var(--coral)] transition-colors font-mono"
                             title="點擊複製空間邀請碼"
                           >
                             <KeyRound size={11} className="shrink-0" />
@@ -882,13 +882,13 @@ export default function SpaceDashboard({
                 <button
                   type="button"
                   onClick={onCreateSpaceClick}
-                  className="dashboard-create-card min-h-[190px] flex flex-col items-center justify-center p-6 text-center gap-2 text-[var(--coral,#e17b62)] group"
+                  className="dashboard-create-card min-h-[190px] flex flex-col items-center justify-center p-6 text-center gap-2 text-[var(--coral)] group"
                 >
-                  <div className="p-2 rounded-2xl bg-[#fff0eb] dark:bg-[#2b2524] border border-[#f7d2c8] dark:border-[#523e3b] flex items-center justify-center shadow-xs transition-transform group-hover:scale-110 group-hover:rotate-3">
+                  <div className="p-2.5 rounded-2xl bg-[var(--coral-light)] border border-[var(--coral-border)] flex items-center justify-center shadow-xs transition-transform group-hover:scale-110 group-hover:rotate-3">
                     <CreateSpaceDoodle className="w-12 h-12" />
                   </div>
-                  <div className="text-xs font-bold text-[var(--ink,#1f2a2e)] group-hover:text-[var(--coral,#e17b62)] transition-colors">建立新手帳空間</div>
-                  <div className="text-[11px] text-[var(--muted,#89959b)] max-w-[160px]">
+                  <div className="text-xs font-bold text-[var(--ink)] group-hover:text-[var(--coral)] transition-colors">建立新手帳空間</div>
+                  <div className="text-[11px] text-[var(--muted)] max-w-[160px]">
                     自訂分欄貨架、嵌入課堂或工作小工具
                   </div>
                 </button>
@@ -898,10 +898,10 @@ export default function SpaceDashboard({
             /* 無資料時的手繪風空狀態插畫卡片 */
             <div className="p-8 sm:p-14 notebook-card bg-[var(--card-bg)] text-center space-y-3 flex flex-col items-center justify-center min-h-[360px] animate-fadeIn">
               {renderEmptyIllustration()}
-              <h3 className="text-base font-bold text-[var(--ink,#1f2a2e)]">
+              <h3 className="text-base font-bold text-[var(--ink)]">
                 {getNavEmptyMessage().title}
               </h3>
-              <p className="text-xs text-[var(--muted,#89959b)] max-w-md leading-relaxed">
+              <p className="text-xs text-[var(--muted)] max-w-md leading-relaxed">
                 {getNavEmptyMessage().desc}
               </p>
               {getNavEmptyMessage().action && (
@@ -921,7 +921,7 @@ export default function SpaceDashboard({
 
     {/* 底部精緻手繪風全景天際線：全寬展開、完全貼近頁底 */}
     <div className="pt-6 w-full -mb-4 sm:-mb-6 flex justify-center items-end pointer-events-none overflow-hidden">
-      <PanoramicSkyline className="w-full max-w-[1700px] h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink,#1f2a2e)] opacity-45 dark:opacity-30 pointer-events-none transition-opacity" />
+      <PanoramicSkyline className="w-full max-w-[1700px] h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink)] opacity-45 dark:opacity-30 pointer-events-none transition-opacity" />
     </div>
   </div>
 );

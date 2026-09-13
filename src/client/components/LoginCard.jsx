@@ -43,21 +43,21 @@ export default function LoginCard() {
             <BookOpen size={20} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#1f2a2e] tracking-tight">
+            <h1 className="text-xl font-bold text-[var(--ink)] tracking-tight">
               工具小本本
             </h1>
-            <p className="text-xs text-[#89959b]">多功能工具嵌入空間</p>
+            <p className="text-xs text-[var(--muted)]">多功能工具嵌入空間</p>
           </div>
         </div>
 
         {/* 迎賓手繪手帳插圖 */}
         <div className="flex justify-center mb-5 pointer-events-none">
-          <LoginWelcomeIllustration className="w-52 h-20 text-[var(--ink,#1f2a2e)] opacity-85" />
+          <LoginWelcomeIllustration className="w-52 h-20 text-[var(--ink)] opacity-85" />
         </div>
 
         {/* 錯誤訊息 */}
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-notebook-sm">
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-notebook-sm">
             {error}
           </div>
         )}
@@ -66,7 +66,7 @@ export default function LoginCard() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {isRegister && (
             <div>
-              <label className="block text-xs font-medium text-[#1f2a2e] mb-1">
+              <label className="block text-xs font-medium text-[var(--ink)] mb-1">
                 姓名 / 稱呼
               </label>
               <input
@@ -80,7 +80,7 @@ export default function LoginCard() {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-[#1f2a2e] mb-1">
+            <label className="block text-xs font-medium text-[var(--ink)] mb-1">
               帳號名稱
             </label>
             <input
@@ -94,7 +94,7 @@ export default function LoginCard() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#1f2a2e] mb-1">
+            <label className="block text-xs font-medium text-[var(--ink)] mb-1">
               密碼
             </label>
             <input
@@ -125,7 +125,7 @@ export default function LoginCard() {
               setIsRegister(!isRegister);
               setError('');
             }}
-            className="text-xs text-[#89959b] hover:text-[#e17b62] transition-colors"
+            className="text-xs text-[var(--muted)] hover:text-[var(--coral)] transition-colors"
           >
             {isRegister ? '已有帳號？返回登入' : '還沒有帳號？立即註冊'}
           </button>

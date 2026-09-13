@@ -191,35 +191,37 @@ export default function SpaceSettingsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1f2a2e]/60 backdrop-blur-sm animate-fadeIn">
-      <div className="notebook-card w-full max-w-xl bg-[var(--card-bg)] border border-[var(--line)] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#11151a]/60 backdrop-blur-sm animate-fadeIn">
+      <div className="notebook-modal-box w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Modal 頂部標題列 */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--line,#e4e8e5)]">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#e17b62]" />
-            <h2 className="text-base font-bold text-[var(--ink,#1f2a2e)] flex items-center gap-2">
-              <Settings size={17} className="text-[#e17b62]" />
-              <span>系統與手帳空間設定中心</span>
-            </h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--line)] bg-[var(--paper)]/40">
+          <div className="flex items-center gap-3">
+            <div className="notebook-modal-badge text-[var(--coral)]">
+              <Settings size={18} />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-[var(--ink)]">系統與手帳空間設定中心</h2>
+              <p className="text-[11px] text-[var(--muted)]">自訂個人暱稱、手帳紙質、主題排版與資料備份</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)] hover:bg-[var(--paper,#f5f7f6)] rounded-md transition-colors"
+            className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--card-bg)] rounded-lg transition-colors"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* 6 頁籤列 */}
-        <div className="flex items-center gap-1.5 px-6 pt-3 pb-2 border-b border-[var(--line,#e4e8e5)] bg-[var(--paper,#f5f7f6)]/40 overflow-x-auto text-xs scrollbar-none">
+        <div className="flex items-center gap-1.5 px-6 pt-3 pb-2 border-b border-[var(--line)] bg-[var(--paper)]/30 overflow-x-auto text-xs scrollbar-none">
           {/* 1. 個人帳號 */}
           <button
             type="button"
             onClick={() => setActiveTab('account')}
             className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'account'
-                ? 'bg-[var(--card-bg)] text-[#e17b62] font-bold shadow-xs border border-[var(--line,#e4e8e5)]'
-                : 'text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]'
+                ? 'bg-[var(--card-bg)] text-[var(--coral)] font-bold shadow-xs border border-[var(--line)]'
+                : 'text-[var(--muted)] hover:text-[var(--ink)]'
             }`}
           >
             <User size={13} />
@@ -232,8 +234,8 @@ export default function SpaceSettingsModal({
             onClick={() => setActiveTab('appearance')}
             className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'appearance'
-                ? 'bg-[var(--card-bg)] text-[#e17b62] font-bold shadow-xs border border-[var(--line,#e4e8e5)]'
-                : 'text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]'
+                ? 'bg-[var(--card-bg)] text-[var(--coral)] font-bold shadow-xs border border-[var(--line)]'
+                : 'text-[var(--muted)] hover:text-[var(--ink)]'
             }`}
           >
             <Palette size={13} />
@@ -247,8 +249,8 @@ export default function SpaceSettingsModal({
               onClick={() => setActiveTab('info')}
               className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'info'
-                  ? 'bg-[var(--card-bg)] text-[#e17b62] font-bold shadow-xs border border-[var(--line,#e4e8e5)]'
-                  : 'text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]'
+                  ? 'bg-[var(--card-bg)] text-[var(--coral)] font-bold shadow-xs border border-[var(--line)]'
+                  : 'text-[var(--muted)] hover:text-[var(--ink)]'
               }`}
             >
               <FolderCog size={13} />
@@ -263,8 +265,8 @@ export default function SpaceSettingsModal({
               onClick={() => setActiveTab('backup')}
               className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'backup'
-                  ? 'bg-[var(--card-bg)] text-[#e17b62] font-bold shadow-xs border border-[var(--line,#e4e8e5)]'
-                  : 'text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]'
+                  ? 'bg-[var(--card-bg)] text-[var(--coral)] font-bold shadow-xs border border-[var(--line)]'
+                  : 'text-[var(--muted)] hover:text-[var(--ink)]'
               }`}
             >
               <FileText size={13} />
@@ -278,8 +280,8 @@ export default function SpaceSettingsModal({
             onClick={() => setActiveTab('about')}
             className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === 'about'
-                ? 'bg-[var(--card-bg)] text-[#e17b62] font-bold shadow-xs border border-[var(--line,#e4e8e5)]'
-                : 'text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]'
+                ? 'bg-[var(--card-bg)] text-[var(--coral)] font-bold shadow-xs border border-[var(--line)]'
+                : 'text-[var(--muted)] hover:text-[var(--ink)]'
             }`}
           >
             <Info size={13} />
@@ -294,7 +296,7 @@ export default function SpaceSettingsModal({
               className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'danger'
                   ? 'bg-red-500/10 text-red-500 font-bold shadow-xs border border-red-500/30'
-                  : 'text-[var(--muted,#89959b)] hover:text-red-500'
+                  : 'text-[var(--muted)] hover:text-red-500'
               }`}
             >
               <Trash2 size={13} />
@@ -309,20 +311,20 @@ export default function SpaceSettingsModal({
           {activeTab === 'account' && (
             <div className="space-y-6 animate-fadeIn">
               {/* 使用者名片頭像展示 */}
-              <div className="p-4 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#fff0eb] border border-[#f7d2c8] flex items-center justify-center text-[#e17b62] font-extrabold text-xl shadow-xs shrink-0">
+              <div className="p-4 rounded-xl bg-[var(--paper)] border border-[var(--line)] flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--coral-light)] border border-[var(--coral-border)] flex items-center justify-center text-[var(--coral)] font-extrabold text-xl shadow-xs shrink-0">
                   {(editDisplayName || currentUser?.username || '用').slice(0, 1)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-bold text-[var(--ink,#1f2a2e)] truncate">
+                    <span className="text-base font-bold text-[var(--ink)] truncate">
                       {currentUser?.displayName || currentUser?.display_name || currentUser?.username || '未登入'}
                     </span>
-                    <span className="notebook-badge bg-[#fff4f0] text-[#e17b62] border-[#f7d2c8]">
+                    <span className="notebook-badge bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)]">
                       {currentUser?.role === 'teacher' ? '教師' : '手帳管理者'}
                     </span>
                   </div>
-                  <p className="text-[11px] text-[var(--muted,#89959b)] mt-0.5 font-mono">
+                  <p className="text-[11px] text-[var(--muted)] mt-0.5 font-mono">
                     @{currentUser?.username || 'guest'}
                   </p>
                 </div>
@@ -331,7 +333,7 @@ export default function SpaceSettingsModal({
               {/* 修改顯示暱稱表單 */}
               <form onSubmit={handleSaveProfile} className="space-y-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-[var(--ink,#1f2a2e)] mb-1.5">
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1.5">
                     修改顯示暱稱 (首頁大廳迎賓名稱)
                   </label>
                   <input
@@ -343,32 +345,32 @@ export default function SpaceSettingsModal({
                     maxLength={30}
                     required
                   />
-                  <p className="text-[10px] text-[var(--muted,#89959b)] mt-1">
+                  <p className="text-[10px] text-[var(--muted)] mt-1">
                     暱稱將顯示於大廳左側邊欄、頂部導覽列及協作清單中，登出後仍會自動記住。
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[var(--muted,#89959b)] mb-1.5">
+                  <label className="block text-xs font-semibold text-[var(--muted)] mb-1.5">
                     帳號使用者名稱 (不可變更)
                   </label>
                   <input
                     type="text"
                     value={currentUser?.username || ''}
                     disabled
-                    className="notebook-input w-full bg-[var(--paper,#f5f7f6)]/70 text-[var(--muted,#89959b)] cursor-not-allowed"
+                    className="notebook-input w-full bg-[var(--paper)]/70 text-[var(--muted)] cursor-not-allowed"
                   />
                 </div>
 
                 {profileSuccessMsg && (
-                  <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+                  <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs flex items-center gap-2">
                     <Check size={14} className="shrink-0" />
                     <span>{profileSuccessMsg}</span>
                   </div>
                 )}
 
                 {profileErrorMsg && (
-                  <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                  <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-400 text-xs flex items-center gap-2">
                     <AlertTriangle size={14} className="shrink-0" />
                     <span>{profileErrorMsg}</span>
                   </div>
@@ -382,7 +384,7 @@ export default function SpaceSettingsModal({
                         onClose();
                         logout();
                       }}
-                      className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                      className="text-xs text-red-500 hover:text-red-600 flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
                     >
                       <LogOut size={13} />
                       <span>登出帳號</span>
@@ -407,7 +409,7 @@ export default function SpaceSettingsModal({
             <div className="space-y-6 animate-fadeIn">
               {/* 深色模式切換 */}
               <div>
-                <label className="block text-xs font-bold text-[var(--ink,#1f2a2e)] mb-2">
+                <label className="block text-xs font-bold text-[var(--ink)] mb-2">
                   明暗色彩模式
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -421,11 +423,11 @@ export default function SpaceSettingsModal({
                     }}
                     className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
                       !isDarkMode
-                        ? 'border-[#e17b62] bg-[#fff9f6] text-[#e17b62] shadow-xs font-bold'
-                        : 'border-[var(--line,#e4e8e5)] bg-[var(--paper,#f5f7f6)] text-[var(--muted,#89959b)] hover:border-[#e17b62]/40'
+                        ? 'border-[var(--coral)] bg-[var(--coral-light)] text-[var(--coral)] shadow-xs font-bold'
+                        : 'border-[var(--line)] bg-[var(--paper)] text-[var(--muted)] hover:border-[var(--coral)]/40'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                       <Sun size={17} />
                     </div>
                     <div className="text-left">
@@ -439,11 +441,11 @@ export default function SpaceSettingsModal({
                     onClick={() => onSelectTheme && onSelectTheme('dark')}
                     className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
                       isDarkMode
-                        ? 'border-[#e17b62] bg-[#1c222b] text-[#e57d66] shadow-xs font-bold'
-                        : 'border-[var(--line,#e4e8e5)] bg-[var(--paper,#f5f7f6)] text-[var(--muted,#89959b)] hover:border-[#e17b62]/40'
+                        ? 'border-[var(--coral)] bg-[var(--coral-light)] text-[var(--coral)] shadow-xs font-bold'
+                        : 'border-[var(--line)] bg-[var(--paper)] text-[var(--muted)] hover:border-[var(--coral)]/40'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-slate-800 text-slate-200 flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-slate-500/15 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
                       <Moon size={17} />
                     </div>
                     <div className="text-left">
@@ -457,10 +459,10 @@ export default function SpaceSettingsModal({
               {/* 手帳紙質底色選擇 */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-bold text-[var(--ink,#1f2a2e)]">
+                  <label className="block text-xs font-bold text-[var(--ink)]">
                     手帳紙質風格底色
                     {isDarkMode && (
-                      <span className="ml-2 font-normal text-[11px] text-[var(--muted,#89959b)]">
+                      <span className="ml-2 font-normal text-[11px] text-[var(--muted)]">
                         (目前深色，日間套用)
                       </span>
                     )}
@@ -477,8 +479,8 @@ export default function SpaceSettingsModal({
                         onClick={() => onSelectTheme && onSelectTheme(t.key)}
                         className={`p-3 rounded-xl border text-left transition-all relative ${
                           isSelected
-                            ? 'border-[#e17b62] bg-[#fff9f6] ring-1 ring-[#e17b62]'
-                            : 'border-[var(--line,#e4e8e5)] hover:border-[#e17b62]/40 bg-[var(--card-bg)]'
+                            ? 'border-[var(--coral)] bg-[var(--coral-light)] ring-1 ring-[var(--coral)]'
+                            : 'border-[var(--line)] hover:border-[var(--coral)]/40 bg-[var(--card-bg)]'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1.5">
@@ -486,10 +488,10 @@ export default function SpaceSettingsModal({
                             className="w-4 h-4 rounded-full border shadow-xs"
                             style={{ backgroundColor: t.color, borderColor: t.border }}
                           />
-                          {isSelected && <span className="text-xs font-bold text-[#e17b62]">✓</span>}
+                          {isSelected && <span className="text-xs font-bold text-[var(--coral)]">✓</span>}
                         </div>
-                        <div className="text-xs font-bold text-[var(--ink,#1f2a2e)]">{t.name}</div>
-                        <div className="text-[10px] text-[var(--muted,#89959b)] mt-0.5 leading-relaxed">{t.desc}</div>
+                        <div className="text-xs font-bold text-[var(--ink)]">{t.name}</div>
+                        <div className="text-[10px] text-[var(--muted)] mt-0.5 leading-relaxed">{t.desc}</div>
                       </button>
                     );
                   })}
@@ -499,7 +501,7 @@ export default function SpaceSettingsModal({
               {/* 預設排版模式偏好 */}
               {onToggleLayout && (
                 <div>
-                  <label className="block text-xs font-bold text-[var(--ink,#1f2a2e)] mb-2">
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-2">
                     空間排版模式
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -513,20 +515,20 @@ export default function SpaceSettingsModal({
                           onClick={() => onToggleLayout(opt.key)}
                           className={`p-2.5 rounded-xl border flex items-center gap-2.5 text-left transition-all ${
                             isSelected
-                              ? 'border-[#e17b62] bg-[#fff9f6] text-[#e17b62] font-semibold'
-                              : 'border-[var(--line,#e4e8e5)] hover:border-[#e17b62]/40 text-[var(--ink,#1f2a2e)]'
+                              ? 'border-[var(--coral)] bg-[var(--coral-light)] text-[var(--coral)] font-semibold'
+                              : 'border-[var(--line)] hover:border-[var(--coral)]/40 text-[var(--ink)]'
                           }`}
                         >
                           <div
                             className={`p-2 rounded-lg shrink-0 ${
-                              isSelected ? 'bg-[#e17b62] text-white' : 'bg-[var(--paper,#f5f7f6)] text-[var(--muted,#89959b)]'
+                              isSelected ? 'bg-[var(--coral)] text-white' : 'bg-[var(--paper)] text-[var(--muted)]'
                             }`}
                           >
                             <Icon size={16} />
                           </div>
                           <div className="min-w-0">
                             <div className="text-xs font-bold truncate">{opt.label}</div>
-                            <div className="text-[10px] text-[var(--muted,#89959b)] truncate">{opt.desc}</div>
+                            <div className="text-[10px] text-[var(--muted)] truncate">{opt.desc}</div>
                           </div>
                         </button>
                       );
@@ -541,7 +543,7 @@ export default function SpaceSettingsModal({
           {activeTab === 'info' && space && (
             <form onSubmit={handleSubmit} className="space-y-4 animate-fadeIn">
               <div>
-                <label className="block text-xs font-semibold text-[var(--ink,#1f2a2e)] mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--ink)] mb-1.5">
                   空間名稱
                 </label>
                 <input
@@ -556,7 +558,7 @@ export default function SpaceSettingsModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[var(--ink,#1f2a2e)] mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--ink)] mb-1.5">
                   空間備註說明
                 </label>
                 <textarea
@@ -570,10 +572,10 @@ export default function SpaceSettingsModal({
               </div>
 
               {space.invite_code && (
-                <div className="p-3 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-[var(--paper)] border border-[var(--line)] flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] text-[var(--muted,#89959b)] block">空間邀請碼</span>
-                    <span className="font-mono font-bold text-sm text-[#e17b62] tracking-wider">{space.invite_code}</span>
+                    <span className="text-[11px] text-[var(--muted)] block">空間邀請碼</span>
+                    <span className="font-mono font-bold text-sm text-[var(--coral)] tracking-wider">{space.invite_code}</span>
                   </div>
                 </div>
               )}
@@ -596,18 +598,18 @@ export default function SpaceSettingsModal({
           {/* 頁籤 4：資料備份 (Backup) */}
           {activeTab === 'backup' && space && (
             <div className="space-y-4 animate-fadeIn">
-              <div className="p-4 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] space-y-3">
+              <div className="p-4 rounded-xl bg-[var(--paper)] border border-[var(--line)] space-y-3">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <h4 className="text-xs font-bold text-[var(--ink,#1f2a2e)] flex items-center gap-1.5">
-                      <FileText size={15} className="text-[#e17b62]" />
+                    <h4 className="text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
+                      <FileText size={15} className="text-[var(--coral)]" />
                       <span>工具資料轉移與 JSON 封裝</span>
                     </h4>
-                    <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
+                    <p className="text-[11px] text-[var(--muted)] leading-relaxed">
                       將目前空間內的 {tools.length} 個小工具（包含自訂 HTML/JS、Iframe 配置、色票便箋與釘選狀態）打包為標準 JSON 檔案，供離線保存或轉移至其他空間。
                     </p>
                   </div>
-                  <BackupArchiveDoodle className="w-24 h-12 shrink-0 opacity-70 dark:opacity-40 text-[var(--ink,#1f2a2e)]" />
+                  <BackupArchiveDoodle className="w-24 h-12 shrink-0 opacity-70 dark:opacity-40 text-[var(--ink)]" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
@@ -648,54 +650,54 @@ export default function SpaceSettingsModal({
           {/* 頁籤 5：關於系統 (About) */}
           {activeTab === 'about' && (
             <div className="space-y-5 animate-fadeIn">
-              <div className="p-4 rounded-xl bg-[var(--paper,#f5f7f6)] border border-[var(--line,#e4e8e5)] space-y-2.5">
+              <div className="p-4 rounded-xl bg-[var(--paper)] border border-[var(--line)] space-y-2.5">
                 <div className="flex items-center gap-2">
                   <div className="brand-mark w-8 h-8">
                     <Info size={16} />
                   </div>
                   <div>
-                    <h3 className="text-xs font-bold text-[var(--ink,#1f2a2e)]">工具小本本 Class Notebook</h3>
-                    <p className="text-[10px] text-[var(--muted,#89959b)]">版本 v2.2.0 • 手帳風格多空間工作平台</p>
+                    <h3 className="text-xs font-bold text-[var(--ink)]">工具小本本 Class Notebook</h3>
+                    <p className="text-[10px] text-[var(--muted)]">版本 v2.2.0 • 手帳風格多空間工作平台</p>
                   </div>
                 </div>
-                <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
+                <p className="text-[11px] text-[var(--muted)] leading-relaxed">
                   專為敏捷工作與個人筆記設計的極簡空間，融合經典手帳手作感、多欄貨架排版以及即時工具嵌入。
                 </p>
               </div>
 
               {/* 沙盒安全隔離說明 */}
-              <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-xs">
+              <div className="p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold text-xs">
                   <ShieldCheck size={15} />
                   <span>100% 嚴格安全隔離沙盒 (Iframe Sandbox)</span>
                 </div>
-                <p className="text-[10px] text-emerald-700 leading-relaxed">
+                <p className="text-[10px] text-emerald-600 dark:text-emerald-300 leading-relaxed">
                   所有嵌入的自訂 HTML/JS 小工具均在嚴格隔離的 Iframe 沙盒中運行，不存取主站 Cookie 與 LocalStorage，杜絕 XSS 與跨站隱私外洩風險。
                 </p>
               </div>
 
               {/* 快捷鍵與操作提示 */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-[var(--ink,#1f2a2e)] flex items-center gap-1.5">
-                  <Command size={13} className="text-[#e17b62]" />
+                <h4 className="text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
+                  <Command size={13} className="text-[var(--coral)]" />
                   <span>常用操作提示</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-                  <div className="p-2 rounded-lg bg-[var(--paper,#f5f7f6)] flex items-center justify-between">
-                    <span className="text-[var(--muted,#89959b)]">加入我的最愛</span>
-                    <span className="font-medium text-[var(--ink,#1f2a2e)]">點擊卡片 ⭐ 圖示</span>
+                  <div className="p-2 rounded-lg bg-[var(--paper)] border border-[var(--line)] flex items-center justify-between">
+                    <span className="text-[var(--muted)]">加入我的最愛</span>
+                    <span className="font-medium text-[var(--ink)]">點擊卡片 ⭐ 圖示</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-[var(--paper,#f5f7f6)] flex items-center justify-between">
-                    <span className="text-[var(--muted,#89959b)]">調整卡片大小</span>
-                    <span className="font-medium text-[var(--ink,#1f2a2e)]">卡片右上角 1x / 2x</span>
+                  <div className="p-2 rounded-lg bg-[var(--paper)] border border-[var(--line)] flex items-center justify-between">
+                    <span className="text-[var(--muted)]">調整卡片大小</span>
+                    <span className="font-medium text-[var(--ink)]">卡片右上角 1x / 2x</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-[var(--paper,#f5f7f6)] flex items-center justify-between">
-                    <span className="text-[var(--muted,#89959b)]">變更便箋色彩</span>
-                    <span className="font-medium text-[var(--ink,#1f2a2e)]">點擊便箋右上色彩圓點</span>
+                  <div className="p-2 rounded-lg bg-[var(--paper)] border border-[var(--line)] flex items-center justify-between">
+                    <span className="text-[var(--muted)]">變更便箋色彩</span>
+                    <span className="font-medium text-[var(--ink)]">點擊便箋右上色彩圓點</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-[var(--paper,#f5f7f6)] flex items-center justify-between">
-                    <span className="text-[var(--muted,#89959b)]">跨欄拖曳分類</span>
-                    <span className="font-medium text-[var(--ink,#1f2a2e)]">長按卡片拖動至目標欄位</span>
+                  <div className="p-2 rounded-lg bg-[var(--paper)] border border-[var(--line)] flex items-center justify-between">
+                    <span className="text-[var(--muted)]">跨欄拖曳分類</span>
+                    <span className="font-medium text-[var(--ink)]">長按卡片拖動至目標欄位</span>
                   </div>
                 </div>
               </div>
@@ -710,7 +712,7 @@ export default function SpaceSettingsModal({
                   <AlertTriangle size={16} />
                   <span>永久刪除此空間</span>
                 </div>
-                <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
+                <p className="text-[11px] text-[var(--muted)] leading-relaxed">
                   此操作無法復原。刪除後，空間內所有建立的自訂工具與配置都將被永久銷毀，成員也將立即失去存取權限。
                 </p>
 
@@ -735,7 +737,7 @@ export default function SpaceSettingsModal({
                       <button
                         type="button"
                         onClick={() => onDeleteSpace(space.id)}
-                        className="notebook-btn-primary text-xs py-1.5 px-3 bg-red-600 hover:bg-red-700 border-red-600"
+                        className="notebook-btn-primary text-xs py-1.5 px-3 bg-red-600 hover:bg-red-700 border-red-600 text-white"
                       >
                         確認永久刪除
                       </button>

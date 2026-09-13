@@ -103,7 +103,7 @@ export default function ToolCard({
         tool.color || 'default'
       } ${
         layout !== 'shelf' && layout !== 'wall' && colSpan >= 2 ? 'md:col-span-2' : 'col-span-1'
-      } ${tool.isPinned ? 'ring-2 ring-[#e17b62]/40 shadow-md' : ''}`}
+      } ${tool.isPinned ? 'ring-2 ring-[var(--coral)]/40 shadow-md' : ''}`}
     >
       {/* 置頂和紙膠帶飾紋 */}
       {tool.isPinned && (
@@ -113,20 +113,20 @@ export default function ToolCard({
       )}
 
       {/* 工具卡片頂部控制列 */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#e4e8e5] bg-inherit select-none gap-2">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--line)] bg-inherit select-none gap-2">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {/* 拖曳把手 */}
           {isOwner && (
             <div
-              className="cursor-grab active:cursor-grabbing p-1 text-[#a2aaad] hover:text-[#1f2a2e] rounded transition-colors shrink-0"
+              className="cursor-grab active:cursor-grabbing p-1 text-[var(--faint)] hover:text-[var(--ink)] rounded-lg transition-colors shrink-0"
               title="拖曳以重新排列工具順序"
             >
               <GripVertical size={16} className="shrink-0" />
             </div>
           )}
 
-          <div className="w-2 h-2 rounded-full bg-[#e17b62] shrink-0" />
-          <h3 className="text-sm font-semibold text-[var(--ink,#1f2a2e)] truncate shrink" title={tool.title}>
+          <div className="w-2 h-2 rounded-full bg-[var(--coral)] shrink-0" />
+          <h3 className="text-sm font-semibold text-[var(--ink)] truncate shrink" title={tool.title}>
             {tool.title}
           </h3>
 
@@ -152,15 +152,15 @@ export default function ToolCard({
               <button
                 type="button"
                 onClick={() => setColorMenuOpen(!colorMenuOpen)}
-                className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"
+                className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
                 title="選擇便箋紙質色彩"
               >
                 <Palette size={14} />
               </button>
 
               {colorMenuOpen && (
-                <div className="absolute right-0 mt-1 w-36 bg-white border border-[#e4e8e5] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn">
-                  <div className="text-[10px] font-semibold text-[#89959b] px-2 py-1 uppercase tracking-wider">
+                <div className="absolute right-0 mt-1 w-36 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn">
+                  <div className="text-[10px] font-semibold text-[var(--muted)] px-2 py-1 uppercase tracking-wider">
                     便箋底色
                   </div>
                   <div className="grid grid-cols-3 gap-1.5 p-1">
@@ -172,7 +172,7 @@ export default function ToolCard({
                           setColorMenuOpen(false);
                         }}
                         className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-transform hover:scale-110 ${
-                          (tool.color || 'default') === c.id ? 'ring-2 ring-[#e17b62]' : ''
+                          (tool.color || 'default') === c.id ? 'ring-2 ring-[var(--coral)]' : ''
                         }`}
                         style={{ backgroundColor: c.bg, borderColor: c.border }}
                         title={c.label}
@@ -188,10 +188,10 @@ export default function ToolCard({
           {onTogglePin && (
             <button
               onClick={() => onTogglePin(tool.id)}
-              className={`p-1.5 rounded-md transition-colors ${
+              className={`p-1.5 rounded-lg transition-colors ${
                 tool.isPinned
-                  ? 'bg-[#fff0eb] text-[#e17b62] font-semibold'
-                  : 'text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6]'
+                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-semibold'
+                  : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)]'
               }`}
               title={tool.isPinned ? '取消置頂釘選' : '置頂釘選至最前'}
             >
@@ -202,7 +202,7 @@ export default function ToolCard({
           {/* 獨立快顯浮動視窗 (Pop-out) */}
           <button
             onClick={handlePopout}
-            className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"
+            className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
             title="以獨立浮動視窗彈出 (便於多螢幕/側邊小工具)"
           >
             <ExternalLink size={14} />
@@ -212,10 +212,10 @@ export default function ToolCard({
           {isOwner && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
             <button
               onClick={() => onToggleColSpan(tool.id, colSpan === 1 ? 2 : 1)}
-              className={`p-1.5 rounded-md transition-colors text-xs flex items-center gap-1 ${
+              className={`p-1.5 rounded-lg transition-colors text-xs flex items-center gap-1 ${
                 colSpan >= 2
-                  ? 'bg-[#fff0eb] text-[#e17b62] font-semibold'
-                  : 'text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6]'
+                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-semibold'
+                  : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)]'
               }`}
               title={colSpan === 1 ? '切換為加寬展示 (2x)' : '還原為標準寬度 (1x)'}
             >
@@ -226,7 +226,7 @@ export default function ToolCard({
 
           <button
             onClick={() => setReloadKey((k) => k + 1)}
-            className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"
+            className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
             title="重新整理此小工具"
           >
             <RotateCcw size={14} />
@@ -234,7 +234,7 @@ export default function ToolCard({
           {isOwner && onEdit && (
             <button
               onClick={() => onEdit(tool)}
-              className="p-1.5 text-[#89959b] hover:text-[#e17b62] hover:bg-[#fff0eb] rounded-md transition-colors"
+              className="p-1.5 text-[var(--muted)] hover:text-[var(--coral)] hover:bg-[var(--coral-light)] rounded-lg transition-colors"
               title="編輯小工具代碼與設定"
             >
               <Pencil size={14} />
@@ -242,7 +242,7 @@ export default function ToolCard({
           )}
           <button
             onClick={() => onFocus(tool)}
-            className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-md transition-colors"
+            className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
             title="聚焦全螢幕展示"
           >
             <Maximize2 size={14} />
@@ -250,7 +250,7 @@ export default function ToolCard({
           {isOwner && (
             <button
               onClick={() => onDelete(tool.id)}
-              className="p-1.5 text-[#89959b] hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              className="p-1.5 text-[var(--muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
               title="刪除此小工具"
             >
               <Trash2 size={14} />
@@ -261,7 +261,7 @@ export default function ToolCard({
 
       {/* 標籤列 (若有標籤) */}
       {tagsList.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 px-3 py-1 bg-[var(--paper,#fbfbf9)]/70 border-b border-[#e4e8e5]/60">
+        <div className="flex flex-wrap items-center gap-1.5 px-3 py-1 bg-[var(--paper)]/70 border-b border-[var(--line)]/60">
           {tagsList.map((tag) => (
             <span key={tag} className="notebook-tag text-[10px]">
               #{tag}
@@ -271,7 +271,7 @@ export default function ToolCard({
       )}
 
       {/* 沙盒內容執行區 */}
-      <div className="flex-1 w-full relative bg-white">
+      <div className="flex-1 w-full relative bg-[var(--card-bg)]">
         <SandboxedFrame
           htmlContent={parsed.htmlContent}
           title={tool.title}

@@ -198,16 +198,16 @@ export default function SpaceLayout({
   return (
     <div className="w-full flex-1 flex flex-col space-y-4 animate-fadeIn">
       {/* 頂部搜尋、標籤與過濾篩選工具列 */}
-      <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-notebook border border-[var(--line,#e4e8e5)] shadow-sm relative overflow-hidden">
+      <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-2xl border border-[var(--line)] shadow-xs relative overflow-hidden">
         {/* 背景文具橫幅微型飾紋 */}
         <div className="absolute right-4 top-1 pointer-events-none opacity-25 dark:opacity-15 hidden lg:block">
-          <SpaceStationeryBannerDoodle className="w-36 h-9 text-[var(--muted,#89959b)]" />
+          <SpaceStationeryBannerDoodle className="w-36 h-9 text-[var(--muted)]" />
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 z-10">
           {/* 搜尋框 */}
           <div className="relative flex-1 min-w-[200px] max-w-md">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#89959b] pointer-events-none shrink-0" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none shrink-0" />
             <input
               type="text"
               value={searchQuery}
@@ -218,7 +218,7 @@ export default function SpaceLayout({
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#89959b] hover:text-[#1f2a2e] text-xs"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] text-xs"
               >
                 ✕
               </button>
@@ -230,10 +230,10 @@ export default function SpaceLayout({
             <button
               type="button"
               onClick={() => setFilterType('all')}
-              className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'all'
-                  ? 'bg-[#e17b62] text-white font-semibold'
-                  : 'text-[var(--muted,#69787f)] hover:bg-[var(--paper,#f5f7f6)]'
+                  ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
+                  : 'text-[var(--muted)] hover:bg-[var(--paper)]'
               }`}
             >
               全部 ({tools.length})
@@ -241,10 +241,10 @@ export default function SpaceLayout({
             <button
               type="button"
               onClick={() => setFilterType('html')}
-              className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'html'
-                  ? 'bg-[#e17b62] text-white font-semibold'
-                  : 'text-[var(--muted,#69787f)] hover:bg-[var(--paper,#f5f7f6)]'
+                  ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
+                  : 'text-[var(--muted)] hover:bg-[var(--paper)]'
               }`}
             >
               自訂程式
@@ -252,10 +252,10 @@ export default function SpaceLayout({
             <button
               type="button"
               onClick={() => setFilterType('iframe')}
-              className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
                 filterType === 'iframe'
-                  ? 'bg-[#e17b62] text-white font-semibold'
-                  : 'text-[var(--muted,#69787f)] hover:bg-[var(--paper,#f5f7f6)]'
+                  ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
+                  : 'text-[var(--muted)] hover:bg-[var(--paper)]'
               }`}
             >
               Iframe 視窗
@@ -265,8 +265,8 @@ export default function SpaceLayout({
 
         {/* 標籤過濾清單 (若有任何標籤) */}
         {availableTags.length > 0 && (
-          <div className="flex items-center gap-1.5 pt-2 border-t border-[#e4e8e5]/70 overflow-x-auto pb-0.5">
-            <span className="text-[11px] text-[#89959b] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 pt-2 border-t border-[var(--line)] overflow-x-auto pb-0.5">
+            <span className="text-[11px] text-[var(--muted)] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
               <Tag size={12} className="shrink-0" />
               <span>標籤：</span>
             </span>
@@ -274,8 +274,8 @@ export default function SpaceLayout({
               onClick={() => setSelectedTag(null)}
               className={`px-2.5 py-0.5 rounded-full text-[11px] transition-all shrink-0 ${
                 !selectedTag
-                  ? 'bg-[var(--ink,#1f2a2e)] text-[var(--paper,#ffffff)] font-semibold shadow-xs'
-                  : 'notebook-tag hover:text-[var(--ink,#1f2a2e)]'
+                  ? 'bg-[var(--ink)] text-[var(--paper)] font-semibold shadow-xs'
+                  : 'notebook-tag hover:text-[var(--ink)]'
               }`}
             >
               全部
@@ -287,7 +287,7 @@ export default function SpaceLayout({
                 className={`px-2.5 py-0.5 rounded-full text-[11px] transition-all shrink-0 ${
                   selectedTag === tag
                     ? 'notebook-tag-active font-semibold shadow-xs'
-                    : 'notebook-tag hover:text-[#1f2a2e]'
+                    : 'notebook-tag hover:text-[var(--ink)]'
                 }`}
               >
                 #{tag}
@@ -325,7 +325,7 @@ export default function SpaceLayout({
       {layout === 'collapsed' && sortedAndFilteredTools.length > 0 && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between px-1 mb-1">
-            <span className="text-xs font-semibold text-[#89959b] uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
               折起清單
             </span>
             <span className="notebook-badge text-[11px]">共 {sortedAndFilteredTools.length} 個小工具</span>
@@ -351,20 +351,20 @@ export default function SpaceLayout({
                 <div
                   key={tool.id}
                   className={`notebook-card overflow-hidden transition-all ${
-                    isExpanded ? 'shadow-notebook-hover border-[#d8dedb]' : 'hover:border-[#cbd4d0]'
-                  } ${tool.isPinned ? 'ring-1 ring-[#e17b62]/40' : ''}`}
+                    isExpanded ? 'shadow-md border-[var(--coral-border)]' : 'hover:border-[var(--line)]'
+                  } ${tool.isPinned ? 'ring-1 ring-[var(--coral)]/40' : ''}`}
                 >
                   {/* 折起條頂部按鈕 */}
                   <div
                     onClick={() => setExpandedToolId(isExpanded ? null : tool.id)}
-                    className="flex items-center justify-between px-4 py-3 bg-white cursor-pointer select-none transition-colors hover:bg-[#fafbfa]"
+                    className="flex items-center justify-between px-4 py-3 bg-[var(--card-bg)] cursor-pointer select-none transition-colors hover:bg-[var(--paper)]"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-xs font-mono font-medium text-[#a2aaad] w-4">
+                      <span className="text-xs font-mono font-medium text-[var(--faint)] w-4">
                         #{index + 1}
                       </span>
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#e17b62] shrink-0" />
-                      <span className="text-sm font-bold text-[#1f2a2e] truncate">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[var(--coral)] shrink-0" />
+                      <span className="text-sm font-bold text-[var(--ink)] truncate">
                         {tool.title}
                       </span>
                       {tool.isPinned && (
@@ -387,10 +387,10 @@ export default function SpaceLayout({
                             e.stopPropagation();
                             onTogglePin(tool.id);
                           }}
-                          className={`p-1.5 rounded-md transition-colors ${
+                          className={`p-1.5 rounded-lg transition-colors ${
                             tool.isPinned
-                              ? 'bg-[#fff0eb] text-[#e17b62]'
-                              : 'text-[#89959b] hover:text-[#1f2a2e]'
+                              ? 'bg-[var(--coral-light)] text-[var(--coral)]'
+                              : 'text-[var(--muted)] hover:text-[var(--ink)]'
                           }`}
                           title={tool.isPinned ? '取消置頂' : '置頂釘選'}
                         >
@@ -400,15 +400,15 @@ export default function SpaceLayout({
                       <button
                         type="button"
                         onClick={handlePopout}
-                        className="p-1.5 text-[#89959b] hover:text-[#1f2a2e] rounded-md transition-colors"
+                        className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] rounded-lg transition-colors"
                         title="獨立浮動視窗"
                       >
                         <ExternalLink size={14} />
                       </button>
-                      <span className="text-xs text-[#89959b] font-medium hidden sm:inline">
+                      <span className="text-xs text-[var(--muted)] font-medium hidden sm:inline">
                         {isExpanded ? '收起視窗' : '展開使用'}
                       </span>
-                      <div className="p-1 rounded text-[#89959b]">
+                      <div className="p-1 rounded text-[var(--muted)]">
                         {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                       </div>
                     </div>
@@ -416,14 +416,14 @@ export default function SpaceLayout({
 
                   {/* 展開之大尺寸沙盒工作區 */}
                   {isExpanded && (
-                    <div className="border-t border-[#e4e8e5] flex flex-col h-[560px] bg-white animate-fadeIn">
-                      <div className="flex items-center justify-between px-4 py-2 bg-[#fdfdfc] border-b border-[#e4e8e5] text-xs">
-                        <span className="text-[#89959b]">正在專注使用中</span>
+                    <div className="border-t border-[var(--line)] flex flex-col h-[560px] bg-[var(--card-bg)] animate-fadeIn">
+                      <div className="flex items-center justify-between px-4 py-2 bg-[var(--paper)] border-b border-[var(--line)] text-xs">
+                        <span className="text-[var(--muted)]">正在專注使用中</span>
                         <div className="flex items-center gap-1.5">
                           {isOwner && onEditTool && (
                             <button
                               onClick={() => onEditTool(tool)}
-                              className="text-xs text-[#89959b] hover:text-[#e17b62] hover:bg-[#fff0eb] px-2 py-1 rounded flex items-center gap-1"
+                              className="text-xs text-[var(--muted)] hover:text-[var(--coral)] hover:bg-[var(--coral-light)] px-2 py-1 rounded-lg flex items-center gap-1 transition-colors"
                               title="編輯此工具"
                             >
                               <Pencil size={13} />
@@ -432,7 +432,7 @@ export default function SpaceLayout({
                           )}
                           <button
                             onClick={() => setFocusedTool(tool)}
-                            className="text-xs text-[#e17b62] hover:underline flex items-center gap-1 font-medium px-2 py-1 rounded hover:bg-[#fff0eb]"
+                            className="text-xs text-[var(--coral)] hover:underline flex items-center gap-1 font-medium px-2 py-1 rounded-lg hover:bg-[var(--coral-light)] transition-colors"
                           >
                             <Maximize2 size={13} />
                             <span>全螢幕投影</span>
@@ -443,7 +443,7 @@ export default function SpaceLayout({
                                 e.stopPropagation();
                                 onDeleteTool(tool.id);
                               }}
-                              className="text-xs text-red-600 hover:bg-red-50 px-2 py-1 rounded"
+                              className="text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 px-2 py-1 rounded-lg transition-colors"
                             >
                               刪除
                             </button>
@@ -477,14 +477,14 @@ export default function SpaceLayout({
                 <button
                   key={t.id}
                   onClick={() => setActiveTabId(t.id)}
-                  className={`px-4 py-2 text-xs font-medium rounded-notebook-sm transition-all whitespace-nowrap flex items-center gap-2 border ${
+                  className={`px-4 py-2 text-xs font-medium rounded-xl transition-all whitespace-nowrap flex items-center gap-2 border ${
                     isActive
-                      ? 'bg-[#fff9f6] text-[#e17b62] border-[#e1ac9e] shadow-sm font-semibold'
-                      : 'bg-white text-[#89959b] border-[#e4e8e5] hover:border-[#cbd4d0] hover:text-[#1f2a2e]'
+                      ? 'bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)] shadow-xs font-semibold'
+                      : 'bg-[var(--card-bg)] text-[var(--muted)] border-[var(--line)] hover:border-[var(--coral-border)] hover:text-[var(--ink)]'
                   }`}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#e17b62]' : 'bg-[#a2aaad]'}`} />
-                  {t.isPinned && <Pin size={10} className="text-[#e17b62] fill-current" />}
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[var(--coral)]' : 'bg-[var(--faint)]'}`} />
+                  {t.isPinned && <Pin size={10} className="text-[var(--coral)] fill-current" />}
                   <span>{t.title}</span>
                 </button>
               );
@@ -558,8 +558,8 @@ export default function SpaceLayout({
                 {/* 欄位頂部標題與數量 */}
                 <div className="flex items-center justify-between px-1 py-0.5">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#e17b62] shrink-0" />
-                    <h4 className="text-xs font-bold text-[#1f2a2e] truncate">{sec}</h4>
+                    <span className="w-2.5 h-2.5 rounded-full bg-[var(--coral)] shrink-0" />
+                    <h4 className="text-xs font-bold text-[var(--ink)] truncate">{sec}</h4>
                   </div>
                   <span className="notebook-badge text-[10px] shrink-0">{secTools.length}</span>
                 </div>
@@ -591,8 +591,8 @@ export default function SpaceLayout({
                   ))}
 
                   {secTools.length === 0 && (
-                    <div className="py-8 px-4 border-2 border-dashed border-[#e4e8e5] dark:border-[#334247] rounded-xl text-center flex flex-col items-center justify-center gap-1.5 text-xs text-[var(--muted,#89959b)]">
-                      <EmptyShelfBasketDoodle className="w-14 h-11 text-[var(--muted,#89959b)] opacity-60 dark:opacity-40" />
+                    <div className="py-8 px-4 border-2 border-dashed border-[var(--line)] rounded-2xl text-center flex flex-col items-center justify-center gap-1.5 text-xs text-[var(--muted)]">
+                      <EmptyShelfBasketDoodle className="w-14 h-11 text-[var(--muted)] opacity-60 dark:opacity-40" />
                       <span>可將工具拖曳至此欄</span>
                     </div>
                   )}
@@ -603,7 +603,7 @@ export default function SpaceLayout({
                   <button
                     type="button"
                     onClick={() => onOpenAddModal && onOpenAddModal(sec)}
-                    className="notebook-btn-secondary text-xs py-2 justify-center border-dashed border-[#d8dedb] hover:border-[#e17b62] hover:text-[#e17b62]"
+                    className="notebook-btn-secondary text-xs py-2 justify-center border-dashed border-[var(--line)] hover:border-[var(--coral)] hover:text-[var(--coral)] rounded-xl"
                   >
                     <Plus size={13} />
                     <span>在此欄新增小工具</span>
@@ -619,7 +619,7 @@ export default function SpaceLayout({
               {showAddSectionInput ? (
                 <form
                   onSubmit={handleAddSectionSubmit}
-                  className="p-3 bg-white border border-[#e4e8e5] rounded-2xl shadow-md space-y-2"
+                  className="p-3 bg-[var(--card-bg)] border border-[var(--line)] rounded-2xl shadow-md space-y-2"
                 >
                   <input
                     type="text"
@@ -650,7 +650,7 @@ export default function SpaceLayout({
                 <button
                   type="button"
                   onClick={() => setShowAddSectionInput(true)}
-                  className="w-full notebook-btn-secondary py-3 text-xs border-dashed border-[#d8dedb] hover:border-[#e17b62] hover:text-[#e17b62] justify-center rounded-2xl"
+                  className="w-full notebook-btn-secondary py-3 text-xs border-dashed border-[var(--line)] hover:border-[var(--coral)] hover:text-[var(--coral)] justify-center rounded-2xl"
                 >
                   <Plus size={14} />
                   <span>新增分欄 (Section)…</span>
@@ -689,25 +689,25 @@ export default function SpaceLayout({
 
       {/* 聚焦全螢幕展示視窗 (Zen / Focus Modal) */}
       {focusedTool && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#1f2a2e]/60 backdrop-blur-sm p-4 md:p-8 animate-fadeIn">
-          <div className="notebook-card flex-1 flex flex-col w-full h-full max-w-7xl mx-auto overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#e4e8e5] bg-white">
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#11151a]/60 backdrop-blur-sm p-4 md:p-8 animate-fadeIn">
+          <div className="notebook-card flex-1 flex flex-col w-full h-full max-w-7xl mx-auto overflow-hidden shadow-2xl border border-[var(--line)]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--line)] bg-[var(--card-bg)]">
               <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#e17b62]" />
-                <h2 className="text-base font-bold text-[#1f2a2e]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--coral)]" />
+                <h2 className="text-base font-bold text-[var(--ink)]">
                   {focusedTool.title}
                 </h2>
                 <span className="notebook-badge">全螢幕專注展示</span>
               </div>
               <button
                 onClick={() => setFocusedTool(null)}
-                className="p-2 text-[#89959b] hover:text-[#1f2a2e] hover:bg-[#f5f7f6] rounded-lg transition-colors"
+                className="p-2 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-xl transition-colors"
                 title="關閉全螢幕"
               >
                 <X size={20} />
               </button>
             </div>
-            <div className="flex-1 w-full relative bg-white">
+            <div className="flex-1 w-full relative bg-[var(--card-bg)]">
               <SandboxedFrame
                 htmlContent={parseToolInput(focusedTool.content).htmlContent}
                 title={focusedTool.title}

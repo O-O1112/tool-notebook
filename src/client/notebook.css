@@ -12,9 +12,10 @@
   --faint: #a2aaad;
   --coral: #e17b62;
   --coral-hover: #cf5e43;
-  --coral-light: #fff9f6;
-  --coral-border: #e1ac9e;
+  --coral-light: #fff0eb;
+  --coral-border: #f7d2c8;
   --grid-line: #57767f0e;
+  --backdrop: rgba(31, 42, 46, 0.5);
 }
 
 .theme-dark {
@@ -29,6 +30,7 @@
   --coral-light: rgba(225, 123, 98, 0.15);
   --coral-border: rgba(225, 123, 98, 0.35);
   --grid-line: rgba(255, 255, 255, 0.035);
+  --backdrop: rgba(10, 14, 18, 0.7);
 }
 
 .theme-kraft {
@@ -43,6 +45,7 @@
   --coral-light: #fbf2ea;
   --coral-border: #c89582;
   --grid-line: #42280d0d;
+  --backdrop: rgba(45, 34, 23, 0.5);
 }
 
 .theme-minimal {
@@ -57,6 +60,7 @@
   --coral-light: #eff6ff;
   --coral-border: #bfdbfe;
   --grid-line: #00000006;
+  --backdrop: rgba(17, 24, 39, 0.45);
 }
 
 * {
@@ -87,14 +91,40 @@ html, body, #root {
 .notebook-card {
   background: var(--card-bg, #ffffff);
   border: 1px solid var(--line);
-  border-radius: 17px;
-  box-shadow: 0 13px 34px rgba(53, 66, 72, 0.06);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(53, 66, 72, 0.05);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--ink);
 }
 
 .notebook-card-hover:hover {
-  box-shadow: 0 18px 40px rgba(53, 66, 72, 0.10);
+  box-shadow: 0 16px 36px rgba(53, 66, 72, 0.10);
   border-color: var(--coral-border, #d8dedb);
+}
+
+/* 標準化對話框外框容器 */
+.notebook-modal-box {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.22);
+  color: var(--ink);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 對話框標準圖標徽章 */
+.notebook-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--coral-light);
+  color: var(--coral);
+  border: 1px solid var(--coral-border);
+  flex-shrink: 0;
 }
 
 /* 品牌標章圖示樣式 */
@@ -105,7 +135,7 @@ html, body, #root {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: #fff0eb;
+  background: var(--coral-light, #fff0eb);
   color: var(--coral);
   border: 1px solid var(--coral-border);
 }
@@ -121,7 +151,7 @@ html, body, #root {
   padding: 2px 8px;
   border-radius: 9999px;
   border: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   color: var(--muted);
   white-space: nowrap;
 }
@@ -141,7 +171,7 @@ html, body, #root {
 }
 
 .notebook-badge-teacher {
-  background: #fff4f0;
+  background: var(--coral-light, #fff4f0);
   color: var(--coral);
   border-color: var(--coral-border);
 }
