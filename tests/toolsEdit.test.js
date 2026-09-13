@@ -8,8 +8,8 @@ import authRoutes from '../src/server/routes/auth.js';
 import spacesRoutes from '../src/server/routes/spaces.js';
 import { TOOL_TEMPLATES } from '../src/client/utils/toolTemplates.js';
 
-test('templates: 應內建 15 款實用高質感小工具範本', () => {
-  assert.strictEqual(TOOL_TEMPLATES.length, 15);
+test('templates: 應內建 20 款實用高質感小工具範本', () => {
+  assert.strictEqual(TOOL_TEMPLATES.length, 20);
   const ids = TOOL_TEMPLATES.map(t => t.id);
   assert.ok(ids.includes('pomodoro'));
   assert.ok(ids.includes('decision_wheel'));

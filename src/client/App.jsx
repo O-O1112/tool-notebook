@@ -10,6 +10,8 @@ import CreateSpaceModal from './components/CreateSpaceModal';
 import SpaceSettingsModal from './components/SpaceSettingsModal';
 import JoinSpaceModal from './components/JoinSpaceModal';
 import QRCodeModal from './components/QRCodeModal';
+import CommandPalette from './components/CommandPalette';
+import { Tv, Sun, Moon, X } from 'lucide-react';
 import { api } from './utils/api';
 
 export default function App() {
@@ -42,6 +44,8 @@ export default function App() {
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [isPresentationMode, setIsPresentationMode] = useState(false);
 
   // 空間延伸狀態 (我的最愛、垃圾桶回收、最近存取紀錄)
   const [favoriteSpaceIds, setFavoriteSpaceIds] = useState(() => {
@@ -101,6 +105,46 @@ export default function App() {
       handleSelectTheme(lastLightTheme || 'warm');
     } else {
       handleSelectTheme('dark');
+    }
+  };
+
+  // 全域快捷鍵監聽：Ctrl+K (快捷指令面板)、Shift+P (投影簡報模式)、Esc (離開簡報模式)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isInput =
+        ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName) ||
+        document.activeElement?.isContentEditable;
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+        return;
+      }
+
+      if (e.shiftKey && e.key.toLowerCase() === 'p' && !isInput) {
+        e.preventDefault();
+        setIsPresentationMode((prev) => !prev);
+        return;
+      }
+
+      if (e.key === 'Escape' && isPresentationMode) {
+        setIsPresentationMode(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPresentationMode]);
+
+  // 指令面板選定小工具後聚焦並平滑滾動至該項目
+  const handleFocusToolFromPalette = (toolId) => {
+    const el = document.getElementById(`tool-card-${toolId}`) || document.querySelector(`[data-tool-id="${toolId}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-4', 'ring-[var(--coral)]');
+      setTimeout(() => {
+        el.classList.remove('ring-4', 'ring-[var(--coral)]');
+      }, 2500);
     }
   };
 
@@ -899,30 +943,67 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col notebook-grid-bg">
-      {/* 頂部導覽列：空間大廳 vs 空間工作區動態切換 */}
-      <Navbar
-        currentView={currentView}
-        onNavigateHome={handleNavigateHome}
-        spaces={spaces}
-        currentSpace={currentSpace}
-        onSelectSpace={handleSelectSpace}
-        onOpenCreateModal={() => setCreateModalOpen(true)}
-        onOpenJoinModal={() => setJoinModalOpen(true)}
-        onAddToolClick={() => {
-          setAddModalSection('一般工具');
-          setAddModalOpen(true);
-        }}
-        onOpenSettings={(tab) => handleOpenSettings(tab || (currentView === 'space' ? 'info' : 'appearance'), currentSpace)}
-        onOpenAccountSettings={() => handleOpenSettings('account', currentSpace)}
-        onOpenQRCode={() => setQrModalOpen(true)}
-        layout={layout}
-        onToggleLayout={handleToggleLayout}
-        onRegenerateCode={handleRegenerateCode}
-        theme={theme}
-        onSelectTheme={handleSelectTheme}
-        onToggleDarkMode={handleToggleDarkMode}
-        isGuest={isGuest}
-      />
+      {/* 頂部導覽列：空間大廳 vs 空間工作區動態切換 (簡報模式下隱藏以維持純淨無干擾展示) */}
+      {!isPresentationMode && (
+        <Navbar
+          currentView={currentView}
+          onNavigateHome={handleNavigateHome}
+          spaces={spaces}
+          currentSpace={currentSpace}
+          onSelectSpace={handleSelectSpace}
+          onOpenCreateModal={() => setCreateModalOpen(true)}
+          onOpenJoinModal={() => setJoinModalOpen(true)}
+          onAddToolClick={() => {
+            setAddModalSection('一般工具');
+            setAddModalOpen(true);
+          }}
+          onOpenSettings={(tab) => handleOpenSettings(tab || (currentView === 'space' ? 'info' : 'appearance'), currentSpace)}
+          onOpenAccountSettings={() => handleOpenSettings('account', currentSpace)}
+          onOpenQRCode={() => setQrModalOpen(true)}
+          layout={layout}
+          onToggleLayout={handleToggleLayout}
+          onRegenerateCode={handleRegenerateCode}
+          theme={theme}
+          onSelectTheme={handleSelectTheme}
+          onToggleDarkMode={handleToggleDarkMode}
+          isGuest={isGuest}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+          onTogglePresentation={() => setIsPresentationMode(!isPresentationMode)}
+        />
+      )}
+
+      {/* 大螢幕投影簡報模式浮動快捷控制列 */}
+      {isPresentationMode && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-[var(--card-bg)]/95 backdrop-blur border border-[var(--line)] shadow-xl px-3 py-1.5 rounded-2xl animate-fadeIn">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 mr-1 select-none">
+            <Tv size={15} />
+            <span className="hidden sm:inline">大螢幕投影簡報模式</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleToggleDarkMode}
+            className="notebook-btn-secondary text-xs p-1.5 flex items-center justify-center shrink-0"
+            title={theme === 'dark' ? '切換為日間模式' : '切換為夜間模式'}
+          >
+            {theme === 'dark' ? (
+              <Sun size={14} className="text-amber-400" />
+            ) : (
+              <Moon size={14} className="text-[var(--muted)]" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsPresentationMode(false)}
+            className="notebook-btn-secondary text-xs py-1 px-2.5 flex items-center gap-1 font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 shrink-0"
+            title="離開投影模式 (Esc 或 Shift+P)"
+          >
+            <X size={13} />
+            <span>離開投影 (Esc)</span>
+          </button>
+        </div>
+      )}
 
       {/* 主內容區塊：全螢幕自適應填滿 */}
       <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col min-h-0">
@@ -980,6 +1061,8 @@ export default function App() {
             onDeleteSection={handleDeleteSection}
             availableSpaces={spaces.filter((s) => s.id !== currentSpace?.id && !trashSpaceIds.includes(s.id))}
             isOwner={!isGuest && isOwner}
+            isPresentationMode={isPresentationMode}
+            onTogglePresentation={() => setIsPresentationMode(!isPresentationMode)}
           />
         )}
       </main>
@@ -1040,6 +1123,32 @@ export default function App() {
         isOpen={qrModalOpen}
         onClose={() => setQrModalOpen(false)}
         space={currentSpace}
+      />
+
+      {/* 全域快捷指令面板 (Ctrl + K / Cmd + K) */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        spaces={spaces.filter((s) => !trashSpaceIds.includes(s.id))}
+        currentSpace={currentSpace}
+        tools={tools}
+        onSelectSpace={(spaceId) => {
+          handleSelectSpace(spaceId);
+        }}
+        onSelectTool={(toolId) => {
+          handleFocusToolFromPalette(toolId);
+        }}
+        onOpenAddTool={() => {
+          setAddModalSection('一般工具');
+          setAddModalOpen(true);
+        }}
+        onOpenCreateSpace={() => setCreateModalOpen(true)}
+        onSetLayout={handleToggleLayout}
+        onSetTheme={handleSelectTheme}
+        onTogglePresentation={() => setIsPresentationMode((prev) => !prev)}
+        onExportSpace={() => handleOpenSettings('backup', currentSpace)}
+        onOpenSettings={(tab) => handleOpenSettings(tab, currentSpace)}
+        currentTheme={theme}
       />
     </div>
   );

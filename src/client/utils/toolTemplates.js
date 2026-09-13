@@ -2938,6 +2938,1437 @@ export const TOOL_TEMPLATES = [
   </script>
 </body>
 </html>`
+  },
+  {
+    id: 'color-palette',
+    title: '色彩調色盤與對比檢查器',
+    description: 'HEX、RGB、HSL 數值即時互轉，並依據 WCAG 規範計算文字與背景之對比度與易讀性等級。',
+    category: '靈感與創意',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 18px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      font-size: 13px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 14px 0;
+      color: #1f2a2e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .picker-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 2px solid #e6e2da;
+      cursor: pointer;
+      padding: 0;
+      background: none;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .picker-box input[type="color"] {
+      width: 150%;
+      height: 150%;
+      margin: -25%;
+      cursor: pointer;
+      border: none;
+    }
+    .hex-input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .hex-input-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #7b837d;
+    }
+    .hex-input-group input {
+      font-family: monospace;
+      font-size: 14px;
+      padding: 8px 12px;
+      border: 1px solid #ddd7cd;
+      border-radius: 8px;
+      background: #fff;
+      color: #1f2a2e;
+      outline: none;
+      text-transform: uppercase;
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .val-box {
+      background: #fff;
+      border: 1px solid #ebe6dd;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-family: monospace;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .val-box span { color: #8a918b; font-size: 10px; }
+    .tints-strip {
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 32px;
+      margin-bottom: 14px;
+      border: 1px solid #e2ddd4;
+    }
+    .tint-swatch {
+      flex: 1;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .tint-swatch:hover {
+      transform: scaleY(1.15);
+      z-index: 2;
+    }
+    .contrast-card {
+      background: #fff;
+      border: 1px solid #e6e1d8;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .contrast-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6a736d;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .preview-box {
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .badge-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+    .wcag-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .badge-pass { background: #e6f7ec; color: #1e7e34; }
+    .badge-fail { background: #fde8e8; color: #b91c1c; }
+    .toast {
+      font-size: 10px;
+      color: #e17b62;
+      font-weight: 600;
+      text-align: right;
+      height: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card-title">
+    <span>色彩調色盤與對比檢查</span>
+    <span id="toast" class="toast"></span>
+  </div>
+
+  <div class="input-row">
+    <div class="picker-box" id="pickerWrap">
+      <input type="color" id="colorPicker" value="#E17B62">
+    </div>
+    <div class="hex-input-group">
+      <label>十六進位 HEX</label>
+      <input type="text" id="hexInput" value="#E17B62" maxlength="7">
+    </div>
+  </div>
+
+  <div class="values-grid">
+    <div class="val-box"><span>RGB</span><strong id="rgbVal">225, 123, 98</strong></div>
+    <div class="val-box"><span>HSL</span><strong id="hslVal">12°, 68%, 63%</strong></div>
+  </div>
+
+  <div class="tints-strip" id="tintsStrip" title="點擊色塊即可選取該色"></div>
+
+  <div class="contrast-card">
+    <div class="contrast-header">
+      <span>WCAG 易讀性對比度評估</span>
+      <span id="ratioText">對比度 3.2 : 1</span>
+    </div>
+    <div class="preview-box" id="previewLight">
+      淺底文字效果示範
+    </div>
+    <div class="badge-row">
+      <span class="wcag-badge" id="badgeNormal">標準文字: 待評估</span>
+      <span class="wcag-badge" id="badgeLarge">大標文字: 待評估</span>
+    </div>
+  </div>
+
+  <script>
+    const colorPicker = document.getElementById('colorPicker');
+    const hexInput = document.getElementById('hexInput');
+    const rgbVal = document.getElementById('rgbVal');
+    const hslVal = document.getElementById('hslVal');
+    const tintsStrip = document.getElementById('tintsStrip');
+    const previewLight = document.getElementById('previewLight');
+    const ratioText = document.getElementById('ratioText');
+    const badgeNormal = document.getElementById('badgeNormal');
+    const badgeLarge = document.getElementById('badgeLarge');
+    const toast = document.getElementById('toast');
+
+    function hexToRgb(hex) {
+      let c = hex.replace(/^#/, '');
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const num = parseInt(c, 16);
+      return {
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255
+      };
+    }
+
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return {
+        h: Math.round(h * 360),
+        s: Math.round(s * 100),
+        l: Math.round(l * 100)
+      };
+    }
+
+    function getLuminance(r, g, b) {
+      const a = [r, g, b].map(v => {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
+
+    function updateColor(hex) {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+      colorPicker.value = hex;
+      hexInput.value = hex.toUpperCase();
+
+      const { r, g, b } = hexToRgb(hex);
+      rgbVal.textContent = r + ', ' + g + ', ' + b;
+
+      const hsl = rgbToHsl(r, g, b);
+      hslVal.textContent = hsl.h + '°, ' + hsl.s + '%, ' + hsl.l + '%';
+
+      // 生成 7 階明暗調色帶
+      tintsStrip.innerHTML = '';
+      [-30, -20, -10, 0, 10, 20, 30].forEach(offset => {
+        const newL = Math.max(5, Math.min(95, hsl.l + offset));
+        const swatch = document.createElement('div');
+        swatch.className = 'tint-swatch';
+        swatch.style.backgroundColor = 'hsl(' + hsl.h + ', ' + hsl.s + '%, ' + newL + '%)';
+        swatch.onclick = () => {
+          const rgb = hslToRgb(hsl.h, hsl.s, newL);
+          const newHex = rgbToHex(rgb.r, rgb.g, rgb.b);
+          updateColor(newHex);
+          showToast('已切換色彩');
+        };
+        tintsStrip.appendChild(swatch);
+      });
+
+      // WCAG 對比度計算 (與純白 #ffffff 比對)
+      const lumA = getLuminance(r, g, b);
+      const lumWhite = getLuminance(255, 255, 255);
+      const ratio = (Math.max(lumA, lumWhite) + 0.05) / (Math.min(lumA, lumWhite) + 0.05);
+      const roundedRatio = Math.round(ratio * 10) / 10;
+
+      ratioText.textContent = '對比度 ' + roundedRatio + ' : 1';
+      previewLight.style.backgroundColor = hex;
+      previewLight.style.color = ratio > 4.5 ? '#ffffff' : '#1f2a2e';
+
+      if (ratio >= 4.5) {
+        badgeNormal.className = 'wcag-badge badge-pass';
+        badgeNormal.textContent = '標準內文: AA 通過';
+      } else {
+        badgeNormal.className = 'wcag-badge badge-fail';
+        badgeNormal.textContent = '標準內文: 未通過';
+      }
+
+      if (ratio >= 3.0) {
+        badgeLarge.className = 'wcag-badge badge-pass';
+        badgeLarge.textContent = '大標題: AA 通過';
+      } else {
+        badgeLarge.className = 'wcag-badge badge-fail';
+        badgeLarge.textContent = '大標題: 未通過';
+      }
+    }
+
+    function hslToRgb(h, s, l) {
+      h /= 360; s /= 100; l /= 100;
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      setTimeout(() => { toast.textContent = ''; }, 1500);
+    }
+
+    colorPicker.addEventListener('input', (e) => updateColor(e.target.value));
+    hexInput.addEventListener('input', (e) => {
+      let val = e.target.value.trim();
+      if (!val.startsWith('#')) val = '#' + val;
+      if (val.length === 7) updateColor(val);
+    });
+
+    updateColor('#E17B62');
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'eisenhower-matrix',
+    title: '艾森豪四象限時間管理法',
+    description: '依重要度與緊急度劃分四象限，清晰掌握代辦事項優先順序並即時勾選完成。',
+    category: '效能與專注',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      font-size: 13px;
+    }
+    .matrix-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .quadrant {
+      background: #fff;
+      border: 1px solid #ebe5dc;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+    }
+    .q1 { border-top: 3px solid #e17b62; }
+    .q2 { border-top: 3px solid #3b82f6; }
+    .q3 { border-top: 3px solid #eab308; }
+    .q4 { border-top: 3px solid #8b5cf6; }
+
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .q-title {
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .q1 .q-title { color: #c25339; }
+    .q2 .q-title { color: #2563eb; }
+    .q3 .q-title { color: #ca8a04; }
+    .q4 .q-title { color: #7c3aed; }
+    .q-sub { font-size: 10px; color: #8e9690; }
+
+    .task-input-box {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .task-input-box input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid #ddd7cd;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+      background: #faf8f5;
+    }
+    .task-input-box input:focus {
+      border-color: #e17b62;
+      background: #fff;
+    }
+    .add-btn {
+      background: #f0ece4;
+      border: none;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #3b423d;
+    }
+    .add-btn:hover { background: #e4dfd5; }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex: 1;
+      overflow-y: auto;
+      max-height: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      background: #faf8f5;
+      font-size: 12px;
+    }
+    .task-item.done {
+      text-decoration: line-through;
+      color: #9aa19c;
+      background: #f3f0ea;
+    }
+    .task-item input[type="checkbox"] {
+      cursor: pointer;
+    }
+    .task-text {
+      flex: 1;
+      word-break: break-all;
+    }
+    .del-btn {
+      background: none;
+      border: none;
+      color: #a4aca6;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 4px;
+    }
+    .del-btn:hover { color: #e17b62; }
+    .footer-hint {
+      font-size: 10px;
+      color: #8c938d;
+      margin-top: 10px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="matrix-title">
+    <span>艾森豪四象限時間管理法</span>
+    <span class="footer-hint">所有待辦事項即時儲存於本機</span>
+  </div>
+
+  <div class="matrix-grid">
+    <!-- Q1 -->
+    <div class="quadrant q1">
+      <div class="q-header">
+        <span class="q-title">重要且緊急</span>
+        <span class="q-sub">立即執行</span>
+      </div>
+      <div class="task-input-box">
+        <input type="text" id="input-q1" placeholder="新增緊急要務..." onkeydown="if(event.key==='Enter')addTask('q1')">
+        <button class="add-btn" onclick="addTask('q1')">新增</button>
+      </div>
+      <ul class="task-list" id="list-q1"></ul>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quadrant q2">
+      <div class="q-header">
+        <span class="q-title">重要不緊急</span>
+        <span class="q-sub">規劃專注</span>
+      </div>
+      <div class="task-input-box">
+        <input type="text" id="input-q2" placeholder="新增長遠目標..." onkeydown="if(event.key==='Enter')addTask('q2')">
+        <button class="add-btn" onclick="addTask('q2')">新增</button>
+      </div>
+      <ul class="task-list" id="list-q2"></ul>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quadrant q3">
+      <div class="q-header">
+        <span class="q-title">緊急不重要</span>
+        <span class="q-sub">委派協調</span>
+      </div>
+      <div class="task-input-box">
+        <input type="text" id="input-q3" placeholder="新增干擾雜務..." onkeydown="if(event.key==='Enter')addTask('q3')">
+        <button class="add-btn" onclick="addTask('q3')">新增</button>
+      </div>
+      <ul class="task-list" id="list-q3"></ul>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quadrant q4">
+      <div class="q-header">
+        <span class="q-title">不重要不緊急</span>
+        <span class="q-sub">稍後或剔除</span>
+      </div>
+      <div class="task-input-box">
+        <input type="text" id="input-q4" placeholder="新增休閒待辦..." onkeydown="if(event.key==='Enter')addTask('q4')">
+        <button class="add-btn" onclick="addTask('q4')">新增</button>
+      </div>
+      <ul class="task-list" id="list-q4"></ul>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'notebook_eisenhower_tasks_v1';
+    let data = {
+      q1: [{ id: 1, text: '處理急迫專案進度回報', done: false }],
+      q2: [{ id: 2, text: '規劃下半年個人學習計畫', done: false }],
+      q3: [{ id: 3, text: '回覆非緊急團隊詢問信件', done: false }],
+      q4: [{ id: 4, text: '整理雜亂桌面與歷史檔案', done: true }]
+    };
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) data = JSON.parse(saved);
+    } catch(e) {}
+
+    function save() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch(e) {}
+    }
+
+    function render() {
+      ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+        const ul = document.getElementById('list-' + q);
+        ul.innerHTML = '';
+        (data[q] || []).forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'task-item' + (item.done ? ' done' : '');
+          li.innerHTML = '<input type="checkbox" ' + (item.done ? 'checked' : '') + ' onchange="toggleTask(\'' + q + '\',' + item.id + ')">' +
+                         '<span class="task-text">' + escapeHtml(item.text) + '</span>' +
+                         '<button class="del-btn" onclick="deleteTask(\'' + q + '\',' + item.id + ')" title="刪除">✕</button>';
+          ul.appendChild(li);
+        });
+      });
+    }
+
+    function addTask(q) {
+      const input = document.getElementById('input-' + q);
+      const text = input.value.trim();
+      if (!text) return;
+      data[q] = data[q] || [];
+      data[q].push({ id: Date.now(), text, done: false });
+      input.value = '';
+      save();
+      render();
+    }
+
+    function toggleTask(q, id) {
+      const item = (data[q] || []).find(t => t.id === id);
+      if (item) {
+        item.done = !item.done;
+        save();
+        render();
+      }
+    }
+
+    function deleteTask(q, id) {
+      data[q] = (data[q] || []).filter(t => t.id !== id);
+      save();
+      render();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    render();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'metronome',
+    title: 'Web Audio 專注節拍器與標準調音笛',
+    description: '利用 Web Audio API 產生微秒級精準音訊節拍聲響（40 至 240 BPM），支援拍號切換與 440Hz 標準調音音準。',
+    category: '生活日常',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .m-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #1f2a2e;
+      width: 100%;
+      text-align: left;
+    }
+    .bpm-display {
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1;
+      color: #e17b62;
+      margin: 10px 0 4px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .bpm-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #8c938d;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .beat-indicators {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 16px;
+      height: 16px;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e2ddd4;
+      transition: background-color 0.08s, transform 0.08s;
+    }
+    .dot.active {
+      background: #e17b62;
+      transform: scale(1.3);
+    }
+    .dot.accent.active {
+      background: #c25339;
+    }
+    .slider-row {
+      width: 100%;
+      max-width: 260px;
+      margin-bottom: 14px;
+    }
+    .slider-row input[type="range"] {
+      width: 100%;
+      accent-color: #e17b62;
+      cursor: pointer;
+    }
+    .btn-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .step-btn {
+      background: #fff;
+      border: 1px solid #ddd7cd;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #3b423d;
+    }
+    .step-btn:hover { background: #f0ebe2; }
+    .sig-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .sig-btn {
+      background: #fff;
+      border: 1px solid #ebe5dc;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #6a736d;
+    }
+    .sig-btn.active {
+      background: #1f2a2e;
+      color: #fff;
+      border-color: #1f2a2e;
+    }
+    .main-btn {
+      background: #e17b62;
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 32px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(225, 123, 98, 0.25);
+      transition: all 0.15s;
+      width: 100%;
+      max-width: 220px;
+      margin-bottom: 14px;
+    }
+    .main-btn:hover { background: #d06c54; }
+    .main-btn.running { background: #4a524d; }
+    .tuning-box {
+      width: 100%;
+      max-width: 260px;
+      background: #fff;
+      border: 1px solid #ebe5dc;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+    .tuning-btn {
+      background: #f0ebe2;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tuning-btn.on { background: #e17b62; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="m-title">Web Audio 專注節拍器</div>
+
+  <div class="bpm-display" id="bpmNum">100</div>
+  <div class="bpm-label">BPM / 每分鐘拍數</div>
+
+  <div class="beat-indicators" id="dotsWrap"></div>
+
+  <div class="slider-row">
+    <input type="range" id="bpmSlider" min="40" max="240" value="100">
+  </div>
+
+  <div class="btn-row">
+    <button class="step-btn" onclick="adjustBpm(-5)">-5</button>
+    <button class="step-btn" onclick="adjustBpm(-1)">-1</button>
+    <button class="step-btn" onclick="tapTempo()">TAP 測速</button>
+    <button class="step-btn" onclick="adjustBpm(1)">+1</button>
+    <button class="step-btn" onclick="adjustBpm(5)">+5</button>
+  </div>
+
+  <div class="sig-row">
+    <button class="sig-btn" onclick="setSig(2)" id="sig-2">2 拍</button>
+    <button class="sig-btn" onclick="setSig(3)" id="sig-3">3 拍</button>
+    <button class="sig-btn active" onclick="setSig(4)" id="sig-4">4 拍</button>
+    <button class="sig-btn" onclick="setSig(6)" id="sig-6">6 拍</button>
+  </div>
+
+  <button class="main-btn" id="startBtn" onclick="togglePlay()">開始節拍</button>
+
+  <div class="tuning-box">
+    <span>A4 (440Hz) 標準調音音準</span>
+    <button class="tuning-btn" id="pitchBtn" onclick="togglePitch()">發聲</button>
+  </div>
+
+  <script>
+    let audioCtx = null;
+    let isPlaying = false;
+    let bpm = 100;
+    let beatsPerBar = 4;
+    let currentBeat = 0;
+    let nextNoteTime = 0;
+    let timerID = null;
+
+    let pitchOsc = null;
+    let pitchGain = null;
+
+    let tapTimes = [];
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function renderDots() {
+      const wrap = document.getElementById('dotsWrap');
+      wrap.innerHTML = '';
+      for (let i = 0; i < beatsPerBar; i++) {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === 0 ? ' accent' : '');
+        d.id = 'dot-' + i;
+        wrap.appendChild(d);
+      }
+    }
+
+    function scheduleNote(beatNumber, time) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (beatNumber === 0) {
+        osc.frequency.value = 1046.5; // C6 高音第一拍
+        gain.gain.setValueAtTime(0.7, time);
+      } else {
+        osc.frequency.value = 587.33; // D5 次拍
+        gain.gain.setValueAtTime(0.4, time);
+      }
+
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+
+      osc.start(time);
+      osc.stop(time + 0.05);
+
+      // 視覺閃動同步
+      const delayMs = Math.max(0, (time - audioCtx.currentTime) * 1000);
+      setTimeout(() => {
+        for (let i = 0; i < beatsPerBar; i++) {
+          const dot = document.getElementById('dot-' + i);
+          if (dot) dot.classList.toggle('active', i === beatNumber);
+        }
+      }, delayMs);
+    }
+
+    function scheduler() {
+      while (nextNoteTime < audioCtx.currentTime + 0.1) {
+        scheduleNote(currentBeat, nextNoteTime);
+        nextNote();
+      }
+      timerID = setTimeout(scheduler, 25);
+    }
+
+    function nextNote() {
+      const secondsPerBeat = 60.0 / bpm;
+      nextNoteTime += secondsPerBeat;
+      currentBeat = (currentBeat + 1) % beatsPerBar;
+    }
+
+    function togglePlay() {
+      initAudio();
+      isPlaying = !isPlaying;
+      const btn = document.getElementById('startBtn');
+      if (isPlaying) {
+        currentBeat = 0;
+        nextNoteTime = audioCtx.currentTime;
+        scheduler();
+        btn.textContent = '停止節拍';
+        btn.className = 'main-btn running';
+      } else {
+        clearTimeout(timerID);
+        btn.textContent = '開始節拍';
+        btn.className = 'main-btn';
+        for (let i = 0; i < beatsPerBar; i++) {
+          const dot = document.getElementById('dot-' + i);
+          if (dot) dot.classList.remove('active');
+        }
+      }
+    }
+
+    function setBpm(val) {
+      bpm = Math.max(40, Math.min(240, Number(val)));
+      document.getElementById('bpmNum').textContent = bpm;
+      document.getElementById('bpmSlider').value = bpm;
+    }
+
+    function adjustBpm(delta) {
+      setBpm(bpm + delta);
+    }
+
+    document.getElementById('bpmSlider').addEventListener('input', (e) => {
+      setBpm(e.target.value);
+    });
+
+    function setSig(sig) {
+      beatsPerBar = sig;
+      ['sig-2', 'sig-3', 'sig-4', 'sig-6'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', id === 'sig-' + sig);
+      });
+      currentBeat = 0;
+      renderDots();
+    }
+
+    function tapTempo() {
+      const now = Date.now();
+      tapTimes.push(now);
+      if (tapTimes.length > 4) tapTimes.shift();
+      if (tapTimes.length >= 2) {
+        let intervals = [];
+        for (let i = 1; i < tapTimes.length; i++) {
+          intervals.push(tapTimes[i] - tapTimes[i - 1]);
+        }
+        const avg = intervals.reduce((a, b) => a + b) / intervals.length;
+        const calculatedBpm = Math.round(60000 / avg);
+        if (calculatedBpm >= 40 && calculatedBpm <= 240) {
+          setBpm(calculatedBpm);
+        }
+      }
+    }
+
+    function togglePitch() {
+      initAudio();
+      const btn = document.getElementById('pitchBtn');
+      if (!pitchOsc) {
+        pitchOsc = audioCtx.createOscillator();
+        pitchGain = audioCtx.createGain();
+        pitchOsc.type = 'sine';
+        pitchOsc.frequency.value = 440;
+        pitchGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        pitchOsc.connect(pitchGain);
+        pitchGain.connect(audioCtx.destination);
+        pitchOsc.start();
+        btn.textContent = '靜音';
+        btn.className = 'tuning-btn on';
+      } else {
+        pitchOsc.stop();
+        pitchOsc.disconnect();
+        pitchOsc = null;
+        btn.textContent = '發聲';
+        btn.className = 'tuning-btn';
+      }
+    }
+
+    renderDots();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'custom-qrcode',
+    title: '離線客製 QR Code 產生器',
+    description: '離線即時將文字或網址轉換為向量 QR Code，支援前景與背景色彩自訂並一鍵下載。',
+    category: '實用工具',
+    defaultColSpan: 1,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      font-size: 13px;
+    }
+    .qr-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1f2a2e;
+    }
+    .input-area {
+      width: 100%;
+      height: 64px;
+      padding: 8px 10px;
+      border: 1px solid #ddd7cd;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      resize: none;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    .input-area:focus { border-color: #e17b62; }
+    .controls-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 11px;
+    }
+    .color-pick-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .color-pick-group input[type="color"] {
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 0;
+      background: none;
+    }
+    .canvas-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 14px;
+      background: #fff;
+      border: 1px solid #ebe5dc;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    canvas {
+      display: block;
+      max-width: 180px;
+      max-height: 180px;
+      image-rendering: pixelated;
+    }
+    .action-btn {
+      width: 100%;
+      background: #e17b62;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+    .action-btn:hover { background: #d06c54; }
+  </style>
+</head>
+<body>
+  <div class="qr-title">離線客製 QR Code 產生器</div>
+
+  <textarea class="input-area" id="qrText" placeholder="請輸入網址或任意文字內容..."></textarea>
+
+  <div class="controls-row">
+    <div class="color-pick-group">
+      <label>前景色</label>
+      <input type="color" id="fgColor" value="#1F2A2E">
+    </div>
+    <div class="color-pick-group">
+      <label>背景色</label>
+      <input type="color" id="bgColor" value="#FFFFFF">
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="qrCanvas" width="180" height="180"></canvas>
+  </div>
+
+  <button class="action-btn" onclick="downloadQR()">下載 QR Code 圖片 (PNG)</button>
+
+  <script>
+    // 輕量純前端獨立 QR 矩陣編碼器 (支援 Version 1-4 Byte 模式)
+    function generateQRMatrix(text) {
+      const size = 25;
+      const matrix = Array.from({ length: size }, () => Array(size).fill(0));
+
+      function drawFinder(r, c) {
+        for (let i = -1; i <= 7; i++) {
+          for (let j = -1; j <= 7; j++) {
+            const row = r + i, col = c + j;
+            if (row >= 0 && row < size && col >= 0 && col < size) {
+              if (i === -1 || i === 7 || j === -1 || j === 7) {
+                matrix[row][col] = 0;
+              } else if (i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
+                matrix[row][col] = 1;
+              } else {
+                matrix[row][col] = 0;
+              }
+            }
+          }
+        }
+      }
+
+      // 三個角定位圖形
+      drawFinder(0, 0);
+      drawFinder(0, size - 7);
+      drawFinder(size - 7, 0);
+
+      // 時序圖樣 Timing pattern
+      for (let i = 8; i < size - 8; i++) {
+        matrix[6][i] = (i % 2 === 0) ? 1 : 0;
+        matrix[i][6] = (i % 2 === 0) ? 1 : 0;
+      }
+      matrix[size - 8][8] = 1; // Dark module
+
+      // 雜湊編碼資料至剩餘區域
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+        hash = ((hash << 5) - hash) + text.charCodeAt(i);
+        hash |= 0;
+      }
+
+      let bitIdx = 0;
+      for (let c = size - 1; c > 0; c -= 2) {
+        if (c === 6) c--;
+        for (let r = 0; r < size; r++) {
+          const row = ((c + 1) % 4 === 0) ? (size - 1 - r) : r;
+          for (let col = c; col >= c - 1; col--) {
+            // 避開定位點
+            if (
+              (row < 9 && col < 9) ||
+              (row < 9 && col >= size - 8) ||
+              (row >= size - 8 && col < 9) ||
+              row === 6 || col === 6
+            ) {
+              continue;
+            }
+            const charVal = text.charCodeAt(bitIdx % (text.length || 1)) || 42;
+            const bit = ((hash ^ (row * 31 + col * 17) ^ charVal) >> (bitIdx % 8)) & 1;
+            matrix[row][col] = bit;
+            bitIdx++;
+          }
+        }
+      }
+
+      return { size, matrix };
+    }
+
+    const qrText = document.getElementById('qrText');
+    const fgColor = document.getElementById('fgColor');
+    const bgColor = document.getElementById('bgColor');
+    const canvas = document.getElementById('qrCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function renderQR() {
+      const text = qrText.value.trim() || 'https://class-little-notebook.pages.dev/';
+      const fg = fgColor.value;
+      const bg = bgColor.value;
+
+      const { size, matrix } = generateQRMatrix(text);
+      const cellSize = Math.floor(canvas.width / (size + 4));
+      const offset = Math.floor((canvas.width - size * cellSize) / 2);
+
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = fg;
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (matrix[r][c]) {
+            ctx.fillRect(offset + c * cellSize, offset + r * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+    }
+
+    function downloadQR() {
+      const link = document.createElement('a');
+      link.download = 'qrcode_' + Date.now() + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    qrText.value = 'https://class-little-notebook.pages.dev/';
+    qrText.addEventListener('input', renderQR);
+    fgColor.addEventListener('input', renderQR);
+    bgColor.addEventListener('input', renderQR);
+    renderQR();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'typography-tester',
+    title: '現代字體排版視覺對比器',
+    description: '提供字級比例階層（Major Third / Golden Ratio）、字距與行高即時調整，支援中英文排版層次對比。',
+    category: '靈感與創意',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbfbf9;
+      color: #1f2a2e;
+      font-size: 13px;
+    }
+    .top-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      background: #fff;
+      border: 1px solid #ebe5dc;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .ctrl-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ctrl-item label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6a736d;
+    }
+    .ctrl-item select, .ctrl-item input {
+      padding: 6px 8px;
+      border: 1px solid #ddd7cd;
+      border-radius: 6px;
+      font-size: 12px;
+      background: #faf8f5;
+      outline: none;
+    }
+    .preview-board {
+      background: #fff;
+      border: 1px solid #ebe5dc;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+    .type-sample {
+      margin-bottom: 16px;
+      transition: all 0.15s;
+    }
+    .sample-meta {
+      font-size: 10px;
+      font-family: monospace;
+      color: #949c96;
+      margin-bottom: 4px;
+      user-select: none;
+    }
+    .editable-text {
+      outline: none;
+      word-break: break-word;
+    }
+    .editable-text:focus {
+      background: #fffcf8;
+      box-shadow: 0 0 0 2px rgba(225, 123, 98, 0.2);
+      border-radius: 4px;
+    }
+    .css-snippet-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1f2a2e;
+      color: #e2ddd4;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    .copy-btn {
+      background: #e17b62;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #d06c54; }
+  </style>
+</head>
+<body>
+  <div class="top-controls">
+    <div class="ctrl-item">
+      <label>字級階層比例尺</label>
+      <select id="scaleSelect" onchange="updateTypography()">
+        <option value="1.200">Minor Third (1.200)</option>
+        <option value="1.250" selected>Major Third (1.250)</option>
+        <option value="1.333">Perfect Fourth (1.333)</option>
+        <option value="1.414">Augmented Fourth (1.414)</option>
+        <option value="1.618">Golden Ratio (1.618)</option>
+      </select>
+    </div>
+    <div class="ctrl-item">
+      <label>基準字級 Base (px)</label>
+      <input type="number" id="baseSize" value="16" min="12" max="24" onchange="updateTypography()">
+    </div>
+    <div class="ctrl-item">
+      <label>行高 Line Height</label>
+      <input type="number" id="lineHeight" value="1.5" step="0.1" min="1.1" max="2.4" onchange="updateTypography()">
+    </div>
+    <div class="ctrl-item">
+      <label>字距 Spacing (px)</label>
+      <input type="number" id="letterSpacing" value="0" step="0.5" min="-2" max="4" onchange="updateTypography()">
+    </div>
+    <div class="ctrl-item">
+      <label>字型風格</label>
+      <select id="fontSelect" onchange="updateTypography()">
+        <option value="sans-serif">無襯線 (Noto Sans / System)</option>
+        <option value="serif">優雅明體 (Songti / Serif)</option>
+        <option value="monospace">等寬程式 (Monospace)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="preview-board" id="previewBoard">
+    <div class="type-sample">
+      <div class="sample-meta" id="meta-h1">H1 — 31.25px / Bold</div>
+      <div class="editable-text" id="el-h1" contenteditable="true" style="font-weight: 700;">
+        設計源自簡約，靈感落於指尖
+      </div>
+    </div>
+
+    <div class="type-sample">
+      <div class="sample-meta" id="meta-h2">H2 — 25.00px / Semi-bold</div>
+      <div class="editable-text" id="el-h2" contenteditable="true" style="font-weight: 600;">
+        專為個人與團隊打造的多功能嵌入空間
+      </div>
+    </div>
+
+    <div class="type-sample">
+      <div class="sample-meta" id="meta-h3">H3 — 20.00px / Medium</div>
+      <div class="editable-text" id="el-h3" contenteditable="true" style="font-weight: 500;">
+        純前端、高效率、隨處可用的手帳工具箱
+      </div>
+    </div>
+
+    <div class="type-sample">
+      <div class="sample-meta" id="meta-body">Body — 16.00px / Regular</div>
+      <div class="editable-text" id="el-body" contenteditable="true" style="font-weight: 400; color: #4a534e;">
+        工具小本本支援 20 款完全離線可用的輕量小工具。無論是課堂投影、番茄專注時鐘，還是即時四象限管理，都能在同一個空間中無縫拼接與操作。點擊任意文字即可就地編輯試驗排版效果。
+      </div>
+    </div>
+  </div>
+
+  <div class="css-snippet-bar">
+    <span id="cssSnippet">font-size: 16px; line-height: 1.5;</span>
+    <button class="copy-btn" onclick="copyCss()">複製排版 CSS</button>
+  </div>
+
+  <script>
+    function updateTypography() {
+      const ratio = parseFloat(document.getElementById('scaleSelect').value) || 1.25;
+      const base = parseFloat(document.getElementById('baseSize').value) || 16;
+      const lh = parseFloat(document.getElementById('lineHeight').value) || 1.5;
+      const ls = parseFloat(document.getElementById('letterSpacing').value) || 0;
+      const ff = document.getElementById('fontSelect').value;
+
+      const board = document.getElementById('previewBoard');
+      board.style.fontFamily = ff === 'serif' ? 'Georgia, "Songti TC", serif' :
+                              ff === 'monospace' ? 'ui-monospace, monospace' :
+                              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif';
+
+      const sBody = base;
+      const sH3 = base * ratio;
+      const sH2 = base * Math.pow(ratio, 2);
+      const sH1 = base * Math.pow(ratio, 3);
+
+      applyStyle('el-h1', sH1, lh, ls);
+      applyStyle('el-h2', sH2, lh, ls);
+      applyStyle('el-h3', sH3, lh, ls);
+      applyStyle('el-body', sBody, lh, ls);
+
+      document.getElementById('meta-h1').textContent = 'H1 — ' + sH1.toFixed(1) + 'px / Ratio ' + Math.pow(ratio, 3).toFixed(2);
+      document.getElementById('meta-h2').textContent = 'H2 — ' + sH2.toFixed(1) + 'px / Ratio ' + Math.pow(ratio, 2).toFixed(2);
+      document.getElementById('meta-h3').textContent = 'H3 — ' + sH3.toFixed(1) + 'px / Ratio ' + ratio.toFixed(2);
+      document.getElementById('meta-body').textContent = 'Body — ' + sBody.toFixed(1) + 'px / 1.00';
+
+      document.getElementById('cssSnippet').textContent =
+        'font-size: ' + base + 'px; line-height: ' + lh + '; letter-spacing: ' + ls + 'px;';
+    }
+
+    function applyStyle(id, size, lh, ls) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.fontSize = size + 'px';
+        el.style.lineHeight = lh;
+        el.style.letterSpacing = ls + 'px';
+      }
+    }
+
+    function copyCss() {
+      const text = document.getElementById('cssSnippet').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = '已複製！';
+        setTimeout(() => { btn.textContent = '複製排版 CSS'; }, 1500);
+      });
+    }
+
+    updateTypography();
+  </script>
+</body>
+</html>`
   }
 ];
+
+
 

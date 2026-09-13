@@ -21,6 +21,8 @@ import {
   QrCode,
   Eye,
   ArrowLeft,
+  Search,
+  Tv,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -43,6 +45,8 @@ export default function Navbar({
   onSelectTheme,
   onToggleDarkMode,
   isGuest = false,
+  onOpenCommandPalette,
+  onTogglePresentation,
 }) {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -258,6 +262,34 @@ export default function Navbar({
                 </button>
               </div>
 
+              {/* 快捷指令面板按鈕 (Ctrl + K) */}
+              {onOpenCommandPalette && (
+                <button
+                  type="button"
+                  onClick={onOpenCommandPalette}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 text-[var(--muted)] hover:text-[var(--ink)] shrink-0"
+                  title="全域快捷指令面板 (Ctrl + K)"
+                >
+                  <Search size={14} className="shrink-0" />
+                  <span className="hidden md:inline font-normal">搜尋...</span>
+                  <kbd className="hidden lg:inline-flex items-center text-[10px] font-mono bg-[var(--paper)] px-1.5 py-0.5 rounded border border-[var(--line)] text-[var(--muted)]">
+                    Ctrl K
+                  </kbd>
+                </button>
+              )}
+
+              {/* 大螢幕投影簡報模式 */}
+              {onTogglePresentation && (
+                <button
+                  type="button"
+                  onClick={onTogglePresentation}
+                  className="notebook-btn-secondary text-xs p-1.5 flex items-center justify-center text-purple-600 hover:text-purple-700"
+                  title="切換大螢幕投影簡報模式 (Shift + P)"
+                >
+                  <Tv size={15} />
+                </button>
+              )}
+
               {/* 深色模式一鍵切換按鈕 (Sun / Moon) */}
               <button
                 type="button"
@@ -316,8 +348,24 @@ export default function Navbar({
               )}
             </>
           ) : (
-            /* 大廳模式右側：加入空間、建立空間、主題切換 */
+            /* 大廳模式右側：快捷指令面板、加入空間、建立空間、主題切換 */
             <>
+              {/* 快捷指令面板按鈕 (Ctrl + K) */}
+              {onOpenCommandPalette && (
+                <button
+                  type="button"
+                  onClick={onOpenCommandPalette}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 text-[var(--muted)] hover:text-[var(--ink)] shrink-0"
+                  title="全域快捷指令面板 (Ctrl + K)"
+                >
+                  <Search size={14} className="shrink-0" />
+                  <span className="hidden md:inline font-normal">搜尋...</span>
+                  <kbd className="hidden lg:inline-flex items-center text-[10px] font-mono bg-[var(--paper)] px-1.5 py-0.5 rounded border border-[var(--line)] text-[var(--muted)]">
+                    Ctrl K
+                  </kbd>
+                </button>
+              )}
+
               {/* 加入空間按鈕 */}
               <button
                 type="button"

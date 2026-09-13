@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert';
 import { TOOL_TEMPLATES } from '../src/client/utils/toolTemplates.js';
 
-test('advancedFeatures: 15 款小工具範本離線可用性與多樣性驗證', () => {
-  assert.strictEqual(TOOL_TEMPLATES.length, 15, '應提供完整 15 款小工具範本');
+test('advancedFeatures: 小工具範本離線可用性與多樣性驗證', () => {
+  assert.ok(TOOL_TEMPLATES.length >= 15, '應提供至少 15 款小工具範本');
 
   const categories = new Set(TOOL_TEMPLATES.map((t) => t.category));
   assert.ok(categories.has('效能與專注'), '應包含效能與專注分類');

@@ -28,6 +28,7 @@ import {
   Kanban,
   Trash2,
   Palette,
+  Tv,
 } from 'lucide-react';
 import ToolCard, { CARD_COLORS } from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
@@ -53,6 +54,8 @@ export default function SpaceLayout({
   onDeleteSection,
   availableSpaces = [],
   isOwner = true,
+  isPresentationMode = false,
+  onTogglePresentation,
 }) {
   const [activeTabId, setActiveTabId] = useState(tools[0]?.id || null);
   const [focusedTool, setFocusedTool] = useState(null);
@@ -305,139 +308,154 @@ export default function SpaceLayout({
 
   return (
     <div className="w-full flex-1 flex flex-col space-y-4 animate-fadeIn">
-      {/* 頂部搜尋、標籤與過濾篩選工具列 */}
-      <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-2xl border border-[var(--line)] shadow-xs relative overflow-hidden">
-        {/* 背景文具橫幅微型飾紋 */}
-        <div className="absolute right-4 top-1 pointer-events-none opacity-25 dark:opacity-15 hidden lg:block">
-          <SpaceStationeryBannerDoodle className="w-36 h-9 text-[var(--muted)]" />
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 z-10">
-          {/* 搜尋框 */}
-          <div className="relative flex-1 min-w-[200px] max-w-md">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜尋工具名稱或 #標籤…"
-              className="notebook-input notebook-input-search w-full"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] text-xs"
-              >
-                ✕
-              </button>
-            )}
+      {/* 頂部搜尋、標籤與過濾篩選工具列 (簡報模式下隱藏以維持純淨無干擾展示) */}
+      {!isPresentationMode && (
+        <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-2xl border border-[var(--line)] shadow-xs relative overflow-hidden">
+          {/* 背景文具橫幅微型飾紋 */}
+          <div className="absolute right-4 top-1 pointer-events-none opacity-25 dark:opacity-15 hidden lg:block">
+            <SpaceStationeryBannerDoodle className="w-36 h-9 text-[var(--muted)]" />
           </div>
 
-          {/* 類型篩選標籤 */}
-          <div className="flex items-center gap-1.5 text-xs flex-wrap">
-            <button
-              type="button"
-              onClick={() => setFilterType('all')}
-              className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
-                filterType === 'all'
-                  ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
-                  : 'text-[var(--muted)] hover:bg-[var(--paper)]'
-              }`}
-            >
-              全部 ({tools.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterType('html')}
-              className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
-                filterType === 'html'
-                  ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
-                  : 'text-[var(--muted)] hover:bg-[var(--paper)]'
-              }`}
-            >
-              自訂程式
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterType('iframe')}
-              className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
-                filterType === 'iframe'
-                  ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
-                  : 'text-[var(--muted)] hover:bg-[var(--paper)]'
-              }`}
-            >
-              Iframe 視窗
-            </button>
+          <div className="flex flex-wrap items-center justify-between gap-3 z-10">
+            {/* 搜尋框 */}
+            <div className="relative flex-1 min-w-[200px] max-w-md">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none shrink-0" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="搜尋工具名稱或 #標籤…"
+                className="notebook-input notebook-input-search w-full"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] text-xs"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
 
-            <div className="h-4 w-px bg-[var(--line)] mx-0.5 hidden sm:block" />
-
-            {/* 範本專區快捷按鈕 */}
-            <button
-              type="button"
-              onClick={() => onOpenAddModal && onOpenAddModal('一般工具', 'templates')}
-              className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-[var(--coral)] hover:bg-[var(--coral-light)] shrink-0"
-              title="瀏覽精選 15 款小工具範本並加入空間"
-            >
-              <BookTemplate size={13} />
-              <span>範本專區</span>
-            </button>
-
-            {/* 批次操作模式切換按鈕 */}
-            {isOwner && (
+            {/* 類型篩選標籤 */}
+            <div className="flex items-center gap-1.5 text-xs flex-wrap">
               <button
                 type="button"
-                onClick={() => {
-                  const next = !isBatchMode;
-                  setIsBatchMode(next);
-                  if (!next) setSelectedToolIds([]);
-                }}
-                className={`py-1.5 px-3 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
-                  isBatchMode
-                    ? 'bg-[var(--coral)] text-white font-bold shadow-xs'
-                    : 'notebook-btn-secondary text-[var(--muted)] hover:text-[var(--ink)]'
+                onClick={() => setFilterType('all')}
+                className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
+                  filterType === 'all'
+                    ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
+                    : 'text-[var(--muted)] hover:bg-[var(--paper)]'
                 }`}
-                title="啟用多選批次管理"
               >
-                <CheckSquare size={13} />
-                <span>{isBatchMode ? '結束批次選取' : '批次選取'}</span>
+                全部 ({tools.length})
               </button>
-            )}
-          </div>
-        </div>
-
-        {/* 標籤過濾清單 (若有任何標籤) */}
-        {availableTags.length > 0 && (
-          <div className="flex items-center gap-1.5 pt-2 border-t border-[var(--line)] overflow-x-auto pb-0.5">
-            <span className="text-[11px] text-[var(--muted)] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
-              <Tag size={12} className="shrink-0" />
-              <span>標籤：</span>
-            </span>
-            <button
-              onClick={() => setSelectedTag(null)}
-              className={`px-2.5 py-0.5 rounded-full text-[11px] transition-all shrink-0 ${
-                !selectedTag
-                  ? 'bg-[var(--ink)] text-[var(--paper)] font-semibold shadow-xs'
-                  : 'notebook-tag hover:text-[var(--ink)]'
-              }`}
-            >
-              全部
-            </button>
-            {availableTags.map((tag) => (
               <button
-                key={tag}
-                onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                type="button"
+                onClick={() => setFilterType('html')}
+                className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
+                  filterType === 'html'
+                    ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
+                    : 'text-[var(--muted)] hover:bg-[var(--paper)]'
+                }`}
+              >
+                自訂程式
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterType('iframe')}
+                className={`px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap shrink-0 ${
+                  filterType === 'iframe'
+                    ? 'bg-[var(--coral)] text-white font-semibold shadow-xs'
+                    : 'text-[var(--muted)] hover:bg-[var(--paper)]'
+                }`}
+              >
+                Iframe 視窗
+              </button>
+
+              <div className="h-4 w-px bg-[var(--line)] mx-0.5 hidden sm:block" />
+
+              {/* 範本專區快捷按鈕 */}
+              <button
+                type="button"
+                onClick={() => onOpenAddModal && onOpenAddModal('一般工具', 'templates')}
+                className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-[var(--coral)] hover:bg-[var(--coral-light)] shrink-0"
+                title="瀏覽精選 20 款小工具範本並加入空間"
+              >
+                <BookTemplate size={13} />
+                <span>範本專區</span>
+              </button>
+
+              {/* 投影簡報按鈕 */}
+              {onTogglePresentation && (
+                <button
+                  type="button"
+                  onClick={onTogglePresentation}
+                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 text-purple-600 hover:text-purple-700"
+                  title="切換大螢幕投影簡報模式 (Shift + P)"
+                >
+                  <Tv size={13} />
+                  <span className="hidden sm:inline">投影簡報</span>
+                </button>
+              )}
+
+              {/* 批次操作模式切換按鈕 */}
+              {isOwner && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !isBatchMode;
+                    setIsBatchMode(next);
+                    if (!next) setSelectedToolIds([]);
+                  }}
+                  className={`py-1.5 px-3 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
+                    isBatchMode
+                      ? 'bg-[var(--coral)] text-white font-bold shadow-xs'
+                      : 'notebook-btn-secondary text-[var(--muted)] hover:text-[var(--ink)]'
+                  }`}
+                  title="啟用多選批次管理"
+                >
+                  <CheckSquare size={13} />
+                  <span>{isBatchMode ? '結束批次選取' : '批次選取'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 標籤過濾清單 (若有任何標籤) */}
+          {availableTags.length > 0 && (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-[var(--line)] overflow-x-auto pb-0.5">
+              <span className="text-[11px] text-[var(--muted)] font-medium flex items-center gap-1 shrink-0 whitespace-nowrap">
+                <Tag size={12} className="shrink-0" />
+                <span>標籤：</span>
+              </span>
+              <button
+                onClick={() => setSelectedTag(null)}
                 className={`px-2.5 py-0.5 rounded-full text-[11px] transition-all shrink-0 ${
-                  selectedTag === tag
-                    ? 'notebook-tag-active font-semibold shadow-xs'
+                  !selectedTag
+                    ? 'bg-[var(--ink)] text-[var(--paper)] font-semibold shadow-xs'
                     : 'notebook-tag hover:text-[var(--ink)]'
                 }`}
               >
-                #{tag}
+                全部
               </button>
-            ))}
-          </div>
-        )}
-      </div>
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] transition-all shrink-0 ${
+                    selectedTag === tag
+                      ? 'notebook-tag-active font-semibold shadow-xs'
+                      : 'notebook-tag hover:text-[var(--ink)]'
+                  }`}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 搜尋無結果提示插畫 */}
       {sortedAndFilteredTools.length === 0 && (
@@ -497,7 +515,7 @@ export default function SpaceLayout({
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {/* 批次選取框 */}
-                      {isBatchMode && (
+                      {isBatchMode && !isPresentationMode && (
                         <button
                           type="button"
                           onClick={(e) => {
@@ -523,77 +541,46 @@ export default function SpaceLayout({
                       </span>
                       {tool.isPinned && (
                         <span className="notebook-pin-badge shrink-0" title="已置頂釘選">
-                          <Pin size={9} className="fill-current" />
-                          <span>置頂</span>
+                          <Pin size={10} className="fill-current shrink-0" />
+                          <span className="hidden sm:inline">置頂</span>
                         </span>
                       )}
-                      <span className="notebook-badge">
-                        {getTypeIcon(tool.type)}
-                        <span>{getTypeName(tool.type)}</span>
+                      <span className="notebook-badge shrink-0 text-[10px]" title={getTypeName(tool.type)}>
+                        <span className="shrink-0">{getTypeIcon(tool.type)}</span>
+                        <span className="hidden sm:inline">{getTypeName(tool.type)}</span>
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {onTogglePin && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onTogglePin(tool.id);
-                          }}
-                          className={`p-1.5 rounded-lg transition-colors ${
-                            tool.isPinned
-                              ? 'bg-[var(--coral-light)] text-[var(--coral)]'
-                              : 'text-[var(--muted)] hover:text-[var(--ink)]'
-                          }`}
-                          title={tool.isPinned ? '取消置頂' : '置頂釘選'}
-                        >
-                          <Pin size={14} className={tool.isPinned ? 'fill-current' : ''} />
-                        </button>
-                      )}
                       <button
-                        type="button"
                         onClick={handlePopout}
-                        className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] rounded-lg transition-colors"
-                        title="獨立浮動視窗"
+                        className="text-xs text-[var(--muted)] hover:text-[var(--ink)] p-1 rounded-lg hover:bg-[var(--line)]/50 transition-colors"
+                        title="以獨立視窗彈出"
                       >
                         <ExternalLink size={14} />
                       </button>
-                      <span className="text-xs text-[var(--muted)] font-medium hidden sm:inline">
-                        {isExpanded ? '收起視窗' : '展開使用'}
-                      </span>
-                      <div className="p-1 rounded text-[var(--muted)]">
-                        {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                      </div>
+                      {isExpanded ? (
+                        <ChevronUp size={16} className="text-[var(--muted)] shrink-0" />
+                      ) : (
+                        <ChevronDown size={16} className="text-[var(--muted)] shrink-0" />
+                      )}
                     </div>
                   </div>
 
-                  {/* 展開之大尺寸沙盒工作區 */}
+                  {/* 展開後的卡片內容與 SandboxedFrame */}
                   {isExpanded && (
-                    <div className="border-t border-[var(--line)] flex flex-col h-[560px] bg-[var(--card-bg)] animate-fadeIn">
-                      <div className="flex items-center justify-between px-4 py-2 bg-[var(--paper)] border-b border-[var(--line)] text-xs">
-                        <span className="text-[var(--muted)]">正在專注使用中</span>
-                        <div className="flex items-center gap-1.5">
-                          {isOwner && onDuplicateTool && (
-                            <button
-                              onClick={() => onDuplicateTool(tool)}
-                              className="text-xs text-[var(--muted)] hover:text-[var(--coral)] hover:bg-[var(--coral-light)] px-2 py-1 rounded-lg flex items-center gap-1 transition-colors"
-                              title="建立此工具副本"
-                            >
-                              <Copy size={13} />
-                              <span>副本</span>
-                            </button>
-                          )}
-                          {isOwner && onEditTool && (
-                            <button
-                              onClick={() => onEditTool(tool)}
-                              className="text-xs text-[var(--muted)] hover:text-[var(--coral)] hover:bg-[var(--coral-light)] px-2 py-1 rounded-lg flex items-center gap-1 transition-colors"
-                              title="編輯此工具"
-                            >
-                              <Pencil size={13} />
-                              <span>編輯</span>
-                            </button>
-                          )}
+                    <div className="h-[460px] border-t border-[var(--line)] bg-[var(--paper)] flex flex-col animate-fadeIn">
+                      <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--card-bg)] border-b border-[var(--line)] select-none">
+                        <span className="text-[11px] text-[var(--muted)]">手帳小工具視圖</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handlePopout}
+                            className="text-xs text-[var(--muted)] hover:text-[var(--ink)] hover:underline flex items-center gap-1 font-medium px-2 py-1 rounded-lg transition-colors"
+                            title="以獨立浮動視窗開啟"
+                          >
+                            <ExternalLink size={13} />
+                            <span>獨立快顯</span>
+                          </button>
                           <button
                             onClick={() => setFocusedTool(tool)}
                             className="text-xs text-[var(--coral)] hover:underline flex items-center gap-1 font-medium px-2 py-1 rounded-lg hover:bg-[var(--coral-light)] transition-colors"
@@ -601,7 +588,7 @@ export default function SpaceLayout({
                             <Maximize2 size={13} />
                             <span>全螢幕投影</span>
                           </button>
-                          {isOwner && (
+                          {isOwner && !isPresentationMode && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -673,6 +660,7 @@ export default function SpaceLayout({
                 isSelected={selectedToolIds.includes(currentTabTool.id)}
                 onToggleSelect={handleToggleSelectTool}
                 isOwner={isOwner}
+                isPresentationMode={isPresentationMode}
               />
             </div>
           )}
@@ -699,11 +687,12 @@ export default function SpaceLayout({
               isBatchMode={isBatchMode}
               isSelected={selectedToolIds.includes(tool.id)}
               onToggleSelect={handleToggleSelectTool}
-              draggable={isOwner && !searchQuery.trim() && !selectedTag && !isBatchMode}
+              draggable={isOwner && !searchQuery.trim() && !selectedTag && !isBatchMode && !isPresentationMode}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               isOwner={isOwner}
+              isPresentationMode={isPresentationMode}
             />
           ))}
         </div>
@@ -814,11 +803,12 @@ export default function SpaceLayout({
                       isBatchMode={isBatchMode}
                       isSelected={selectedToolIds.includes(tool.id)}
                       onToggleSelect={handleToggleSelectTool}
-                      draggable={isOwner && !isBatchMode}
+                      draggable={isOwner && !isBatchMode && !isPresentationMode}
                       onDragStart={handleDragStart}
                       onDragOver={handleDragOver}
                       onDrop={handleDrop}
                       isOwner={isOwner}
+                      isPresentationMode={isPresentationMode}
                     />
                   ))}
 
@@ -831,7 +821,7 @@ export default function SpaceLayout({
                 </div>
 
                 {/* 欄位底部快速新增按鈕 */}
-                {isOwner && (
+                {isOwner && !isPresentationMode && (
                   <button
                     type="button"
                     onClick={() => onOpenAddModal && onOpenAddModal(sec)}
@@ -846,7 +836,7 @@ export default function SpaceLayout({
           })}
 
           {/* 新增分欄按鈕 / 表單 */}
-          {isOwner && (
+          {isOwner && !isPresentationMode && (
             <div className="flex-shrink-0 w-64">
               {showAddSectionInput ? (
                 <form
@@ -913,11 +903,12 @@ export default function SpaceLayout({
                 isBatchMode={isBatchMode}
                 isSelected={selectedToolIds.includes(tool.id)}
                 onToggleSelect={handleToggleSelectTool}
-                draggable={isOwner && !searchQuery.trim() && !selectedTag && !isBatchMode}
+                draggable={isOwner && !searchQuery.trim() && !selectedTag && !isBatchMode && !isPresentationMode}
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 isOwner={isOwner}
+                isPresentationMode={isPresentationMode}
               />
             </div>
           ))}

@@ -46,6 +46,7 @@ export default function ToolCard({
   onDrop,
   index,
   isOwner = true,
+  isPresentationMode = false,
 }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
@@ -124,7 +125,9 @@ export default function ToolCard({
 
   return (
     <div
-      draggable={draggable && isOwner}
+      id={`tool-card-${tool.id}`}
+      data-tool-id={tool.id}
+      draggable={draggable && isOwner && !isPresentationMode}
       onDragStart={handleDragStartInternal}
       onDragOver={(e) => onDragOver && onDragOver(e, index)}
       onDrop={(e) => onDrop && onDrop(e, index)}
@@ -145,7 +148,7 @@ export default function ToolCard({
       <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--line)] bg-inherit select-none gap-2">
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {/* 批次選取框 */}
-          {isBatchMode && (
+          {isBatchMode && !isPresentationMode && (
             <button
               type="button"
               onClick={(e) => {
@@ -160,7 +163,7 @@ export default function ToolCard({
           )}
 
           {/* 拖曳把手 */}
-          {isOwner && !isBatchMode && (
+          {isOwner && !isBatchMode && !isPresentationMode && (
             <div
               className="cursor-grab active:cursor-grabbing p-1 text-[var(--faint)] hover:text-[var(--ink)] rounded-lg transition-colors shrink-0"
               title="拖曳以重新排列工具順序"
@@ -191,7 +194,7 @@ export default function ToolCard({
         {/* 控制按鈕組 */}
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           {/* 便箋色票切換 */}
-          {isOwner && onChangeColor && (
+          {isOwner && !isPresentationMode && onChangeColor && (
             <div className="relative">
               <button
                 type="button"
@@ -232,64 +235,66 @@ export default function ToolCard({
           )}
 
           {/* 更多操作選單 (建立副本、複製至其他空間、匯出 JSON) */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-              className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
-              title="更多小工具動作"
-            >
-              <MoreVertical size={14} />
-            </button>
+          {!isPresentationMode && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
+                title="更多小工具動作"
+              >
+                <MoreVertical size={14} />
+              </button>
 
-            {moreMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
-                <div
-                  className="absolute right-0 mt-1 w-44 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn text-xs"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {isOwner && onDuplicate && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMoreMenuOpen(false);
-                        onDuplicate(tool);
-                      }}
-                      className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
-                    >
-                      <Copy size={13} className="text-[var(--coral)]" />
-                      <span>建立副本</span>
-                    </button>
-                  )}
-                  {onCloneToSpace && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMoreMenuOpen(false);
-                        onCloneToSpace(tool);
-                      }}
-                      className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
-                    >
-                      <Send size={13} className="text-blue-500" />
-                      <span>複製到其他空間...</span>
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={handleExportTool}
-                    className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+              {moreMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
+                  <div
+                    className="absolute right-0 mt-1 w-44 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn text-xs"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <Download size={13} className="text-emerald-500" />
-                    <span>匯出小工具 (.json)</span>
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+                    {isOwner && onDuplicate && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMoreMenuOpen(false);
+                          onDuplicate(tool);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                      >
+                        <Copy size={13} className="text-[var(--coral)]" />
+                        <span>建立副本</span>
+                      </button>
+                    )}
+                    {onCloneToSpace && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMoreMenuOpen(false);
+                          onCloneToSpace(tool);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                      >
+                        <Send size={13} className="text-blue-500" />
+                        <span>複製到其他空間...</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleExportTool}
+                      className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                    >
+                      <Download size={13} className="text-emerald-500" />
+                      <span>匯出小工具 (.json)</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {/* 置頂釘選按鈕 */}
-          {onTogglePin && (
+          {!isPresentationMode && onTogglePin && (
             <button
               onClick={() => onTogglePin(tool.id)}
               className={`p-1.5 rounded-lg transition-colors ${
@@ -313,7 +318,7 @@ export default function ToolCard({
           </button>
 
           {/* 寬度尺寸切換 (1x / 2x - 僅在非貨架與非瀑布流下呈現) */}
-          {isOwner && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
+          {isOwner && !isPresentationMode && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
             <button
               onClick={() => onToggleColSpan(tool.id, colSpan === 1 ? 2 : 1)}
               className={`p-1.5 rounded-lg transition-colors text-xs flex items-center gap-1 ${
@@ -335,7 +340,7 @@ export default function ToolCard({
           >
             <RotateCcw size={14} />
           </button>
-          {isOwner && onEdit && (
+          {isOwner && !isPresentationMode && onEdit && (
             <button
               onClick={() => onEdit(tool)}
               className="p-1.5 text-[var(--muted)] hover:text-[var(--coral)] hover:bg-[var(--coral-light)] rounded-lg transition-colors"
@@ -351,7 +356,7 @@ export default function ToolCard({
           >
             <Maximize2 size={14} />
           </button>
-          {isOwner && (
+          {isOwner && !isPresentationMode && (
             <button
               onClick={() => onDelete(tool.id)}
               className="p-1.5 text-[var(--muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
