@@ -1,11 +1,12 @@
 import express from 'express';
 import { db, generateInviteCode } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
+import { inviteLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-// 0. 免登入訪客透過邀請碼 / QR Code 查看空間 (公開唯讀)
-router.get('/share/:code', (req, res) => {
+// 0. 免登入訪客透過邀請碼 / QR Code 查看空間 (公開唯讀，受速率限制保護)
+router.get('/share/:code', inviteLimiter, (req, res) => {
   try {
     const { code } = req.params;
     if (!code) return res.status(400).json({ error: '請提供邀請碼' });
@@ -66,13 +67,22 @@ router.get('/', (req, res) => {
   }
 });
 
-// 2. 建立新空間
+// 2. 建立新空間 (含長度與排版約束)
 router.post('/', (req, res) => {
   try {
     const { name, description = '', layout = 'grid' } = req.body;
-    if (!name || !name.trim()) {
+    if (!name || typeof name !== 'string' || !name.trim()) {
       return res.status(400).json({ error: '空間名稱為必填' });
     }
+
+    const cleanName = name.trim();
+    if (cleanName.length > 100) {
+      return res.status(400).json({ error: '空間名稱不可超過 100 個字元' });
+    }
+
+    const cleanDesc = (typeof description === 'string' ? description.trim() : '').slice(0, 1000);
+    const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+    const safeLayout = validLayouts.includes(layout) ? layout : 'grid';
 
     let inviteCode = generateInviteCode();
     for (let r = 0; r < 10; r++) {
@@ -84,7 +94,7 @@ router.post('/', (req, res) => {
       INSERT INTO spaces (user_id, name, description, layout, invite_code)
       VALUES (?, ?, ?, ?, ?)
     `);
-    const result = insert.run(req.user.id, name.trim(), description.trim(), layout, inviteCode);
+    const result = insert.run(req.user.id, cleanName, cleanDesc, safeLayout, inviteCode);
     const spaceId = Number(result.lastInsertRowid);
 
     const getNewSpace = db.prepare(`
@@ -101,11 +111,11 @@ router.post('/', (req, res) => {
   }
 });
 
-// 3. 透過邀請碼加入空間 (學生或協作者)
-router.post('/join', (req, res) => {
+// 3. 透過邀請碼加入空間 (學生或協作者，受速率限制保護)
+router.post('/join', inviteLimiter, (req, res) => {
   try {
     const { inviteCode } = req.body;
-    if (!inviteCode || !inviteCode.trim()) {
+    if (!inviteCode || typeof inviteCode !== 'string' || !inviteCode.trim()) {
       return res.status(400).json({ error: '請輸入有效的邀請碼' });
     }
 
@@ -205,6 +215,9 @@ router.get('/:id', (req, res) => {
 router.patch('/:id', (req, res) => {
   try {
     const spaceId = Number(req.params.id);
+    if (!Number.isInteger(spaceId) || spaceId <= 0) {
+      return res.status(400).json({ error: '無效的空間 ID' });
+    }
     const { name, description, layout } = req.body;
 
     const checkSpace = db.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?');
@@ -215,9 +228,35 @@ router.patch('/:id', (req, res) => {
     const updates = [];
     const params = [];
 
-    if (name !== undefined) { updates.push('name = ?'); params.push(name.trim()); }
-    if (description !== undefined) { updates.push('description = ?'); params.push(description.trim()); }
-    if (layout !== undefined) { updates.push('layout = ?'); params.push(layout); }
+    if (name !== undefined) {
+      if (typeof name !== 'string' || !name.trim()) {
+        return res.status(400).json({ error: '空間名稱不可為空' });
+      }
+      const cleanName = name.trim();
+      if (cleanName.length > 100) {
+        return res.status(400).json({ error: '空間名稱不可超過 100 個字元' });
+      }
+      updates.push('name = ?');
+      params.push(cleanName);
+    }
+
+    if (description !== undefined) {
+      const cleanDesc = typeof description === 'string' ? description.trim() : '';
+      if (cleanDesc.length > 1000) {
+        return res.status(400).json({ error: '空間描述不可超過 1000 個字元' });
+      }
+      updates.push('description = ?');
+      params.push(cleanDesc);
+    }
+
+    if (layout !== undefined) {
+      const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+      if (!validLayouts.includes(layout)) {
+        return res.status(400).json({ error: '無效的排版格式' });
+      }
+      updates.push('layout = ?');
+      params.push(layout);
+    }
 
     if (updates.length > 0) {
       params.push(spaceId);
@@ -265,6 +304,9 @@ router.patch('/:id/tools/:toolId', (req, res) => {
   try {
     const spaceId = Number(req.params.id);
     const toolId = Number(req.params.toolId);
+    if (!Number.isInteger(spaceId) || !Number.isInteger(toolId)) {
+      return res.status(400).json({ error: '無效的空間或工具 ID' });
+    }
     const { colSpan, title, content, type } = req.body;
 
     const checkSpace = db.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?');
@@ -274,10 +316,41 @@ router.patch('/:id/tools/:toolId', (req, res) => {
 
     const updates = [];
     const params = [];
-    if (colSpan !== undefined) { updates.push('col_span = ?'); params.push(Number(colSpan)); }
-    if (title !== undefined) { updates.push('title = ?'); params.push(title.trim()); }
-    if (content !== undefined) { updates.push('content = ?'); params.push(content.trim()); }
-    if (type !== undefined) { updates.push('type = ?'); params.push(type.trim()); }
+    if (colSpan !== undefined) {
+      const parsedColSpan = Number(colSpan);
+      updates.push('col_span = ?');
+      params.push(parsedColSpan === 2 ? 2 : 1);
+    }
+    if (title !== undefined) {
+      if (typeof title !== 'string' || !title.trim()) {
+        return res.status(400).json({ error: '工具名稱不可為空' });
+      }
+      const cleanTitle = title.trim();
+      if (cleanTitle.length > 100) {
+        return res.status(400).json({ error: '工具名稱不可超過 100 個字元' });
+      }
+      updates.push('title = ?');
+      params.push(cleanTitle);
+    }
+    if (content !== undefined) {
+      if (typeof content !== 'string' || !content.trim()) {
+        return res.status(400).json({ error: '工具內容不可為空' });
+      }
+      const cleanContent = content.trim();
+      if (cleanContent.length > 1048576) {
+        return res.status(400).json({ error: '工具內容大小不可超過 1MB' });
+      }
+      updates.push('content = ?');
+      params.push(cleanContent);
+    }
+    if (type !== undefined) {
+      const validTypes = ['html', 'iframe', 'url'];
+      if (!validTypes.includes(type)) {
+        return res.status(400).json({ error: '無效的工具類型' });
+      }
+      updates.push('type = ?');
+      params.push(type);
+    }
 
     if (updates.length > 0) {
       params.push(toolId, spaceId);
@@ -314,15 +387,30 @@ router.delete('/:id', (req, res) => {
 router.post('/:id/tools', (req, res) => {
   try {
     const spaceId = Number(req.params.id);
+    if (!Number.isInteger(spaceId) || spaceId <= 0) {
+      return res.status(400).json({ error: '無效的空間 ID' });
+    }
     const { title, type = 'html', content, colSpan = 1 } = req.body;
 
-    if (!title || !title.trim()) {
+    if (!title || typeof title !== 'string' || !title.trim()) {
       return res.status(400).json({ error: '工具名稱為必填' });
     }
+    const cleanTitle = title.trim();
+    if (cleanTitle.length > 100) {
+      return res.status(400).json({ error: '工具名稱不可超過 100 個字元' });
+    }
 
-    if (!content || !content.trim()) {
+    if (!content || typeof content !== 'string' || !content.trim()) {
       return res.status(400).json({ error: '請貼入程式碼、iframe 或網址' });
     }
+    const cleanContent = content.trim();
+    if (cleanContent.length > 1048576) {
+      return res.status(400).json({ error: '工具內容大小不可超過 1MB' });
+    }
+
+    const validTypes = ['html', 'iframe', 'url'];
+    const safeType = validTypes.includes(type) ? type : 'html';
+    const safeColSpan = Number(colSpan) === 2 ? 2 : 1;
 
     const checkSpace = db.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?');
     if (!checkSpace.get(spaceId, req.user.id)) {
@@ -336,7 +424,7 @@ router.post('/:id/tools', (req, res) => {
       INSERT INTO tools (space_id, title, type, content, sort_order, col_span)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
-    const result = insertTool.run(spaceId, title.trim(), type, content.trim(), sortOrder, colSpan);
+    const result = insertTool.run(spaceId, cleanTitle, safeType, cleanContent, sortOrder, safeColSpan);
     const toolId = Number(result.lastInsertRowid);
 
     const newTool = db.prepare('SELECT * FROM tools WHERE id = ?').get(toolId);

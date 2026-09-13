@@ -45,7 +45,12 @@
 - **空間備份與移轉 (JSON v2.2)**：支援將整套空間工具（含標籤、置頂、色彩與分欄狀態）一鍵匯出為 JSON 備份檔，並可上傳匯入復原。
 - **多空間與邀請碼共享**：可建立多個專案空間，並透過「空間邀請碼 (`SPC-XXXX`)」邀請團隊成員加入共享。
 - **多元閱讀佈局**：支援「貨架分欄 (Shelf)」、「瀑布流 (Wall)」、「網格並列 (Grid)」、「分頁輪播 (Tabs)」與「折起專注模式 (Collapsed)」。
-- **安全沙盒隔離**：嚴格配置 `iframe sandbox`（排除 `allow-same-origin`），防止跨站與 Token 竊取。
+- **安全沙盒隔離與快顯防護**：全站卡片嚴格配置 `iframe sandbox`（排除 `allow-same-origin`），獨立快顯外開視窗自動斷開 `window.opener` 並以無同源沙盒包裹，防止惡意指令碼竊取主應用權杖或 localStorage。
+- **系統安全深度防護架構**：
+  - **定時安全驗證 (Constant-time verification)**：JWT 簽名比對與密碼驗證全面採用 `crypto.timingSafeEqual`，阻斷計時側信道攻擊 (Timing Attacks)。
+  - **滑動視窗速率限制 (Sliding-window Rate Limiting)**：自主實作無外部依賴之記憶體速率限制中介層，針對認證登入 (15次/15分)、邀請碼探索 (30次/分) 與全域 API (300次/分) 提供細緻防護。
+  - **全方位 HTTP 安全防護標頭 (Security Headers)**：主動注入 `X-Content-Type-Options: nosniff`、`X-Frame-Options: SAMEORIGIN`、`Referrer-Policy`、`Cross-Origin-Opener-Policy` 與 `Permissions-Policy`。
+  - **邊界驗證與防 DoS**：限制密碼最大長度 (128 字元) 防範 Scrypt 演算法 CPU 耗竭攻擊，並限制名稱、代碼長度與內容上限。
 - **雲端與邊緣整合**：支援 **GitHub Pages** 靜態託管 + **Cloudflare D1 (Serverless SQLite)** 邊緣資料庫。
 
 ---

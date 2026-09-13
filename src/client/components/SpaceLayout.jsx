@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import ToolCard, { CARD_COLORS } from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
-import { parseToolInput } from '../utils/codeParser';
+import { parseToolInput, openSandboxedPopout } from '../utils/codeParser';
 import { ToolsEmptyIllustration, SearchEmptyIllustration, EmptyShelfBasketDoodle, SpaceStationeryBannerDoodle } from './Illustrations';
 
 export default function SpaceLayout({
@@ -480,13 +480,7 @@ export default function SpaceLayout({
 
               const handlePopout = (e) => {
                 e.stopPropagation();
-                const w = window.open('', '_blank', 'width=840,height=620,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
-                if (w) {
-                  w.document.title = `${tool.title} - 工具小本本`;
-                  w.document.open();
-                  w.document.write(parsed.htmlContent);
-                  w.document.close();
-                }
+                openSandboxedPopout(tool.title, parsed.htmlContent);
               };
 
               return (
@@ -1144,13 +1138,7 @@ export default function SpaceLayout({
                   type="button"
                   onClick={() => {
                     const parsed = parseToolInput(focusedTool.content);
-                    const w = window.open('', '_blank', 'width=840,height=620,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
-                    if (w) {
-                      w.document.title = `${focusedTool.title} - 工具小本本`;
-                      w.document.open();
-                      w.document.write(parsed.htmlContent);
-                      w.document.close();
-                    }
+                    openSandboxedPopout(focusedTool.title, parsed.htmlContent);
                   }}
                   className="p-2 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-xl transition-colors"
                   title="以獨立視窗快顯外開"

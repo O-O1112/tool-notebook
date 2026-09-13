@@ -105,6 +105,14 @@ export function hashPassword(password) {
 }
 
 export function verifyPassword(password, hash, salt) {
-  const checkHash = crypto.scryptSync(password, salt, 64).toString('hex');
-  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(checkHash, 'hex'));
+  try {
+    if (!password || !hash || !salt) return false;
+    const checkHash = crypto.scryptSync(password, salt, 64).toString('hex');
+    const hashBuf = Buffer.from(hash, 'hex');
+    const checkBuf = Buffer.from(checkHash, 'hex');
+    if (hashBuf.length !== checkBuf.length) return false;
+    return crypto.timingSafeEqual(hashBuf, checkBuf);
+  } catch (err) {
+    return false;
+  }
 }

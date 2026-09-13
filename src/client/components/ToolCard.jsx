@@ -21,7 +21,7 @@ import {
   Square,
 } from 'lucide-react';
 import SandboxedFrame from './SandboxedFrame';
-import { parseToolInput } from '../utils/codeParser';
+import { parseToolInput, openSandboxedPopout } from '../utils/codeParser';
 import { CARD_COLORS } from '../utils/cardColors';
 import { WashiTapePinDoodle } from './Illustrations';
 export { CARD_COLORS };
@@ -89,15 +89,7 @@ export default function ToolCard({
   }, [tool.tags]);
 
   const handlePopout = () => {
-    const w = window.open('', '_blank', 'width=840,height=620,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
-    if (!w) {
-      alert('請允許瀏覽器彈出式視窗以使用獨立浮動工具視窗');
-      return;
-    }
-    w.document.title = `${tool.title} - 工具小本本`;
-    w.document.open();
-    w.document.write(parsed.htmlContent);
-    w.document.close();
+    openSandboxedPopout(tool.title, parsed.htmlContent);
   };
 
   const getTypeIcon = (type) => {

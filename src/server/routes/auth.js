@@ -1,39 +1,45 @@
 import express from 'express';
 import { db, hashPassword, verifyPassword } from '../db.js';
 import { signToken, requireAuth } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-// 註冊帳號 (統一使用者模型)
-router.post('/register', (req, res) => {
+// 註冊帳號 (統一使用者模型與輸入約束)
+router.post('/register', authLimiter, (req, res) => {
   try {
     const { username, password, displayName } = req.body;
 
-    if (!username || !password) {
+    if (!username || typeof username !== 'string' || !password || typeof password !== 'string') {
       return res.status(400).json({ error: '帳號與密碼為必填' });
     }
 
-    if (username.length < 3) {
-      return res.status(400).json({ error: '帳號長度至少需 3 個字元' });
+    const cleanUsername = username.trim();
+    if (cleanUsername.length < 3 || cleanUsername.length > 50) {
+      return res.status(400).json({ error: '帳號長度需介於 3 至 50 個字元' });
     }
 
-    if (password.length < 4) {
-      return res.status(400).json({ error: '密碼長度至少需 4 個字元' });
+    if (!/^[a-zA-Z0-9_\u4e00-\u9fa5-]+$/.test(cleanUsername)) {
+      return res.status(400).json({ error: '帳號僅支援中英文字母、數字、底線與連字號' });
+    }
+
+    if (password.length < 4 || password.length > 128) {
+      return res.status(400).json({ error: '密碼長度需介於 4 至 128 個字元' });
     }
 
     const checkUser = db.prepare('SELECT id FROM users WHERE username = ?');
-    if (checkUser.get(username)) {
+    if (checkUser.get(cleanUsername)) {
       return res.status(409).json({ error: '此帳號已存在，請直接登入或使用其他帳號' });
     }
 
     const { hash, salt } = hashPassword(password);
-    const finalDisplayName = displayName?.trim() || username;
+    const finalDisplayName = (typeof displayName === 'string' ? displayName.trim().slice(0, 50) : '') || cleanUsername;
 
     const insertUser = db.prepare(`
       INSERT INTO users (username, password_hash, salt, display_name, role)
       VALUES (?, ?, ?, ?, 'user')
     `);
-    const result = insertUser.run(username, hash, salt, finalDisplayName);
+    const result = insertUser.run(cleanUsername, hash, salt, finalDisplayName);
     const userId = Number(result.lastInsertRowid);
 
     // 自動為新使用者建立一個預設個人空間
@@ -45,7 +51,7 @@ router.post('/register', (req, res) => {
 
     const userPayload = {
       id: userId,
-      username,
+      username: cleanUsername,
       displayName: finalDisplayName,
     };
 
@@ -57,13 +63,17 @@ router.post('/register', (req, res) => {
   }
 });
 
-// 帳號登入
-router.post('/login', (req, res) => {
+// 帳號登入 (具備速率限制與長度約束)
+router.post('/login', authLimiter, (req, res) => {
   try {
     const { username, password } = req.body;
 
-    if (!username || !password) {
+    if (!username || typeof username !== 'string' || !password || typeof password !== 'string') {
       return res.status(400).json({ error: '請輸入有效的帳號與密碼' });
+    }
+
+    if (username.length > 50 || password.length > 128) {
+      return res.status(400).json({ error: '帳號或密碼格式不符規範' });
     }
 
     const getUser = db.prepare(`
@@ -127,11 +137,15 @@ router.get('/me', requireAuth, (req, res) => {
 router.patch('/profile', requireAuth, (req, res) => {
   try {
     const { displayName } = req.body;
-    if (!displayName || !displayName.trim()) {
+    if (!displayName || typeof displayName !== 'string' || !displayName.trim()) {
       return res.status(400).json({ error: '請輸入有效的顯示名稱' });
     }
 
     const finalName = displayName.trim();
+    if (finalName.length > 50) {
+      return res.status(400).json({ error: '顯示名稱不可超過 50 個字元' });
+    }
+
     const update = db.prepare('UPDATE users SET display_name = ? WHERE id = ?');
     update.run(finalName, req.user.id);
 

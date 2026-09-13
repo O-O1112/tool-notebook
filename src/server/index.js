@@ -4,6 +4,8 @@ import path from 'node:path';
 import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { initDB } from './db.js';
+import { securityHeaders } from './middleware/securityHeaders.js';
+import { apiLimiter } from './middleware/rateLimiter.js';
 import authRoutes from './routes/auth.js';
 import spacesRoutes from './routes/spaces.js';
 
@@ -15,8 +17,19 @@ const PORT = process.env.PORT || 3000;
 // 初始化 SQLite 資料庫綱要與示範帳號
 initDB();
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+// 安全 HTTP 標頭與 CORS 防護
+app.use(securityHeaders);
+app.use(
+  cors({
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400,
+  })
+);
+app.use(express.json({ limit: '2mb' }));
+
+// 全域 API 速率防護
+app.use('/api', apiLimiter);
 
 // API 路由
 app.use('/api/auth', authRoutes);

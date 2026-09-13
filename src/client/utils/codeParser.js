@@ -40,6 +40,8 @@ export function parseToolInput(input) {
 <html>
 <head>
   <meta charset="utf-8">
+  <base href="about:blank">
+  <meta name="referrer" content="no-referrer">
   <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
     iframe { width: 100%; height: 100%; border: none; display: block; }
@@ -75,6 +77,8 @@ export function parseToolInput(input) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="about:blank">
+  <meta name="referrer" content="no-referrer">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -120,3 +124,49 @@ function normalizeIframeTag(iframeHtml) {
   }
   return normalized;
 }
+
+/**
+ * 安全彈出獨立視窗
+ * 1. 斷開 window.opener 連線 (防止反向存取主應用權杖與 localStorage)
+ * 2. 以沙盒 iframe 包裹目標內容，禁止 allow-same-origin，確保執行緒與資料庫隔離
+ */
+export function openSandboxedPopout(title, htmlContent) {
+  const w = window.open('', '_blank', 'width=840,height=620,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
+  if (!w) {
+    alert('請允許瀏覽器彈出式視窗以使用獨立浮動工具視窗');
+    return null;
+  }
+  try {
+    w.opener = null;
+  } catch (e) {
+    console.error('Failed to clear window.opener:', e);
+  }
+
+  const safeTitle = (title || '工具小本本').replace(/[<>&"]/g, '');
+  const encodedContent = JSON.stringify(htmlContent || '');
+
+  const sandboxedDoc = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${safeTitle} - 工具小本本</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+    iframe { width: 100%; height: 100%; border: none; display: block; }
+  </style>
+</head>
+<body>
+  <iframe sandbox="allow-scripts allow-forms allow-modals allow-popups" id="sandbox-frame"></iframe>
+  <script>
+    const frame = document.getElementById('sandbox-frame');
+    frame.srcdoc = ${encodedContent};
+  <\/script>
+</body>
+</html>`;
+
+  w.document.open();
+  w.document.write(sandboxedDoc);
+  w.document.close();
+  return w;
+}
+
