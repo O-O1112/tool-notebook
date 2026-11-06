@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert';
 import { TOOL_TEMPLATES } from '../src/client/utils/toolTemplates.js';
 
-test('expandedFeatures: 完整提供 20 款高質感離線小工具範本', () => {
-  assert.strictEqual(TOOL_TEMPLATES.length, 20, '應提供完整 20 款開箱即用小工具範本');
+test('expandedFeatures: 完整提供 20 款以上高質感離線小工具範本', () => {
+  assert.ok(TOOL_TEMPLATES.length >= 20, '應提供完整 20 款以上開箱即用小工具範本');
 
   TOOL_TEMPLATES.forEach((tmpl) => {
     assert.ok(tmpl.id, `範本應有唯一 ID: ${tmpl.id}`);

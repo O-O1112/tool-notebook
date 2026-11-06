@@ -1,3 +1,5 @@
+import { transformUrlToEmbed } from './embedTransformers.js';
+
 /**
  * 智慧解析貼入的代碼、iframe 或網址
  */
@@ -13,16 +15,21 @@ export function parseToolInput(input) {
 
   const trimmed = input.trim();
 
-  // 1. 若為純網址 (URL)，標註為不支援並提示改用 iframe 或 HTML
+  // 1. 若為純網址 (URL)，透過萬用嵌入引擎自動轉譯為最佳化嵌入內容
   const isUrl = /^https?:\/\/[^\s]+$/i.test(trimmed);
   if (isUrl) {
-    return {
-      type: 'invalid',
-      isRawUrl: true,
-      titleSuggestion: '未支援的純網址',
-      error: '目前不支援直接貼上純網址。請使用 <iframe> 嵌入標籤（例如 <iframe src="..."></iframe>）或自訂 HTML 程式碼。',
-      htmlContent: '',
-    };
+    const transformed = transformUrlToEmbed(trimmed);
+    if (transformed) {
+      return {
+        type: 'iframe',
+        isRawUrl: true,
+        titleSuggestion: transformed.titleSuggestion,
+        htmlContent: transformed.htmlContent,
+        embedUrl: transformed.embedUrl,
+        platformName: transformed.platformName,
+        isKnownPlatform: transformed.isKnownPlatform,
+      };
+    }
   }
 
   // 2. 判斷是否為 <iframe> 標籤

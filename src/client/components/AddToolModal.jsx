@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Code, Frame, Play, Check, AlertTriangle, ArrowRightLeft, Sparkles, Plus, Eye, Palette, Folder } from 'lucide-react';
+import { X, Code, Frame, Play, Check, AlertTriangle, ArrowRightLeft, Sparkles, Plus, Eye, Palette, Folder, Globe } from 'lucide-react';
 import { parseToolInput } from '../utils/codeParser';
 import { TOOL_TEMPLATES } from '../utils/toolTemplates';
 import SandboxedFrame from './SandboxedFrame';
@@ -32,7 +32,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
   const parsed = parseToolInput(content);
 
   useEffect(() => {
-    if (content.trim() && (!title || title === '未命名工具') && !parsed.isRawUrl) {
+    if (content.trim() && (!title || title === '未命名工具')) {
       setTitle(parsed.titleSuggestion);
     }
   }, [content]);
@@ -49,14 +49,15 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!content.trim() || parsed.isRawUrl) return;
+    if (!content.trim()) return;
 
     setSubmitting(true);
     try {
+      const finalContent = parsed.isRawUrl ? parsed.htmlContent : content.trim();
       await onAddTool({
         title: title.trim() || parsed.titleSuggestion || '自訂小工具',
         type: parsed.type,
-        content: content.trim(),
+        content: finalContent,
         colSpan: 1,
         tags: parseTags(tagsInput),
         color,
@@ -159,8 +160,8 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
                   : 'border-transparent text-[var(--muted)] hover:text-[var(--ink)]'
               }`}
             >
-              <Code size={14} />
-              <span>自訂代碼 / iframe</span>
+              <Globe size={14} />
+              <span>自訂代碼 / 網址嵌入</span>
             </button>
           </div>
         </div>
@@ -320,17 +321,18 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
               </div>
             </div>
 
-            {/* 程式碼 / iframe 輸入區 */}
+            {/* 程式碼 / iframe / 網址輸入區 */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-[var(--ink)]">
-                  HTML/JS 原始碼或 &lt;iframe&gt; 嵌入標籤
+                  HTML/JS 原始碼、&lt;iframe&gt; 標籤或一般網址
                 </label>
-                {content.trim() && !parsed.isRawUrl && (
+                {content.trim() && (
                   <span className="notebook-badge text-[10px]">
-                    {parsed.type === 'iframe' && <Frame size={12} className="text-emerald-500" />}
+                    {parsed.isRawUrl && <Globe size={12} className="text-blue-500" />}
+                    {parsed.type === 'iframe' && !parsed.isRawUrl && <Frame size={12} className="text-emerald-500" />}
                     {parsed.type === 'html' && <Code size={12} className="text-amber-500" />}
-                    <span>格式：{parsed.type.toUpperCase()}</span>
+                    <span>格式：{parsed.isRawUrl ? `網址轉譯 (${parsed.platformName || '外部網站'})` : parsed.type.toUpperCase()}</span>
                   </span>
                 )}
               </div>
@@ -339,39 +341,26 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
                 rows={6}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="請在此貼入 HTML/JS 原始碼或 <iframe src=&quot;...&quot;></iframe> 嵌入標籤"
+                placeholder="支援直接貼入：&#10;1. 外部網址（YouTube、Google文件/試算表/簡報、Desmos、GeoGebra、Figma、CodePen、一般網頁）&#10;2. <iframe> 嵌入代碼&#10;3. 自訂 HTML / JavaScript / CSS 程式碼"
                 className="notebook-input w-full font-mono text-xs leading-relaxed resize-none"
                 required
               />
 
-              {/* 純網址防呆提示與一鍵轉換 */}
+              {/* 網址自動轉譯提示 */}
               {parsed.isRawUrl && (
-                <div className="mt-2.5 p-3 bg-[var(--coral-light)] border border-[var(--coral-border)] rounded-xl text-xs space-y-2">
-                  <div className="flex items-start gap-2 text-[var(--coral)]">
-                    <AlertTriangle size={15} className="shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold">不支援直接貼上純網址</span>
-                      <p className="text-[var(--muted)] text-[11px] mt-0.5">
-                        大部分外部網站會拒絕被純網址直接內嵌。請改用 <strong>&lt;iframe&gt;</strong> 嵌入標籤或 HTML 程式碼。
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={handleConvertToIframe}
-                      className="notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 text-[var(--coral)] border-[var(--coral-border)]"
-                    >
-                      <ArrowRightLeft size={13} />
-                      <span>轉為 &lt;iframe&gt; 標籤嘗試</span>
-                    </button>
+                <div className="mt-2.5 p-2.5 bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40 rounded-xl text-xs flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                    <Globe size={14} className="shrink-0" />
+                    <span className="font-medium">
+                      已啟用萬用嵌入引擎：自動適配為【{parsed.platformName || '外部網站'}】安全展示容器
+                    </span>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* 即時預覽切換 (限合法 HTML/iframe) */}
-            {content.trim() && !parsed.isRawUrl && (
+            {/* 即時預覽切換 */}
+            {content.trim() && (
               <div className="pt-2 border-t border-[var(--line)]">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold text-[var(--ink)]">即時預覽確認</span>
@@ -386,7 +375,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
                 </div>
 
                 {previewActive && (
-                  <div className="h-48 border border-[var(--line)] rounded-xl overflow-hidden bg-[var(--card-bg)] shadow-xs">
+                  <div className="h-56 border border-[var(--line)] rounded-xl overflow-hidden bg-[var(--card-bg)] shadow-xs">
                     <SandboxedFrame
                       htmlContent={parsed.htmlContent}
                       title="即時預覽"
@@ -408,7 +397,7 @@ export default function AddToolModal({ isOpen, onClose, onAddTool, initialSectio
               </button>
               <button
                 type="submit"
-                disabled={submitting || !content.trim() || parsed.isRawUrl}
+                disabled={submitting || !content.trim()}
                 className="notebook-btn-primary text-xs py-2 px-4"
               >
                 <Check size={15} />

@@ -11,6 +11,7 @@ import SpaceSettingsModal from './components/SpaceSettingsModal';
 import JoinSpaceModal from './components/JoinSpaceModal';
 import QRCodeModal from './components/QRCodeModal';
 import CommandPalette from './components/CommandPalette';
+import AIToolModal from './components/AIToolModal';
 import { Tv, Sun, Moon, X } from 'lucide-react';
 import { api } from './utils/api';
 
@@ -46,6 +47,7 @@ export default function App() {
   const [isGuest, setIsGuest] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
 
   // 空間延伸狀態 (我的最愛、垃圾桶回收、最近存取紀錄)
   const [favoriteSpaceIds, setFavoriteSpaceIds] = useState(() => {
@@ -967,6 +969,7 @@ export default function App() {
           onSelectTheme={handleSelectTheme}
           onToggleDarkMode={handleToggleDarkMode}
           isGuest={isGuest}
+          onOpenAIModal={() => setAiModalOpen(true)}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
           onTogglePresentation={() => setIsPresentationMode(!isPresentationMode)}
         />
@@ -1048,6 +1051,7 @@ export default function App() {
               if (tab) setAddModalTab(tab);
               setAddModalOpen(true);
             }}
+            onOpenAIModal={() => setAiModalOpen(true)}
             onToggleColSpan={handleToggleColSpan}
             onTogglePin={handleTogglePin}
             onChangeColor={handleUpdateToolColor}
@@ -1142,6 +1146,7 @@ export default function App() {
           setAddModalSection('一般工具');
           setAddModalOpen(true);
         }}
+        onOpenAIModal={() => setAiModalOpen(true)}
         onOpenCreateSpace={() => setCreateModalOpen(true)}
         onSetLayout={handleToggleLayout}
         onSetTheme={handleSelectTheme}
@@ -1149,6 +1154,15 @@ export default function App() {
         onExportSpace={() => handleOpenSettings('backup', currentSpace)}
         onOpenSettings={(tab) => handleOpenSettings(tab, currentSpace)}
         currentTheme={theme}
+      />
+
+      {/* AI 智慧代寫小工具工作室 */}
+      <AIToolModal
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        onAddTool={handleAddTool}
+        currentSpaceName={currentSpace?.name}
+        initialSection={addModalSection}
       />
     </div>
   );

@@ -29,6 +29,7 @@ import {
   Trash2,
   Palette,
   Tv,
+  Sparkles,
 } from 'lucide-react';
 import ToolCard, { CARD_COLORS } from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
@@ -41,6 +42,7 @@ export default function SpaceLayout({
   onDeleteTool,
   onEditTool,
   onOpenAddModal,
+  onOpenAIModal,
   onToggleColSpan,
   onTogglePin,
   onChangeColor,
@@ -380,11 +382,24 @@ export default function SpaceLayout({
                 type="button"
                 onClick={() => onOpenAddModal && onOpenAddModal('一般工具', 'templates')}
                 className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-[var(--coral)] hover:bg-[var(--coral-light)] shrink-0"
-                title="瀏覽精選 20 款小工具範本並加入空間"
+                title="瀏覽精選小工具範本並加入空間"
               >
                 <BookTemplate size={13} />
                 <span>範本專區</span>
               </button>
+
+              {/* AI 智慧代寫按鈕 */}
+              {isOwner && onOpenAIModal && (
+                <button
+                  type="button"
+                  onClick={onOpenAIModal}
+                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-purple-600 hover:text-purple-700 bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800 shrink-0 font-medium"
+                  title="使用 AI 自動編寫並生成小工具"
+                >
+                  <Sparkles size={13} />
+                  <span>AI 代寫</span>
+                </button>
+              )}
 
               {/* 投影簡報按鈕 */}
               {onTogglePresentation && (

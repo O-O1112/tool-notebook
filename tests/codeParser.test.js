@@ -2,13 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert';
 import { parseToolInput } from '../src/client/utils/codeParser.js';
 
-test('codeParser: 輸入純網址應被標記為不支援並提示使用 iframe 或 HTML', () => {
+test('codeParser: 輸入純網址應透過萬用嵌入引擎自動轉譯為最佳化嵌入內容', () => {
   const url = 'https://www.geogebra.org/calculator';
   const result = parseToolInput(url);
 
-  assert.strictEqual(result.type, 'invalid');
+  assert.strictEqual(result.type, 'iframe');
   assert.strictEqual(result.isRawUrl, true);
-  assert.ok(result.error);
+  assert.ok(result.htmlContent.includes('<iframe'));
+  assert.ok(result.titleSuggestion.includes('外部網站') || result.titleSuggestion.includes('GeoGebra'));
 });
 
 test('codeParser: 應正確識別並標準化 <iframe> 標籤', () => {

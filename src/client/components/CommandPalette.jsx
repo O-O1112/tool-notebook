@@ -31,6 +31,7 @@ export default function CommandPalette({
   onSelectSpace,
   onSelectTool,
   onOpenAddTool,
+  onOpenAIModal,
   onOpenCreateSpace,
   onSetLayout,
   onSetTheme,
@@ -67,6 +68,14 @@ export default function CommandPalette({
 
   // 系統預設操作指令庫
   const systemActions = useMemo(() => [
+    {
+      id: 'action-ai-tool',
+      group: '常用指令',
+      title: 'AI 智慧代寫小工具工作室',
+      hint: '用自然語言描述需求，即時編寫單檔工具',
+      icon: <Sparkles size={16} className="text-purple-500" />,
+      perform: () => onOpenAIModal?.(),
+    },
     {
       id: 'action-add-tool',
       group: '常用指令',
@@ -147,7 +156,7 @@ export default function CommandPalette({
       icon: currentTheme === 'dark' ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} className="text-slate-400" />,
       perform: () => onSetTheme?.(currentTheme === 'dark' ? 'warm' : 'dark'),
     },
-  ], [onOpenAddTool, onTogglePresentation, onOpenCreateSpace, onExportSpace, onSetLayout, onSetTheme, currentTheme]);
+  ], [onOpenAIModal, onOpenAddTool, onTogglePresentation, onOpenCreateSpace, onExportSpace, onSetLayout, onSetTheme, currentTheme]);
 
   // 過濾與比對
   const filteredItems = useMemo(() => {

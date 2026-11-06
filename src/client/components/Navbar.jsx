@@ -23,6 +23,7 @@ import {
   ArrowLeft,
   Search,
   Tv,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -35,6 +36,7 @@ export default function Navbar({
   onOpenCreateModal,
   onOpenJoinModal,
   onAddToolClick,
+  onOpenAIModal,
   onOpenSettings,
   onOpenAccountSettings,
   onOpenQRCode,
@@ -333,6 +335,19 @@ export default function Navbar({
                 >
                   <Settings size={13} className="shrink-0" />
                   <span className="font-semibold hidden sm:inline">空間設定</span>
+                </button>
+              )}
+
+              {/* AI 智慧代寫小工具按鈕 */}
+              {!isGuest && isOwner && onOpenAIModal && (
+                <button
+                  type="button"
+                  onClick={onOpenAIModal}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-purple-600 hover:text-purple-700 bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800 font-semibold"
+                  title="使用 AI 自動生成獨立小工具代碼"
+                >
+                  <Sparkles size={14} className="shrink-0" />
+                  <span className="hidden sm:inline">AI 代寫</span>
                 </button>
               )}
 

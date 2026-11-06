@@ -4367,6 +4367,994 @@ export const TOOL_TEMPLATES = [
   </script>
 </body>
 </html>`
+  },
+  {
+    id: 'csv-analyst',
+    title: 'CSV 數據分析與多圖表試算表',
+    description: '支援 CSV 檔案上傳讀取、多欄位統計加總/平均/標準差、互動圖表繪製、即時搜尋與 CSV 匯出。',
+    category: '實用工具',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbf9f4;
+      color: #1f2a2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button, .file-label {
+      background: #ffffff;
+      border: 1px solid #e2ddd5;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #1f2a2e;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    button:hover, .file-label:hover {
+      background: #f4efe6;
+      border-color: #d1c8bb;
+    }
+    .btn-primary {
+      background: #e17b62;
+      color: #ffffff;
+      border-color: #e17b62;
+    }
+    .btn-primary:hover {
+      background: #cf664d;
+    }
+    input[type="file"] { display: none; }
+    .search-input {
+      border: 1px solid #e2ddd5;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      outline: none;
+      background: #ffffff;
+      width: 140px;
+    }
+    .stats-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .stat-pill {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+    }
+    .stat-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: #e17b62;
+      margin-bottom: 2px;
+    }
+    .stat-lbl {
+      font-size: 10px;
+      color: #89959b;
+      font-weight: 600;
+    }
+    .content-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      min-height: 0;
+    }
+    @media (min-width: 640px) {
+      .content-body {
+        grid-template-columns: 3fr 2fr;
+      }
+    }
+    .table-pane {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: left;
+    }
+    th, td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #eeebe5;
+      white-space: nowrap;
+    }
+    th {
+      background: #f7f4ed;
+      color: #636e72;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+    }
+    tr:hover td {
+      background: #fcfbf8;
+    }
+    .chart-pane {
+      background: #ffffff;
+      border: 1px solid #e4e8e5;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1f2a2e;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    canvas {
+      width: 100%;
+      flex: 1;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-actions">
+    <div class="btn-group">
+      <label class="file-label">
+        <span>讀取 CSV 檔案</span>
+        <input type="file" id="fileInput" accept=".csv,.txt" onchange="handleFileUpload(event)">
+      </label>
+      <button onclick="loadSampleData()">示範數據</button>
+      <button onclick="exportCSV()" class="btn-primary">匯出 CSV</button>
+    </div>
+    <div class="btn-group">
+      <input type="text" id="searchInput" placeholder="搜尋表格內容..." class="search-input" oninput="renderTable()">
+    </div>
+  </div>
+
+  <div class="stats-card-grid" id="statsGrid"></div>
+
+  <div class="content-body">
+    <div class="table-pane">
+      <table id="dataTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="chart-pane">
+      <div class="chart-header">
+        <span id="chartTitle">數據長條圖與趨勢分佈</span>
+        <select id="columnSelect" style="font-size: 10px; border-radius: 6px; padding: 2px 4px; border: 1px solid #e2ddd5;" onchange="updateChart()"></select>
+      </div>
+      <canvas id="dataCanvas"></canvas>
+    </div>
+  </div>
+
+  <script>
+    let headers = ['品項', '數量', '單價', '總金額'];
+    let rows = [
+      ['經典手帳筆記本', 12, 180, 2160],
+      ['復古黃銅尺標', 25, 95, 2375],
+      ['和紙彩色膠帶組', 40, 60, 2400],
+      ['極細防水代針筆', 50, 45, 2250],
+      ['黃銅萬用紙夾', 30, 70, 2100],
+      ['牛皮紙收納袋', 18, 120, 2160]
+    ];
+
+    function init() {
+      const saved = localStorage.getItem('notebook_csv_analyst_data');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.headers && parsed.rows) {
+            headers = parsed.headers;
+            rows = parsed.rows;
+          }
+        } catch(e) {}
+      }
+      populateColumnSelect();
+      renderAll();
+    }
+
+    function saveState() {
+      localStorage.setItem('notebook_csv_analyst_data', JSON.stringify({ headers, rows }));
+    }
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        parseCSVText(evt.target.result);
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCSVText(text) {
+      const lines = text.trim().split(/\\r?\\n/).filter(l => l.trim().length > 0);
+      if (lines.length < 2) return;
+      headers = lines[0].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+      rows = lines.slice(1).map(line => {
+        return line.split(',').map(s => {
+          const v = s.trim().replace(/^"|"$/g, '');
+          return !isNaN(v) && v !== '' ? parseFloat(v) : v;
+        });
+      });
+      populateColumnSelect();
+      saveState();
+      renderAll();
+    }
+
+    function loadSampleData() {
+      headers = ['姓名', '數學', '英文', '程式設計', '總分'];
+      rows = [
+        ['小明', 85, 78, 92, 255],
+        ['小華', 92, 95, 88, 275],
+        ['小美', 76, 82, 85, 243],
+        ['大強', 64, 70, 95, 229],
+        ['志豪', 90, 88, 96, 274],
+        ['雅婷', 88, 94, 91, 273]
+      ];
+      populateColumnSelect();
+      saveState();
+      renderAll();
+    }
+
+    function populateColumnSelect() {
+      const sel = document.getElementById('columnSelect');
+      sel.innerHTML = '';
+      headers.forEach((h, idx) => {
+        const isNum = rows.some(r => typeof r[idx] === 'number');
+        if (isNum) {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = h;
+          sel.appendChild(opt);
+        }
+      });
+    }
+
+    function renderAll() {
+      renderStats();
+      renderTable();
+      updateChart();
+    }
+
+    function renderStats() {
+      const grid = document.getElementById('statsGrid');
+      grid.innerHTML = '';
+
+      const countPill = document.createElement('div');
+      countPill.className = 'stat-pill';
+      countPill.innerHTML = '<div class="stat-val">' + rows.length + '</div><div class="stat-lbl">總筆數</div>';
+      grid.appendChild(countPill);
+
+      const selIdx = parseInt(document.getElementById('columnSelect').value) || 1;
+      const numVals = rows.map(r => r[selIdx]).filter(v => typeof v === 'number');
+
+      if (numVals.length > 0) {
+        const sum = numVals.reduce((a, b) => a + b, 0);
+        const avg = sum / numVals.length;
+        const max = Math.max(...numVals);
+        const min = Math.min(...numVals);
+
+        const sumPill = document.createElement('div');
+        sumPill.className = 'stat-pill';
+        sumPill.innerHTML = '<div class="stat-val">' + sum.toLocaleString() + '</div><div class="stat-lbl">' + headers[selIdx] + ' 總和</div>';
+        grid.appendChild(sumPill);
+
+        const avgPill = document.createElement('div');
+        avgPill.className = 'stat-pill';
+        avgPill.innerHTML = '<div class="stat-val">' + avg.toFixed(1) + '</div><div class="stat-lbl">' + headers[selIdx] + ' 平均</div>';
+        grid.appendChild(avgPill);
+
+        const maxPill = document.createElement('div');
+        maxPill.className = 'stat-pill';
+        maxPill.innerHTML = '<div class="stat-val">' + max + ' / ' + min + '</div><div class="stat-lbl">最大值 / 最小值</div>';
+        grid.appendChild(maxPill);
+      }
+    }
+
+    function renderTable() {
+      const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const thead = document.getElementById('tableHead');
+      const tbody = document.getElementById('tableBody');
+
+      thead.innerHTML = '<tr>' + headers.map(h => '<th>' + h + '</th>').join('') + '</tr>';
+
+      const filtered = rows.filter(r => {
+        if (!query) return true;
+        return r.some(cell => String(cell).toLowerCase().includes(query));
+      });
+
+      tbody.innerHTML = filtered.map(r => {
+        return '<tr>' + r.map(c => '<td>' + (typeof c === 'number' ? c.toLocaleString() : c) + '</td>').join('') + '</tr>';
+      }).join('');
+    }
+
+    function updateChart() {
+      const canvas = document.getElementById('dataCanvas');
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * 2 || 600;
+      canvas.height = rect.height * 2 || 400;
+
+      const selIdx = parseInt(document.getElementById('columnSelect').value) || 1;
+      const labels = rows.map(r => String(r[0]));
+      const values = rows.map(r => typeof r[selIdx] === 'number' ? r[selIdx] : 0);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (values.length === 0) return;
+
+      const maxVal = Math.max(...values, 10);
+      const padLeft = 60;
+      const padBottom = 60;
+      const padTop = 30;
+      const padRight = 30;
+
+      const chartW = canvas.width - padLeft - padRight;
+      const chartH = canvas.height - padTop - padBottom;
+      const barW = Math.max(16, (chartW / values.length) * 0.65);
+      const gap = chartW / values.length;
+
+      // 繪製 Y 軸格線
+      ctx.strokeStyle = '#e4e8e5';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padTop + (chartH / 4) * i;
+        const val = Math.round(maxVal - (maxVal / 4) * i);
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(canvas.width - padRight, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#89959b';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(val, padLeft - 10, y + 6);
+      }
+
+      // 繪製長條
+      values.forEach((v, idx) => {
+        const x = padLeft + gap * idx + (gap - barW) / 2;
+        const h = (v / maxVal) * chartH;
+        const y = padTop + chartH - h;
+
+        ctx.fillStyle = '#e17b62';
+        ctx.beginPath();
+        ctx.roundRect(x, y, barW, h, [6, 6, 0, 0]);
+        ctx.fill();
+
+        ctx.fillStyle = '#1f2a2e';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(v, x + barW / 2, y - 8);
+
+        // X 軸標籤
+        ctx.fillStyle = '#4a534e';
+        ctx.font = '18px sans-serif';
+        const label = labels[idx].length > 6 ? labels[idx].slice(0, 5) + '..' : labels[idx];
+        ctx.fillText(label, x + barW / 2, canvas.height - padBottom + 26);
+      });
+    }
+
+    function exportCSV() {
+      let csvContent = 'data:text/csv;charset=utf-8,\uFEFF';
+      csvContent += headers.join(',') + '\\r\\n';
+      rows.forEach(r => {
+        csvContent += r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',') + '\\r\\n';
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'data_export.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    window.addEventListener('resize', updateChart);
+    init();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'drawing-canvas-pro',
+    title: '手帳現代畫布白板 (Excalidraw風格)',
+    description: '支援幾何圖形、箭頭連接線、筆刷手繪、便利貼文字、還原重做、畫布記憶與 PNG 匯出。',
+    category: '靈感與創意',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #faf8f5;
+      display: flex;
+      flex-direction: column;
+    }
+    .top-toolbar {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border: 1px solid #e2ddd5;
+      padding: 5px 12px;
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 20;
+    }
+    .tool-btn {
+      background: transparent;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #555e63;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .tool-btn:hover {
+      background: #f4efe6;
+      color: #1f2a2e;
+    }
+    .tool-btn.active {
+      background: #e17b62;
+      color: #ffffff;
+    }
+    .divider {
+      width: 1px;
+      height: 18px;
+      background: #e2ddd5;
+      margin: 0 2px;
+    }
+    .color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 1px #d1c8bb;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .color-dot.active {
+      transform: scale(1.25);
+      box-shadow: 0 0 0 2px #e17b62;
+    }
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-toolbar">
+    <button class="tool-btn active" id="tool-pen" onclick="setTool('pen')">畫筆</button>
+    <button class="tool-btn" id="tool-line" onclick="setTool('line')">直線</button>
+    <button class="tool-btn" id="tool-arrow" onclick="setTool('arrow')">箭頭</button>
+    <button class="tool-btn" id="tool-rect" onclick="setTool('rect')">矩形</button>
+    <button class="tool-btn" id="tool-circle" onclick="setTool('circle')">圓形</button>
+    <button class="tool-btn" id="tool-text" onclick="setTool('text')">便利貼文字</button>
+    <button class="tool-btn" id="tool-eraser" onclick="setTool('eraser')">橡皮擦</button>
+
+    <div class="divider"></div>
+
+    <div style="display: flex; gap: 5px; align-items: center;">
+      <div class="color-dot active" style="background: #1f2a2e;" onclick="setColor('#1f2a2e', this)"></div>
+      <div class="color-dot" style="background: #e17b62;" onclick="setColor('#e17b62', this)"></div>
+      <div class="color-dot" style="background: #3b827e;" onclick="setColor('#3b827e', this)"></div>
+      <div class="color-dot" style="background: #3b82f6;" onclick="setColor('#3b82f6', this)"></div>
+      <div class="color-dot" style="background: #d97706;" onclick="setColor('#d97706', this)"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="tool-btn" onclick="undo()">復原</button>
+    <button class="tool-btn" onclick="clearCanvas()">清除</button>
+    <button class="tool-btn" style="color: #e17b62;" onclick="exportPNG()">匯出 PNG</button>
+  </div>
+
+  <canvas id="paintCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('paintCanvas');
+    const ctx = canvas.getContext('2d');
+    let currentTool = 'pen';
+    let currentColor = '#1f2a2e';
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let history = [];
+    let currentPath = [];
+
+    function resize() {
+      const saved = canvas.toDataURL();
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0); };
+      img.src = saved;
+    }
+
+    function init() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      ctx.fillStyle = '#faf8f5';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const saved = localStorage.getItem('notebook_drawing_board_data');
+      if (saved) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0);
+          saveState();
+        };
+        img.src = saved;
+      } else {
+        saveState();
+      }
+
+      canvas.addEventListener('mousedown', onMouseDown);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('resize', resize);
+    }
+
+    function setTool(t) {
+      currentTool = t;
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('tool-' + t);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    function setColor(c, el) {
+      currentColor = c;
+      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function saveState() {
+      if (history.length > 20) history.shift();
+      history.push(canvas.toDataURL());
+      localStorage.setItem('notebook_drawing_board_data', canvas.toDataURL());
+    }
+
+    function undo() {
+      if (history.length > 1) {
+        history.pop();
+        const prev = history[history.length - 1];
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          localStorage.setItem('notebook_drawing_board_data', prev);
+        };
+        img.src = prev;
+      }
+    }
+
+    function clearCanvas() {
+      if (confirm('確定要清除整張畫布嗎？')) {
+        ctx.fillStyle = '#faf8f5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        saveState();
+      }
+    }
+
+    function exportPNG() {
+      const link = document.createElement('a');
+      link.download = '手帳白板_' + new Date().toISOString().slice(0,10) + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function onMouseDown(e) {
+      isDrawing = true;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      if (currentTool === 'pen' || currentTool === 'eraser') {
+        currentPath = [{ x: startX, y: startY }];
+      } else if (currentTool === 'text') {
+        const text = prompt('請輸入要放在此處的文字：');
+        if (text) {
+          ctx.font = 'bold 16px sans-serif';
+          ctx.fillStyle = currentColor;
+          ctx.fillText(text, startX, startY);
+          saveState();
+        }
+        isDrawing = false;
+      }
+    }
+
+    function onMouseMove(e) {
+      if (!isDrawing) return;
+      const x = e.clientX;
+      const y = e.clientY;
+
+      if (currentTool === 'pen') {
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        const last = currentPath[currentPath.length - 1];
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        currentPath.push({ x, y });
+      } else if (currentTool === 'eraser') {
+        ctx.strokeStyle = '#faf8f5';
+        ctx.lineWidth = 20;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        const last = currentPath[currentPath.length - 1];
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        currentPath.push({ x, y });
+      }
+    }
+
+    function onMouseUp(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+      const endX = e.clientX;
+      const endY = e.clientY;
+
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = 2.5;
+
+      if (currentTool === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        saveState();
+      } else if (currentTool === 'arrow') {
+        drawArrow(startX, startY, endX, endY);
+        saveState();
+      } else if (currentTool === 'rect') {
+        ctx.beginPath();
+        ctx.roundRect(startX, startY, endX - startX, endY - startY, 6);
+        ctx.stroke();
+        saveState();
+      } else if (currentTool === 'circle') {
+        ctx.beginPath();
+        const rX = Math.abs(endX - startX) / 2;
+        const rY = Math.abs(endY - startY) / 2;
+        ctx.ellipse(startX + (endX - startX) / 2, startY + (endY - startY) / 2, rX, rY, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        saveState();
+      } else if (currentTool === 'pen' || currentTool === 'eraser') {
+        saveState();
+      }
+    }
+
+    function drawArrow(fromx, fromy, tox, toy) {
+      const headlen = 12;
+      const dx = tox - fromx;
+      const dy = toy - fromy;
+      const angle = Math.atan2(dy, dx);
+      ctx.beginPath();
+      ctx.moveTo(fromx, fromy);
+      ctx.lineTo(tox, toy);
+      ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.moveTo(tox, toy);
+      ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.stroke();
+    }
+
+    init();
+  </script>
+</body>
+</html>`
+  },
+  {
+    id: 'academic-notes',
+    title: 'Markdown 與 LaTeX 專業學術雙欄筆記器',
+    description: '支援 Markdown 語法即時解析、LaTeX 數學公式排版、本機檔案開啟讀取、HTML/MD 匯出與字數統計。',
+    category: '效能與專注',
+    defaultColSpan: 2,
+    content: `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: #fbf9f4;
+      color: #1f2a2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button, .file-label {
+      background: #ffffff;
+      border: 1px solid #e2ddd5;
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #1f2a2e;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    button:hover, .file-label:hover {
+      background: #f4efe6;
+    }
+    .meta-tag {
+      font-size: 11px;
+      color: #89959b;
+      font-weight: 500;
+    }
+    .panes-wrapper {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      min-height: 0;
+    }
+    @media (min-width: 640px) {
+      .panes-wrapper {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .editor-pane, .preview-pane {
+      background: #ffffff;
+      border: 1px solid #e2ddd5;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    }
+    .pane-header {
+      padding: 6px 12px;
+      background: #f7f4ed;
+      border-bottom: 1px solid #e2ddd5;
+      font-size: 11px;
+      font-weight: 700;
+      color: #636e72;
+      display: flex;
+      justify-content: space-between;
+    }
+    textarea {
+      flex: 1;
+      border: none;
+      padding: 12px;
+      font-family: Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      outline: none;
+      resize: none;
+      color: #1f2a2e;
+    }
+    .preview-body {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #2d3748;
+    }
+    .preview-body h1 { font-size: 18px; margin: 0 0 10px; border-bottom: 1px solid #e2ddd5; padding-bottom: 4px; color: #1f2a2e; }
+    .preview-body h2 { font-size: 15px; margin: 12px 0 8px; color: #1f2a2e; }
+    .preview-body p { margin: 6px 0; }
+    .preview-body code { background: #f0ece3; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+    .preview-body pre { background: #2d3748; color: #edf2f7; padding: 10px; border-radius: 8px; overflow-x: auto; }
+    .preview-body blockquote { border-left: 3px solid #e17b62; margin: 8px 0; padding-left: 10px; color: #718096; }
+    .math-block {
+      background: #fdfaf6;
+      border: 1px dashed #e17b62;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin: 8px 0;
+      font-family: Georgia, serif;
+      font-style: italic;
+      color: #b84c33;
+      text-align: center;
+      font-size: 14px;
+    }
+    .math-inline {
+      background: #fdfaf6;
+      border-bottom: 1px dotted #e17b62;
+      padding: 0 3px;
+      font-family: Georgia, serif;
+      font-style: italic;
+      color: #b84c33;
+    }
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="btn-group">
+      <label class="file-label">
+        <span>開啟 .md 檔案</span>
+        <input type="file" accept=".md,.txt" onchange="loadFile(event)">
+      </label>
+      <button onclick="exportMarkdown()">匯出 Markdown</button>
+      <button onclick="exportHTML()">匯出 HTML</button>
+    </div>
+    <div class="meta-tag">
+      <span id="charCount">0 字元</span> / <span id="wordCount">0 詞</span>
+    </div>
+  </div>
+
+  <div class="panes-wrapper">
+    <div class="editor-pane">
+      <div class="pane-header">Markdown / LaTeX 輸入區</div>
+      <textarea id="editor" oninput="render()"></textarea>
+    </div>
+    <div class="preview-pane">
+      <div class="pane-header">學術筆記渲染視圖</div>
+      <div class="preview-body" id="preview"></div>
+    </div>
+  </div>
+
+  <script>
+    const defaultContent = '# 機器學習與最佳化導論\\n\\n在凸最佳化問題中，目標函數 $f(x)$ 滿足二次收斂性。\\n\\n## 1. 均方誤差 (MSE) 公式\\n\\n$$MSE = \\\\frac{1}{n} \\\\sum_{i=1}^{n} (y_i - \\\\hat{y}_i)^2$$\\n\\n## 2. 歐拉恆等式\\n\\n自然科學中最美麗的恆等式之一：\\n\\n$$e^{i\\\\pi} + 1 = 0$$\\n\\n- **學習目標**：掌握梯度下降與 Hessian 矩陣性質\\n- **重點筆記**：學習率 $\\\\alpha$ 過大將導致震盪不收斂\\n\\n> 筆記會自動即時儲存於本機瀏覽器，重新整理不遺失。';
+
+    function init() {
+      const saved = localStorage.getItem('notebook_academic_notes');
+      const text = saved !== null ? saved : defaultContent;
+      document.getElementById('editor').value = text;
+      render();
+    }
+
+    function render() {
+      const raw = document.getElementById('editor').value;
+      localStorage.setItem('notebook_academic_notes', raw);
+
+      document.getElementById('charCount').textContent = raw.length + ' 字元';
+      const words = raw.trim() ? raw.trim().split(/\\\\s+/).length : 0;
+      document.getElementById('wordCount').textContent = words + ' 詞';
+
+      let html = raw;
+      html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      // 區塊數學公式 $$ ... $$
+      html = html.replace(/\\\\$\\$([\\\\s\\\\S]*?)\\\\$\\$/g, function(match, formula) {
+        return '<div class="math-block">' + formula.trim() + '</div>';
+      });
+
+      // 行內數學公式 $ ... $
+      html = html.replace(/\\\\$([^\\\\$\\n]+?)\\\\$/g, function(match, formula) {
+        return '<span class="math-inline">' + formula.trim() + '</span>';
+      });
+
+      // 標題
+      html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+      html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+
+      // 粗體與斜體
+      html = html.replace(/\\\\*\\\\*(.*?)\\\\*\\\\*/g, '<strong>$1</strong>');
+      html = html.replace(/\\\\*(.*?)\\\\*/g, '<em>$1</em>');
+
+      // 引用
+      html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+
+      // 清單
+      html = html.replace(/^\\\\- (.*$)/gim, '<li>$1</li>');
+
+      // 段落換行
+      html = html.replace(/\\n\\n/g, '</p><p>');
+      html = '<p>' + html + '</p>';
+      html = html.replace(/<p><\\/p>/g, '');
+
+      document.getElementById('preview').innerHTML = html;
+    }
+
+    function loadFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = function(evt) {
+        document.getElementById('editor').value = evt.target.result;
+        render();
+      };
+      r.readAsText(file);
+    }
+
+    function exportMarkdown() {
+      const text = document.getElementById('editor').value;
+      const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+      downloadBlob(blob, '學術筆記.md');
+    }
+
+    function exportHTML() {
+      const content = document.getElementById('preview').innerHTML;
+      const fullHtml = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>學術筆記匯出</title><style>body{font-family:sans-serif;padding:30px;max-width:800px;margin:auto;line-height:1.7;}.math-block{border:1px dashed #e17b62;padding:10px;margin:10px 0;font-style:italic;}</style></head><body>' + content + '</body></html>';
+      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+      downloadBlob(blob, '學術筆記.html');
+    }
+
+    function downloadBlob(blob, name) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    init();
+  </script>
+</body>
+</html>`
   }
 ];
 
