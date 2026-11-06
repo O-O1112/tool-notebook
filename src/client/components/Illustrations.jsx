@@ -399,13 +399,13 @@ export function SearchEmptyIllustration({ className = 'w-72 h-44' }) {
 
 /**
  * 底部手繪全景天際線 (PanoramicSkyline)
- * 精緻宏偉的手繪手帳漫遊天際線：
- * 包含遊樂摩天輪、巴伐利亞半木小木屋、三孔羅馬石橋與運河貢多拉、巨型翻開手帳之山與鋼筆紀念碑、
- * 玻璃花房植物溫室、宏偉哥德式大笨鐘鐘樓、古典石柱圖書館、熱氣球、凱旋門、法式鑄鐵街燈、
- * 鉛筆與鋼筆筆尖建築群、荷蘭風車與水車、天文台望遠鏡、星空新月與北斗七星、海崖紅白螺旋燈塔、
- * 雙桅帆船、海港木棧橋、海鳥與連綿松林海角。
+ * 高密度連綿手繪漫遊景觀：
+ * 包含連綿起伏丘陵、背景高聳山脈、繁茂樹叢與松林、遊樂摩天輪、鄉村尖頂小屋、
+ * 緊湊密集的現代都市高樓群（排屋、垂直百葉塔樓、波浪立面大廈、帝國尖塔、斜頂商辦）、
+ * 丘陵上的石造燈塔、橫跨水岸的鋼索吊橋、水濱香蒲蘆葦、山頂炊煙小屋與放牧羊群、
+ * 第二座跨湖吊橋、海角崖頂燈塔以及全幅貫穿的起伏水岸波紋。
  */
-export function PanoramicSkyline({ className = 'w-full h-28 sm:h-36 md:h-48 lg:h-56 opacity-45 dark:opacity-30 pointer-events-none' }) {
+export function PanoramicSkyline({ className = 'w-full h-28 sm:h-36 md:h-48 lg:h-56 opacity-60 dark:opacity-45 pointer-events-none' }) {
   return (
     <svg
       viewBox="0 0 1600 152"
@@ -417,405 +417,544 @@ export function PanoramicSkyline({ className = 'w-full h-28 sm:h-36 md:h-48 lg:h
       className={className}
       preserveAspectRatio="xMidYBottom meet"
     >
-      {/* 貫穿全景的大地與河岸基線 */}
-      <line x1="0" y1="136" x2="1600" y2="136" strokeWidth="1.5" />
-      {/* 河水與海港微波波紋 */}
-      <path d="M 190 142 Q 220 145 250 142" strokeWidth="0.8" opacity="0.6" />
-      <path d="M 270 146 Q 300 149 330 146" strokeWidth="0.8" opacity="0.5" />
-      <path d="M 720 142 Q 750 145 780 142" strokeWidth="0.8" opacity="0.6" />
-      <path d="M 740 148 Q 770 151 800 148" strokeWidth="0.8" opacity="0.5" />
-      <path d="M 1080 144 Q 1110 147 1140 144" strokeWidth="0.8" opacity="0.6" />
-      <path d="M 1260 142 Q 1300 146 1340 142" strokeWidth="0.8" opacity="0.6" />
-      <path d="M 1320 148 Q 1360 152 1400 148" strokeWidth="0.8" opacity="0.5" />
-      <path d="M 1430 144 Q 1470 148 1510 144" strokeWidth="0.8" opacity="0.6" />
-      <path d="M 1490 150 Q 1530 154 1570 150" strokeWidth="0.8" opacity="0.5" />
+      {/* ============================================================ */}
+      {/* 1. 第一層：遠景崇山峻嶺與天際線輪廓 (Background Mountains)   */}
+      {/* ============================================================ */}
+      <g opacity="0.6">
+        {/* 左側遠山 1 (x: 40 - 180) */}
+        <path d="M 40 138 L 105 38 L 175 138" strokeWidth="1.3" />
+        <path d="M 105 38 L 115 115" strokeWidth="1" />
+        {/* 山體右側斜向陰影排線 */}
+        <line x1="108" y1="52" x2="124" y2="60" strokeWidth="0.8" />
+        <line x1="110" y1="64" x2="136" y2="76" strokeWidth="0.8" />
+        <line x1="112" y1="76" x2="148" y2="92" strokeWidth="0.8" />
+        <line x1="114" y1="88" x2="158" y2="108" strokeWidth="0.8" />
 
-      {/* 1. 左側：豪華浪漫遊樂摩天輪 (Ferris Wheel) */}
-      <g>
-        {/* 雙重轉輪外圈與桁架刻度 */}
-        <circle cx="95" cy="72" r="42" strokeWidth="1.5" />
-        <circle cx="95" cy="72" r="38" strokeDasharray="3 2" opacity="0.75" />
-        <circle cx="95" cy="72" r="8" fill="var(--card-bg,#1c222b)" strokeWidth="1.5" />
-        <circle cx="95" cy="72" r="3" fill="currentColor" />
+        {/* 左側遠山 2 (x: 150 - 245) */}
+        <path d="M 150 138 L 188 56 L 245 138" strokeWidth="1.2" />
+        <path d="M 188 56 L 196 118" strokeWidth="0.9" />
+        <line x1="190" y1="70" x2="208" y2="80" strokeWidth="0.8" />
+        <line x1="192" y1="84" x2="220" y2="98" strokeWidth="0.8" />
 
-        {/* 12 組輻條輪輻與交叉支撐 */}
-        <line x1="95" y1="30" x2="95" y2="114" />
-        <line x1="53" y1="72" x2="137" y2="72" />
-        <line x1="65" y1="42" x2="125" y2="102" />
-        <line x1="65" y1="102" x2="125" y2="42" />
-        <line x1="78" y1="34" x2="112" y2="110" opacity="0.7" />
-        <line x1="112" y1="34" x2="78" y2="110" opacity="0.7" />
-        <line x1="57" y1="89" x2="133" y2="55" opacity="0.7" />
-        <line x1="57" y1="55" x2="133" y2="89" opacity="0.7" />
+        {/* 都市後方遠山 3 (x: 550 - 660) */}
+        <path d="M 550 138 L 605 44 L 665 138" strokeWidth="1.3" />
+        <path d="M 605 44 L 612 115" strokeWidth="1" />
+        <line x1="607" y1="58" x2="624" y2="68" strokeWidth="0.8" />
+        <line x1="609" y1="72" x2="636" y2="86" strokeWidth="0.8" />
+        <line x1="611" y1="86" x2="648" y2="104" strokeWidth="0.8" />
 
-        {/* 輪輻交叉斜撐 (Cross Bracing) */}
-        <circle cx="95" cy="72" r="24" strokeDasharray="2 2" opacity="0.5" />
+        {/* 燈塔 1 後方遠山 4 (x: 645 - 755) */}
+        <path d="M 645 138 L 695 56 L 755 138" strokeWidth="1.2" />
+        <path d="M 695 56 L 702 120" strokeWidth="0.9" />
+        <line x1="697" y1="72" x2="716" y2="82" strokeWidth="0.8" />
+        <line x1="699" y1="88" x2="730" y2="102" strokeWidth="0.8" />
 
-        {/* 12 座懸掛式景觀車廂 (Gondola Cars) */}
-        <rect x="91" y="24" width="8" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="91" y="113" width="8" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="47" y="68" width="7" height="8" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="136" y="68" width="7" height="8" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="62" y="38" width="8" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="120" y="38" width="8" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="62" y="99" width="8" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="120" y="99" width="8" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="74" y="29" width="7" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="109" y="29" width="7" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="52" y="85" width="7" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
-        <rect x="131" y="85" width="7" height="7" rx="2" fill="var(--card-bg,#1c222b)" />
+        {/* 吊橋後方綿延山脈 (x: 920 - 1080) */}
+        <path d="M 920 138 L 975 75 L 1025 105 L 1080 138" strokeWidth="1.1" />
 
-        {/* 摩天輪重型 A 字支架 */}
-        <line x1="95" y1="72" x2="68" y2="136" strokeWidth="2" />
-        <line x1="95" y1="72" x2="122" y2="136" strokeWidth="2" />
-        <line x1="78" y1="114" x2="112" y2="114" strokeWidth="1.2" />
-        <line x1="72" y1="128" x2="118" y2="128" strokeWidth="1" />
+        {/* 右側雄偉阿爾卑斯雙峰 (x: 1180 - 1340) */}
+        <path d="M 1180 138 L 1228 34 L 1262 76 L 1295 44 L 1345 138" strokeWidth="1.4" />
+        <path d="M 1228 34 L 1238 112" strokeWidth="1" />
+        <line x1="1231" y1="48" x2="1248" y2="58" strokeWidth="0.8" />
+        <line x1="1233" y1="62" x2="1256" y2="74" strokeWidth="0.8" />
+        <path d="M 1295 44 L 1302 110" strokeWidth="1" />
+        <line x1="1297" y1="58" x2="1318" y2="70" strokeWidth="0.8" />
+        <line x1="1299" y1="74" x2="1330" y2="92" strokeWidth="0.8" />
 
-        {/* 乘車木棧道與波浪遮陽棚 */}
-        <rect x="62" y="128" width="66" height="8" rx="1" fill="var(--card-bg,#1c222b)" />
-        <path d="M 62 128 Q 67 124 72 128 Q 77 124 82 128 Q 87 124 92 128 Q 97 124 102 128 Q 107 124 112 128 Q 117 124 122 128 Q 127 124 128 128" stroke="#f59e0b" />
+        {/* 右側海岸山脈 (x: 1530 - 1600) */}
+        <path d="M 1530 138 L 1572 48 L 1600 95" strokeWidth="1.3" />
+        <path d="M 1572 48 L 1578 112" strokeWidth="0.9" />
+        <line x1="1574" y1="62" x2="1590" y2="72" strokeWidth="0.8" />
       </g>
 
-      {/* 2. 巴伐利亞歐風半木造雙層小木屋聚落 (x: 150 - 225) */}
-      <g>
-        {/* 左側斜頂小木屋 */}
-        <path d="M 148 136 L 148 95 L 164 78 L 180 95 L 180 136" fill="var(--card-bg,#1c222b)" />
-        <path d="M 148 95 L 180 95" />
-        {/* 屋頂瓦片與煙囪 */}
-        <line x1="164" y1="78" x2="164" y2="88" />
-        <rect x="170" y="72" width="5" height="12" />
-        <path d="M 172 70 Q 170 62 176 56 Q 182 50 178 44" stroke="#89959b" strokeDasharray="2 2" />
-        {/* 木造外露 X 形木桁架 */}
-        <line x1="151" y1="98" x2="177" y2="116" stroke="#e17b62" opacity="0.6" />
-        <line x1="177" y1="98" x2="151" y2="116" stroke="#e17b62" opacity="0.6" />
-        <rect x="156" y="102" width="16" height="12" rx="1" fill="var(--card-bg,#1c222b)" />
-        <line x1="164" y1="102" x2="164" y2="114" />
-        <line x1="156" y1="108" x2="172" y2="108" />
-        {/* 窗台花架 */}
-        <rect x="154" y="114" width="20" height="3" rx="1" fill="#3b827e" fillOpacity="0.3" stroke="#3b827e" />
-
-        {/* 右側雙坡屋頂高宅 */}
-        <path d="M 182 136 L 182 72 L 202 52 L 222 72 L 222 136" fill="var(--card-bg,#1c222b)" />
-        <path d="M 178 74 L 202 50 L 226 74" strokeWidth="1.5" />
-        <circle cx="202" cy="64" r="4" />
-        <line x1="202" y1="60" x2="202" y2="68" />
-        <line x1="198" y1="64" x2="206" y2="64" />
-        <rect x="190" y="80" width="8" height="11" rx="1" />
-        <rect x="206" y="80" width="8" height="11" rx="1" />
-        <rect x="190" y="104" width="8" height="11" rx="1" />
-        <rect x="206" y="104" width="8" height="11" rx="1" />
-        <rect x="196" y="122" width="12" height="14" rx="1" />
+      {/* 天空點綴：自由翱翔的海鳥群 */}
+      <g strokeWidth="1" opacity="0.55">
+        <path d="M 72 26 Q 76 22 80 26 Q 84 22 88 26" />
+        <path d="M 88 18 Q 91 15 95 18 Q 98 15 102 18" />
+        <path d="M 845 22 Q 849 18 853 22 Q 857 18 861 22" />
+        <path d="M 860 14 Q 863 11 867 14 Q 870 11 874 14" />
+        <path d="M 1370 20 Q 1374 16 1378 20 Q 1382 16 1386 20" />
       </g>
 
-      {/* 3. 羅馬三孔拱門大石橋與運河行舟 (x: 230 - 365) */}
-      <g>
-        {/* 橋墩與 3 個半圓拱門 */}
-        <path d="M 230 114 L 365 114" strokeWidth="1.8" />
-        <path d="M 230 118 L 365 118" />
-        {/* 3 個橋拱 */}
-        <path d="M 238 136 Q 260 92 282 136" />
-        <path d="M 282 136 Q 304 92 326 136" />
-        <path d="M 326 136 Q 348 92 370 136" />
-        {/* 橋拱中央拱心石 (Keystone) */}
-        <rect x="258" y="93" width="4" height="6" fill="currentColor" opacity="0.5" />
-        <rect x="302" y="93" width="4" height="6" fill="currentColor" opacity="0.5" />
-        <rect x="346" y="93" width="4" height="6" fill="currentColor" opacity="0.5" />
-        {/* 石質護欄直條 */}
-        <line x1="235" y1="108" x2="365" y2="108" strokeWidth="1" />
-        <line x1="245" y1="108" x2="245" y2="114" />
-        <line x1="260" y1="108" x2="260" y2="114" />
-        <line x1="275" y1="108" x2="275" y2="114" />
-        <line x1="290" y1="108" x2="290" y2="114" />
-        <line x1="305" y1="108" x2="305" y2="114" />
-        <line x1="320" y1="108" x2="320" y2="114" />
-        <line x1="335" y1="108" x2="335" y2="114" />
-        <line x1="350" y1="108" x2="350" y2="114" />
-        {/* 橋上鑄鐵路燈 */}
-        <path d="M 270 108 L 270 94 Q 272 90 276 94" />
-        <circle cx="276" cy="94" r="2" fill="#fbbf24" stroke="#fbbf24" />
-        <path d="M 330 108 L 330 94 Q 332 90 336 94" />
-        <circle cx="336" cy="94" r="2" fill="#fbbf24" stroke="#fbbf24" />
-        {/* 運河穿梭的小型貢多拉 / 划槳小舟 */}
-        <path d="M 292 136 Q 302 143 316 136 Z" fill="var(--card-bg,#1c222b)" />
-        <line x1="304" y1="126" x2="304" y2="136" strokeWidth="1.2" />
-        <circle cx="304" cy="124" r="1.8" fill="currentColor" />
-        <line x1="303" y1="129" x2="312" y2="138" />
+      {/* ============================================================ */}
+      {/* 2. 第二層：中景連綿起伏丘陵 (Midground Rolling Hills)         */}
+      {/* ============================================================ */}
+      {/* 丘陵採用 fill="var(--paper)" 確保遮蔽背後遠山，營造純粹層次感 */}
+      <g fill="var(--paper,#fbfbf9)">
+        {/* 左側丘陵 */}
+        <path d="M -10 138 Q 45 102 105 118 Q 155 130 195 138 Z" strokeWidth="1.3" />
+        {/* 摩天輪右側過渡丘陵 */}
+        <path d="M 215 138 Q 265 110 325 124 Q 355 132 385 138 Z" strokeWidth="1.3" />
+        {/* 都市右側過渡斜坡 */}
+        <path d="M 535 138 Q 585 112 645 125 Q 695 134 735 138 Z" strokeWidth="1.3" />
+        {/* 燈塔 1 圓頂大丘陵 */}
+        <path d="M 715 138 Q 782 82 852 112 Q 885 128 915 138 Z" strokeWidth="1.4" />
+        {/* 鄉村小屋坐落之寬闊起伏山丘 */}
+        <path d="M 1065 138 Q 1135 84 1205 108 Q 1245 125 1275 138 Z" strokeWidth="1.4" />
+        {/* 右側燈塔 2 海岬起伏丘陵 */}
+        <path d="M 1465 138 Q 1530 82 1585 114 Q 1600 124 1610 138 Z" strokeWidth="1.4" />
       </g>
 
-      {/* 4. 巨型展開手帳之山與鋼筆紀念碑 (x: 375 - 475) */}
-      <g>
-        {/* 展開之精裝手帳地貌 */}
-        <path d="M 375 136 Q 390 86 422 66 L 426 136" fill="var(--paper,#f5f7f6)" stroke="currentColor" />
-        <path d="M 422 66 Q 454 86 475 136" fill="var(--paper,#f5f7f6)" stroke="currentColor" />
-        {/* 手帳頁面方格與線條暗示 */}
-        <line x1="388" y1="98" x2="416" y2="86" stroke="#89959b" strokeDasharray="2 2" strokeWidth="0.8" />
-        <line x1="392" y1="108" x2="418" y2="96" stroke="#89959b" strokeDasharray="2 2" strokeWidth="0.8" />
-        <line x1="396" y1="118" x2="420" y2="106" stroke="#89959b" strokeDasharray="2 2" strokeWidth="0.8" />
-        <line x1="432" y1="86" x2="460" y2="98" stroke="#89959b" strokeDasharray="2 2" strokeWidth="0.8" />
-        <line x1="430" y1="96" x2="456" y2="108" stroke="#89959b" strokeDasharray="2 2" strokeWidth="0.8" />
-        <line x1="428" y1="106" x2="452" y2="118" stroke="#89959b" strokeDasharray="2 2" strokeWidth="0.8" />
-        {/* 垂掛飄揚的珊瑚色緞帶書籤 */}
-        <path d="M 422 66 Q 418 96 427 118 L 423 124 L 432 124 Q 425 96 422 66 Z" fill="#e17b62" stroke="#e17b62" />
-        {/* 山巔上的金色鋼筆筆尖地標紀念碑 */}
-        <path d="M 418 66 L 422 42 L 426 66 Z" fill="#fbbf24" fillOpacity="0.4" stroke="#fbbf24" strokeWidth="1.4" />
-        <circle cx="422" cy="54" r="1.2" fill="#fbbf24" />
-        <line x1="422" y1="42" x2="422" y2="54" stroke="#fbbf24" />
-        {/* 山麓圍繞的長青松樹與針葉林 */}
-        <path d="M 374 136 L 374 118 M 369 130 L 374 122 L 379 130" stroke="#3b827e" />
-        <path d="M 470 136 L 470 116 M 465 128 L 470 120 L 475 128" stroke="#3b827e" />
+      {/* ============================================================ */}
+      {/* 3. 第三層：常青針葉松林 (Evergreen Pine Trees)              */}
+      {/* ============================================================ */}
+      <g strokeWidth="1.1">
+        {/* 遠山坡松樹 1 (x: 82) */}
+        <path d="M 82 118 L 82 102 M 78 112 L 82 105 L 86 112 M 79 116 L 82 110 L 85 116" stroke="#3b827e" />
+        {/* 摩天輪旁松樹 2 (x: 238) */}
+        <path d="M 238 126 L 238 108 M 233 120 L 238 112 L 243 120 M 234 124 L 238 117 L 242 124" stroke="#3b827e" />
+        {/* 都市出口坡道松樹 3 (x: 572) */}
+        <path d="M 572 126 L 572 106 M 567 118 L 572 110 L 577 118 M 568 123 L 572 116 L 576 123" stroke="#3b827e" />
+        {/* 燈塔 1 山腳松樹 4 (x: 648) */}
+        <path d="M 648 128 L 648 108 M 643 120 L 648 112 L 653 120 M 644 125 L 648 118 L 652 125" stroke="#3b827e" />
+        {/* 燈塔 1 頂峰陪伴松樹 5 (x: 812, 矗立於燈塔旁) */}
+        <path d="M 812 104 L 812 76 M 805 92 L 812 80 L 819 92 M 806 98 L 812 88 L 818 98 M 807 103 L 812 94 L 817 103" stroke="#3b827e" strokeWidth="1.2" />
+        {/* 小屋後方山林松樹 6 (x: 1195) */}
+        <path d="M 1195 112 L 1195 86 M 1188 100 L 1195 89 L 1202 100 M 1189 106 L 1195 96 L 1201 106 M 1190 111 L 1195 102 L 1200 111" stroke="#3b827e" />
+        {/* 阿爾卑斯山腳松樹 7 (x: 1282) */}
+        <path d="M 1282 116 L 1282 92 M 1276 106 L 1282 96 L 1288 106 M 1277 112 L 1282 103 L 1287 112" stroke="#3b827e" />
+        {/* 右側燈塔 2 崖壁松樹 8 (x: 1568, 矗立於海風中) */}
+        <path d="M 1568 102 L 1568 76 M 1561 92 L 1568 80 L 1575 92 M 1562 98 L 1568 88 L 1574 98 M 1563 103 L 1568 94 L 1573 103" stroke="#3b827e" strokeWidth="1.2" />
       </g>
 
-      {/* 5. 玻璃花房植物溫室 (Victorian Orangerie) (x: 485 - 565) */}
+      {/* ============================================================ */}
+      {/* 4. 第四層：核心建築與工程景觀 (Architecture & Landmarks)      */}
+      {/* ============================================================ */}
+
+      {/* 4A. 左側遊樂摩天輪 (Ferris Wheel, x: 140 - 225) */}
       <g>
-        <rect x="485" y="102" width="76" height="34" rx="2" fill="var(--card-bg,#1c222b)" />
-        {/* 拱形玻璃穹頂 */}
-        <path d="M 495 102 A 28 28 0 0 1 551 102" />
-        {/* 穹頂鑄鐵肋線 */}
-        <path d="M 523 74 L 507 102" strokeDasharray="2 2" opacity="0.6" />
-        <path d="M 523 74 L 539 102" strokeDasharray="2 2" opacity="0.6" />
-        <line x1="523" y1="74" x2="523" y2="102" />
-        {/* 頂部通風亭與風向雞 */}
-        <rect x="520" y="68" width="6" height="6" rx="1" />
-        <line x1="523" y1="68" x2="523" y2="58" />
-        <path d="M 520 60 L 526 58 L 523 64 Z" fill="#f59e0b" stroke="#f59e0b" strokeWidth="0.8" />
-        {/* 溫室內部隱約可見之熱帶龜背芋與盆栽 */}
-        <path d="M 505 120 Q 501 110 508 106 Q 512 116 505 120 Z" stroke="#3b827e" fill="#3b827e" fillOpacity="0.3" />
-        <path d="M 541 120 Q 545 110 538 106 Q 534 116 541 120 Z" stroke="#3b827e" fill="#3b827e" fillOpacity="0.3" />
-        <line x1="485" y1="116" x2="561" y2="116" />
+        {/* 雙重轉輪輪圈 */}
+        <circle cx="182" cy="74" r="36" strokeWidth="1.4" />
+        <circle cx="182" cy="74" r="32" strokeDasharray="3 2" opacity="0.7" />
+        <circle cx="182" cy="74" r="6" fill="var(--paper,#fbfbf9)" strokeWidth="1.4" />
+        <circle cx="182" cy="74" r="2.5" fill="currentColor" />
+
+        {/* 12 組放射狀輪輻輻條 */}
+        <line x1="182" y1="38" x2="182" y2="110" />
+        <line x1="146" y1="74" x2="218" y2="74" />
+        <line x1="156" y1="48" x2="208" y2="100" />
+        <line x1="156" y1="100" x2="208" y2="48" />
+        <line x1="168" y1="41" x2="196" y2="107" opacity="0.65" />
+        <line x1="196" y1="41" x2="168" y2="107" opacity="0.65" />
+        <line x1="149" y1="88" x2="215" y2="60" opacity="0.65" />
+        <line x1="149" y1="60" x2="215" y2="88" opacity="0.65" />
+        {/* 內層環形支撐拉索 */}
+        <circle cx="182" cy="74" r="18" strokeDasharray="2 2" opacity="0.5" />
+
+        {/* 12 座外掛式景觀座艙 */}
+        <rect x="178" y="32" width="8" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="178" y="109" width="8" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="141" y="70" width="7" height="8" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="216" y="70" width="7" height="8" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="153" y="44" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="204" y="44" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="153" y="97" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="204" y="97" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="164" y="36" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="193" y="36" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="145" y="85" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+        <rect x="212" y="85" width="7" height="7" rx="1.5" fill="var(--paper,#fbfbf9)" />
+
+        {/* 重型 A 字立體結構主支架 */}
+        <line x1="182" y1="74" x2="160" y2="136" strokeWidth="1.8" />
+        <line x1="182" y1="74" x2="204" y2="136" strokeWidth="1.8" />
+        <line x1="168" y1="114" x2="196" y2="114" strokeWidth="1.2" />
+        <line x1="163" y1="126" x2="201" y2="126" strokeWidth="1.2" />
       </g>
 
-      {/* 6. 中央歐風宏偉大鐘樓 (Grand Gothic Clock Tower) (x: 575 - 635) */}
-      <g>
-        {/* 塔身高聳基座與側邊扶壁 */}
-        <path d="M 576 136 L 576 56 L 588 38 L 622 38 L 634 56 L 634 136" fill="var(--card-bg,#1c222b)" strokeWidth="1.5" />
-        <path d="M 580 136 L 580 56 M 630 136 L 630 56" opacity="0.7" />
-        {/* 四面大鐘面 */}
-        <rect x="588" y="62" width="34" height="34" rx="3" fill="var(--card-bg,#1c222b)" strokeWidth="1.4" />
-        <circle cx="605" cy="79" r="13" strokeWidth="1.5" stroke="#f59e0b" />
-        <circle cx="605" cy="79" r="11" strokeDasharray="1 3" strokeWidth="0.8" />
-        {/* 指向 10:10 的典雅指針 */}
-        <line x1="605" y1="79" x2="600" y2="72" strokeWidth="2" stroke="#f59e0b" />
-        <line x1="605" y1="79" x2="612" y2="75" strokeWidth="1.5" stroke="#f59e0b" />
-        <circle cx="605" cy="79" r="1.5" fill="#f59e0b" />
-        {/* 鐘樓鐘室哥德式尖拱百葉窗 (Louvers) */}
-        <path d="M 593 54 L 593 42 Q 597 38 601 42 L 601 54 Z" fill="var(--card-bg,#1c222b)" />
-        <path d="M 609 54 L 609 42 Q 613 38 617 42 L 617 54 Z" fill="var(--card-bg,#1c222b)" />
-        {/* 頂部四角小尖塔與八角形主尖頂 (Spire) */}
-        <path d="M 586 38 L 605 12 L 624 38 Z" fill="var(--card-bg,#1c222b)" strokeWidth="1.5" />
-        <line x1="605" y1="12" x2="605" y2="4" strokeWidth="1.5" stroke="#f59e0b" />
-        <circle cx="605" cy="4" r="2" fill="#f59e0b" stroke="#f59e0b" />
-        {/* 尖塔瓦紋線條 */}
-        <line x1="605" y1="12" x2="598" y2="38" opacity="0.6" />
-        <line x1="605" y1="12" x2="612" y2="38" opacity="0.6" />
-        {/* 塔樓底部拱門 */}
-        <path d="M 597 136 L 597 122 Q 605 116 613 122 L 613 136" />
+      {/* 4B. 鄉村斜頂洋房與天線 (Gabled Town House, x: 254 - 296) */}
+      <g fill="var(--paper,#fbfbf9)">
+        {/* 屋頂山牆 */}
+        <path d="M 252 86 L 275 64 L 298 86 Z" strokeWidth="1.4" />
+        {/* 屋頂排煙煙囪與天線 */}
+        <rect x="284" y="58" width="5" height="12" />
+        <line x1="264" y1="64" x2="264" y2="52" />
+        <line x1="260" y1="56" x2="268" y2="56" />
+        <circle cx="264" cy="52" r="1.2" fill="currentColor" />
+        {/* 兩層主樓立面 */}
+        <rect x="256" y="86" width="38" height="50" strokeWidth="1.3" />
+        {/* 閣樓圓形採光窗 */}
+        <circle cx="275" cy="76" r="3.5" />
+        <line x1="275" y1="72.5" x2="275" y2="79.5" />
+        <line x1="271.5" y1="76" x2="278.5" y2="76" />
+        {/* 二樓雙矩形窗戶 */}
+        <rect x="262" y="93" width="9" height="12" rx="1" />
+        <line x1="266.5" y1="93" x2="266.5" y2="105" />
+        <line x1="262" y1="99" x2="271" y2="99" />
+        <rect x="279" y="93" width="9" height="12" rx="1" />
+        <line x1="283.5" y1="93" x2="283.5" y2="105" />
+        <line x1="279" y1="99" x2="288" y2="99" />
+        {/* 一樓門與單窗 */}
+        <rect x="262" y="115" width="10" height="21" rx="1" />
+        <rect x="279" y="115" width="9" height="11" rx="1" />
+        <line x1="283.5" y1="115" x2="283.5" y2="126" />
       </g>
 
-      {/* 7. 古典柱列圖書館 / 智慧殿堂 (Museum & Library) (x: 645 - 735) */}
-      <g>
-        {/* 三角形古典山形牆 (Pediment) 與浮雕 */}
-        <path d="M 645 78 L 690 54 L 735 78 Z" fill="var(--card-bg,#1c222b)" strokeWidth="1.5" />
-        <circle cx="690" cy="68" r="4" stroke="#e17b62" />
-        <line x1="680" y1="69" x2="700" y2="69" stroke="#e17b62" strokeDasharray="1 1" />
-        {/* 後方穹頂圓頂 */}
-        <path d="M 668 54 A 22 22 0 0 1 712 54" fill="var(--card-bg,#1c222b)" strokeWidth="1.3" />
-        <line x1="690" y1="32" x2="690" y2="24" />
-        <circle cx="690" cy="24" r="1.5" fill="currentColor" />
-        {/* 楣樑與柱頂橫帶 */}
-        <rect x="645" y="78" width="90" height="6" fill="var(--card-bg,#1c222b)" />
-        {/* 6 根帶凹槽古典石柱 (Colonnade) */}
-        <line x1="653" y1="84" x2="653" y2="128" strokeWidth="2.5" />
-        <line x1="668" y1="84" x2="668" y2="128" strokeWidth="2.5" />
-        <line x1="683" y1="84" x2="683" y2="128" strokeWidth="2.5" />
-        <line x1="697" y1="84" x2="697" y2="128" strokeWidth="2.5" />
-        <line x1="712" y1="84" x2="712" y2="128" strokeWidth="2.5" />
-        <line x1="727" y1="84" x2="727" y2="128" strokeWidth="2.5" />
-        {/* 階梯狀基台 */}
-        <line x1="640" y1="128" x2="740" y2="128" strokeWidth="1.2" />
-        <line x1="638" y1="132" x2="742" y2="132" strokeWidth="1.2" />
-        {/* 殿堂中央雙開銅門 */}
-        <rect x="684" y="98" width="12" height="20" rx="1" fill="var(--card-bg,#1c222b)" />
-        <line x1="690" y1="98" x2="690" y2="118" />
+      {/* 4C. 密集無縫現代都市天際線群 (Dense City Skyline, x: 335 - 550) */}
+      <g fill="var(--paper,#fbfbf9)">
+        {/* 建築 1：三層經典排屋公寓 (x: 336 - 376) */}
+        <rect x="336" y="58" width="40" height="78" strokeWidth="1.3" />
+        <line x1="334" y1="58" x2="378" y2="58" strokeWidth="1.6" />
+        {/* 頂樓通風口 */}
+        <rect x="350" y="52" width="12" height="6" />
+        {/* 3 列 x 3 行對稱窗格 */}
+        <rect x="342" y="66" width="6" height="9" rx="0.8" />
+        <rect x="353" y="66" width="6" height="9" rx="0.8" />
+        <rect x="364" y="66" width="6" height="9" rx="0.8" />
+        <rect x="342" y="82" width="6" height="9" rx="0.8" />
+        <rect x="353" y="82" width="6" height="9" rx="0.8" />
+        <rect x="364" y="82" width="6" height="9" rx="0.8" />
+        <rect x="342" y="98" width="6" height="9" rx="0.8" />
+        <rect x="353" y="98" width="6" height="9" rx="0.8" />
+        <rect x="364" y="98" width="6" height="9" rx="0.8" />
+        <rect x="351" y="118" width="10" height="18" rx="1" />
+
+        {/* 建築 2：高聳立體百葉柱大樓 (x: 380 - 418) */}
+        <rect x="380" y="38" width="38" height="98" strokeWidth="1.3" />
+        {/* 樓頂天線塔與階梯女兒牆 */}
+        <line x1="390" y1="38" x2="390" y2="24" strokeWidth="1.2" />
+        <circle cx="390" cy="24" r="1.5" fill="currentColor" />
+        <line x1="406" y1="38" x2="406" y2="28" strokeWidth="1.2" />
+        {/* 4 條修長之立面百葉柱長槽窗 */}
+        <rect x="385" y="46" width="4" height="42" rx="2" />
+        <rect x="393" y="46" width="4" height="42" rx="2" />
+        <rect x="401" y="46" width="4" height="42" rx="2" />
+        <rect x="409" y="46" width="4" height="42" rx="2" />
+        <rect x="385" y="96" width="4" height="26" rx="2" />
+        <rect x="393" y="96" width="4" height="26" rx="2" />
+        <rect x="401" y="96" width="4" height="26" rx="2" />
+        <rect x="409" y="96" width="4" height="26" rx="2" />
+
+        {/* 建築 3：水波紋立面幾何商辦 (x: 422 - 462) */}
+        <rect x="422" y="52" width="40" height="84" strokeWidth="1.3" />
+        <rect x="430" y="46" width="24" height="6" />
+        {/* 經典水波紋 / 折線裝飾立面 */}
+        <path d="M 428 64 Q 434 60 442 64 T 456 64" strokeWidth="1.1" />
+        <path d="M 428 76 Q 434 72 442 76 T 456 76" strokeWidth="1.1" />
+        <path d="M 428 88 Q 434 84 442 88 T 456 88" strokeWidth="1.1" />
+        <path d="M 428 100 Q 434 96 442 100 T 456 100" strokeWidth="1.1" />
+        <path d="M 428 112 Q 434 108 442 112 T 456 112" strokeWidth="1.1" />
+
+        {/* 建築 4：帝國之峰階梯尖頂摩天樓 (x: 466 - 508) */}
+        <rect x="466" y="68" width="42" height="68" strokeWidth="1.3" />
+        <rect x="472" y="48" width="30" height="20" strokeWidth="1.2" />
+        <rect x="478" y="32" width="18" height="16" strokeWidth="1.2" />
+        {/* 中央極限針尖避雷天線 */}
+        <line x1="487" y1="32" x2="487" y2="16" strokeWidth="1.5" stroke="#f59e0b" />
+        <circle cx="487" cy="16" r="1.8" fill="#f59e0b" />
+        {/* 立面纖細窗線 */}
+        <line x1="477" y1="74" x2="477" y2="128" strokeDasharray="3 2" />
+        <line x1="487" y1="74" x2="487" y2="128" strokeDasharray="3 2" />
+        <line x1="497" y1="74" x2="497" y2="128" strokeDasharray="3 2" />
+
+        {/* 建築 5：現代斜切屋頂旗艦辦公室 (x: 512 - 548) */}
+        <path d="M 512 68 L 548 52 L 548 136 L 512 136 Z" strokeWidth="1.3" />
+        {/* 矩陣辦公窗戶 */}
+        <rect x="518" y="74" width="7" height="6" rx="0.5" />
+        <rect x="529" y="71" width="7" height="6" rx="0.5" />
+        <rect x="518" y="86" width="7" height="6" rx="0.5" />
+        <rect x="529" y="83" width="7" height="6" rx="0.5" />
+        <rect x="518" y="98" width="7" height="6" rx="0.5" />
+        <rect x="529" y="95" width="7" height="6" rx="0.5" />
+        <rect x="518" y="110" width="7" height="6" rx="0.5" />
+        <rect x="529" y="107" width="7" height="6" rx="0.5" />
       </g>
 
-      {/* 8. 天空漫遊：浪漫條紋熱氣球與雲端飛鳥 (x: 740 - 840) */}
-      <g>
-        {/* 巨型條紋熱氣球 (Hot Air Balloon) */}
-        <path d="M 760 30 C 760 16 792 16 792 30 C 792 42 782 49 778 52 C 774 49 764 42 764 30 Z" fill="var(--card-bg,#1c222b)" strokeWidth="1.4" />
-        {/* 熱氣球彩色弧形條紋 */}
-        <path d="M 776 17 Q 770 30 774 52" stroke="#e17b62" />
-        <path d="M 776 17 Q 782 30 778 52" stroke="#f59e0b" />
-        {/* 燃燒器小火花與吊索 */}
-        <path d="M 775 52 Q 776 49 777 52 Z" fill="#f59e0b" stroke="#f59e0b" />
-        <line x1="771" y1="52" x2="773" y2="58" />
-        <line x1="781" y1="52" x2="779" y2="58" />
-        {/* 編織乘客藤籃 */}
-        <rect x="771" y="58" width="10" height="6" rx="1" fill="var(--card-bg,#1c222b)" />
-        <line x1="771" y1="61" x2="781" y2="61" strokeDasharray="1 1" />
-        {/* 雲朵伴隨 */}
-        <path d="M 800 32 Q 810 24 822 28 Q 834 20 848 28 Q 858 24 865 34 Q 830 40 800 32 Z" strokeDasharray="2 2" fill="var(--card-bg,#1c222b)" opacity="0.6" />
-        {/* 5 隻海鷗/候鳥翱翔 */}
-        <path d="M 735 24 Q 738 20 742 24 Q 746 20 749 24" strokeWidth="1" />
-        <path d="M 750 16 Q 753 13 756 16 Q 759 13 762 16" strokeWidth="1" />
+      {/* 4D. 丘陵上的第一座石造燈塔 (Lighthouse 1, x: 778 - 802, y: 52 to 84) */}
+      <g fill="var(--paper,#fbfbf9)">
+        {/* 漸縮石造塔身 */}
+        <path d="M 783 84 L 786 58 L 798 58 L 801 84 Z" strokeWidth="1.3" />
+        <line x1="784.5" y1="70" x2="799.5" y2="70" />
+        {/* 觀景廊台圍欄 */}
+        <line x1="782" y1="58" x2="802" y2="58" strokeWidth="1.8" />
+        {/* 燈室與圓頂金屬罩 */}
+        <rect x="786" y="50" width="12" height="8" rx="1" fill="#fff9f6" stroke="#f59e0b" />
+        <circle cx="792" cy="54" r="2" fill="#fbbf24" stroke="#fbbf24" />
+        <path d="M 785 50 Q 792 42 799 50 Z" strokeWidth="1.2" />
+        <line x1="792" y1="42" x2="792" y2="38" />
+        {/* 射向天際的光芒虛線 */}
+        <line x1="786" y1="52" x2="768" y2="44" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="1" />
+        <line x1="798" y1="52" x2="816" y2="44" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="1" />
       </g>
 
-      {/* 9. 宏偉凱旋門與香榭大道鑄鐵路燈 (x: 845 - 935) */}
+      {/* 4E. 第一座跨河水岸大吊橋 (Suspension Bridge 1, x: 885 - 1025) */}
       <g>
-        {/* 凱旋門雙柱拱圈 */}
-        <rect x="848" y="70" width="60" height="66" fill="var(--card-bg,#1c222b)" strokeWidth="1.5" />
-        {/* 拱圈中央主通道 */}
-        <path d="M 865 136 L 865 104 Q 878 92 891 104 L 891 136" fill="var(--paper,#f5f7f6)" strokeWidth="1.4" />
-        {/* 閣樓層裝飾雕刻浮雕帶 */}
-        <rect x="844" y="66" width="68" height="8" fill="var(--card-bg,#1c222b)" strokeWidth="1.3" />
-        <line x1="850" y1="70" x2="906" y2="70" strokeDasharray="2 2" opacity="0.7" />
-        {/* 兩側立面浮雕壁柱 */}
-        <rect x="852" y="82" width="8" height="42" strokeDasharray="2 2" opacity="0.6" />
-        <rect x="896" y="82" width="8" height="42" strokeDasharray="2 2" opacity="0.6" />
-        {/* 雙頭歐風鑄鐵街燈 */}
-        <path d="M 922 136 L 922 108 M 916 112 Q 922 106 928 112" />
-        <circle cx="916" cy="112" r="2.5" fill="#fbbf24" stroke="#fbbf24" />
-        <circle cx="928" cy="112" r="2.5" fill="#fbbf24" stroke="#fbbf24" />
+        {/* 雙主塔鋼架結構 */}
+        <line x1="916" y1="72" x2="916" y2="136" strokeWidth="2.2" />
+        <line x1="924" y1="72" x2="924" y2="136" strokeWidth="2.2" />
+        <line x1="914" y1="84" x2="926" y2="84" strokeWidth="1.2" />
+        <line x1="914" y1="102" x2="926" y2="102" strokeWidth="1.2" />
+        <line x1="916" y1="72" x2="920" y2="66 L 924 72" strokeWidth="1.2" />
+
+        <line x1="986" y1="72" x2="986" y2="136" strokeWidth="2.2" />
+        <line x1="994" y1="72" x2="994" y2="136" strokeWidth="2.2" />
+        <line x1="984" y1="84" x2="996" y2="84" strokeWidth="1.2" />
+        <line x1="984" y1="102" x2="996" y2="102" strokeWidth="1.2" />
+        <line x1="986" y1="72" x2="990" y2="66 L 994 72" strokeWidth="1.2" />
+
+        {/* 主懸索 (Main Catenary Cables) */}
+        <path d="M 885 120 Q 902 96 920 72" strokeWidth="1.5" />
+        <path d="M 920 72 Q 955 106 990 72" strokeWidth="1.6" />
+        <path d="M 990 72 Q 1008 96 1025 120" strokeWidth="1.5" />
+
+        {/* 橋面桁架與護欄 */}
+        <rect x="882" y="118" width="146" height="4" rx="0.5" fill="var(--paper,#fbfbf9)" strokeWidth="1.4" />
+        <line x1="882" y1="115" x2="1028" y2="115" strokeWidth="0.9" />
+
+        {/* 密集垂直吊索 (Vertical Hangers) */}
+        <line x1="895" y1="110" x2="895" y2="118" strokeWidth="0.8" />
+        <line x1="906" y1="94" x2="906" y2="118" strokeWidth="0.8" />
+        <line x1="935" y1="82" x2="935" y2="118" strokeWidth="0.8" />
+        <line x1="948" y1="97" x2="948" y2="118" strokeWidth="0.8" />
+        <line x1="962" y1="102" x2="962" y2="118" strokeWidth="0.8" />
+        <line x1="975" y1="92" x2="975" y2="118" strokeWidth="0.8" />
+        <line x1="1004" y1="88" x2="1004" y2="118" strokeWidth="0.8" />
+        <line x1="1015" y1="106" x2="1015" y2="118" strokeWidth="0.8" />
       </g>
 
-      {/* 10. 手帳靈魂建築群：鉛筆尖塔與鋼筆尖天際線 (x: 945 - 1025) */}
-      <g>
-        {/* 六角鉛筆高塔 */}
-        <rect x="952" y="52" width="16" height="84" fill="var(--card-bg,#1c222b)" />
-        <line x1="960" y1="52" x2="960" y2="136" opacity="0.6" />
-        {/* 削筆木質錐形與石墨筆芯尖端 */}
-        <path d="M 952 52 L 960 22 L 968 52 Z" fill="#fff9f6" stroke="currentColor" strokeWidth="1.3" />
-        <polygon points="960,22 957,32 963,32" fill="currentColor" />
-        {/* 鉛筆頂部金屬金箍 (Ferrule) */}
-        <line x1="952" y1="58" x2="968" y2="58" stroke="#f59e0b" strokeWidth="1.5" />
+      {/* 4F. 山丘上的溫馨田園小屋與放牧山丘 (Hilltop Cottage, x: 1120 - 1165, y: 64 to 90) */}
+      <g fill="var(--paper,#fbfbf9)">
+        {/* 屋頂與煙囪 */}
+        <path d="M 1120 80 L 1142 64 L 1164 80 Z" strokeWidth="1.4" />
+        <rect x="1148" y="58" width="5" height="10" />
+        {/* 炊煙裊裊 */}
+        <path d="M 1150 56 Q 1146 48 1152 42 Q 1158 36 1154 30" strokeWidth="0.9" strokeDasharray="2 2" />
+        {/* 小屋立面 */}
+        <rect x="1126" y="80" width="32" height="18" strokeWidth="1.3" />
+        <rect x="1130" y="84" width="7" height="8" rx="0.8" />
+        <line x1="1133.5" y1="84" x2="1133.5" y2="92" />
+        <rect x="1147" y="84" width="7" height="8" rx="0.8" />
+        <line x1="1150.5" y1="84" x2="1150.5" y2="92" />
+        <rect x="1139" y="87" width="5" height="11" rx="0.5" />
 
-        {/* 經典圓弧鋼筆筆尖大樓 (Quill & Nib Skyscraper) */}
-        <path d="M 982 136 L 982 66 Q 982 32 996 16 Q 1010 32 1010 66 L 1010 136" fill="var(--card-bg,#1c222b)" strokeWidth="1.4" />
-        {/* 金黃筆尖表面分界線與呼吸孔 */}
-        <circle cx="996" cy="42" r="2.5" fill="#fbbf24" stroke="#fbbf24" />
-        <line x1="996" y1="16" x2="996" y2="40" stroke="#fbbf24" strokeWidth="1.8" />
-        <path d="M 988 56 Q 996 50 1004 56" stroke="#fbbf24" opacity="0.7" />
-        {/* 塔樓長條窗格 */}
-        <rect x="992" y="80" width="8" height="14" rx="1" />
-        <rect x="992" y="104" width="8" height="14" rx="1" />
+        {/* 山坡上放牧的小棉羊群 */}
+        <g strokeWidth="1">
+          <ellipse cx="1184" cy="108" rx="5" ry="3.5" />
+          <circle cx="1179" cy="107" r="1.8" fill="currentColor" />
+          <line x1="1182" y1="111" x2="1182" y2="115" />
+          <line x1="1186" y1="111" x2="1186" y2="115" />
+
+          <ellipse cx="1198" cy="116" rx="4.5" ry="3" />
+          <circle cx="1203" cy="115" r="1.6" fill="currentColor" />
+          <line x1="1196" y1="119" x2="1196" y2="122" />
+          <line x1="1200" y1="119" x2="1200" y2="122" />
+        </g>
       </g>
 
-      {/* 11. 經典傳統荷蘭風車與水磨坊 (x: 1030 - 1125) */}
+      {/* 4G. 第二座跨湖懸索橋 (Suspension Bridge 2, x: 1345 - 1445) */}
       <g>
-        {/* 風車八角形磨坊塔身 */}
-        <path d="M 1045 136 L 1052 76 L 1080 76 L 1087 136 Z" fill="var(--card-bg,#1c222b)" strokeWidth="1.4" />
-        {/* 圓弧草頂風車帽 (Cap) */}
-        <path d="M 1048 76 Q 1066 60 1084 76 Z" fill="var(--card-bg,#1c222b)" />
-        <circle cx="1066" cy="74" r="3.5" fill="currentColor" />
-        {/* 4 片精緻格狀翼板 (Lattice Sail Blades) */}
-        <line x1="1066" y1="36" x2="1066" y2="112" strokeWidth="1.8" />
-        <line x1="1028" y1="74" x2="1104" y2="74" strokeWidth="1.8" />
-        {/* 翼板網格階梯 */}
-        <line x1="1061" y1="42" x2="1071" y2="42" opacity="0.7" />
-        <line x1="1061" y1="52" x2="1071" y2="52" opacity="0.7" />
-        <line x1="1061" y1="96" x2="1071" y2="96" opacity="0.7" />
-        <line x1="1061" y1="106" x2="1071" y2="106" opacity="0.7" />
-        <line x1="1036" y1="69" x2="1036" y2="79" opacity="0.7" />
-        <line x1="1046" y1="69" x2="1046" y2="79" opacity="0.7" />
-        <line x1="1086" y1="69" x2="1086" y2="79" opacity="0.7" />
-        <line x1="1096" y1="69" x2="1096" y2="79" opacity="0.7" />
-        {/* 水車磨坊側輪 */}
-        <circle cx="1102" cy="130" r="14" strokeDasharray="3 2" opacity="0.75" />
-        <line x1="1102" y1="116" x2="1102" y2="144" />
-        <line x1="1088" y1="130" x2="1116" y2="130" />
+        {/* 左塔與右塔 */}
+        <line x1="1368" y1="80" x2="1368" y2="136" strokeWidth="2" />
+        <line x1="1374" y1="80" x2="1374" y2="136" strokeWidth="2" />
+        <line x1="1366" y1="92" x2="1376" y2="92" strokeWidth="1.1" />
+
+        <line x1="1420" y1="80" x2="1420" y2="136" strokeWidth="2" />
+        <line x1="1426" y1="80" x2="1426" y2="136" strokeWidth="2" />
+        <line x1="1418" y1="92" x2="1428" y2="92" strokeWidth="1.1" />
+
+        {/* 主懸索弧線 */}
+        <path d="M 1345 120 Q 1357 98 1371 80 Q 1397 108 1423 80 Q 1435 98 1448 120" strokeWidth="1.5" />
+        {/* 橋面 */}
+        <rect x="1342" y="118" width="108" height="4" rx="0.5" fill="var(--paper,#fbfbf9)" strokeWidth="1.3" />
+        <line x1="1342" y1="115" x2="1450" y2="115" strokeWidth="0.8" />
+
+        {/* 垂直鋼索 */}
+        <line x1="1356" y1="104" x2="1356" y2="118" strokeWidth="0.8" />
+        <line x1="1385" y1="92" x2="1385" y2="118" strokeWidth="0.8" />
+        <line x1="1397" y1="102" x2="1397" y2="118" strokeWidth="0.8" />
+        <line x1="1409" y1="95" x2="1409" y2="118" strokeWidth="0.8" />
+        <line x1="1436" y1="104" x2="1436" y2="118" strokeWidth="0.8" />
       </g>
 
-      {/* 12. 高山星象天文台與折射望遠鏡 (x: 1140 - 1235) */}
-      <g>
-        {/* 蜿蜒登山石階 */}
-        <path d="M 1130 136 Q 1150 120 1170 105" strokeDasharray="2 2" opacity="0.6" />
-        {/* 天文台圓柱基座 */}
-        <rect x="1165" y="84" width="48" height="52" rx="2" fill="var(--card-bg,#1c222b)" strokeWidth="1.4" />
-        {/* 半球形觀測圓頂 (Observatory Dome) */}
-        <path d="M 1162 84 A 27 27 0 0 1 1216 84" fill="var(--card-bg,#1c222b)" strokeWidth="1.4" />
-        {/* 開啟天窗與伸出之大型天文望遠鏡 (Telescope) */}
-        <line x1="1189" y1="57" x2="1189" y2="84" strokeDasharray="2 2" />
-        <path d="M 1195 68 L 1226 40 L 1230 44 L 1199 72 Z" fill="#3b827e" fillOpacity="0.3" stroke="#3b827e" strokeWidth="1.6" />
-        <ellipse cx="1228" cy="42" rx="3" ry="5" fill="#fbbf24" stroke="#fbbf24" />
-        {/* 避雷針與風速儀 */}
-        <line x1="1175" y1="84" x2="1175" y2="72" />
-        <circle cx="1175" cy="72" r="1.5" />
+      {/* 4H. 右側海角崖頂第二座守望燈塔 (Lighthouse 2, x: 1532 - 1558, y: 52 to 84) */}
+      <g fill="var(--paper,#fbfbf9)">
+        <path d="M 1536 84 L 1539 58 L 1551 58 L 1554 84 Z" strokeWidth="1.3" />
+        <line x1="1537.5" y1="71" x2="1552.5" y2="71" />
+        <line x1="1535" y1="58" x2="1555" y2="58" strokeWidth="1.8" />
+        <rect x="1539" y="50" width="12" height="8" rx="1" fill="#fff9f6" stroke="#f59e0b" />
+        <circle cx="1545" cy="54" r="2" fill="#fbbf24" stroke="#fbbf24" />
+        <path d="M 1538 50 Q 1545 42 1552 50 Z" strokeWidth="1.2" />
+        <line x1="1545" y1="42" x2="1545" y2="38" />
+        {/* 探照燈向海面的光芒 */}
+        <line x1="1551" y1="52" x2="1585" y2="40" stroke="#fbbf24" strokeDasharray="3 2" strokeWidth="1.1" />
+        <line x1="1551" y1="56" x2="1598" y2="52" stroke="#fbbf24" strokeDasharray="3 2" strokeWidth="1.1" />
       </g>
 
-      {/* 13. 夜空之境：金色新月與星座星宿 (x: 1240 - 1340) */}
-      <g>
-        {/* 經典童話新月 */}
-        <path d="M 1256 16 A 16 16 0 1 0 1274 42 A 13 13 0 1 1 1256 16 Z" fill="#fbbf24" fillOpacity="0.25" stroke="#fbbf24" strokeWidth="1.3" />
-        {/* 北斗七星星座節點 */}
-        <circle cx="1295" cy="20" r="1.8" fill="#fbbf24" stroke="#fbbf24" />
-        <circle cx="1308" cy="24" r="1.8" fill="#fbbf24" stroke="#fbbf24" />
-        <circle cx="1318" cy="34" r="1.8" fill="#fbbf24" stroke="#fbbf24" />
-        <circle cx="1330" cy="38" r="1.8" fill="#fbbf24" stroke="#fbbf24" />
-        <circle cx="1326" cy="50" r="1.8" fill="#fbbf24" stroke="#fbbf24" />
-        <circle cx="1342" cy="52" r="1.8" fill="#fbbf24" stroke="#fbbf24" />
-        <circle cx="1344" cy="40" r="1.8" fill="#fbbf24" stroke="#fbbf24" />
-        {/* 星座連線 */}
-        <line x1="1295" y1="20" x2="1308" y2="24" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
-        <line x1="1308" y1="24" x2="1318" y2="34" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
-        <line x1="1318" y1="34" x2="1330" y2="38" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
-        <line x1="1330" y1="38" x2="1326" y2="50" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
-        <line x1="1326" y1="50" x2="1342" y2="52" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
-        <line x1="1342" y1="52" x2="1344" y2="40" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
-        <line x1="1344" y1="40" x2="1330" y2="38" stroke="#fbbf24" strokeDasharray="2 2" strokeWidth="0.8" opacity="0.6" />
+      {/* ============================================================ */}
+      {/* 5. 第五層：全域茂密樹木與灌木叢 (Lush Foliage & Bushes)       */}
+      {/* ============================================================ */}
+      {/* 填補每一處空隙，與參考圖一模一樣的飽滿與生機 */}
+      <g fill="var(--paper,#fbfbf9)" strokeWidth="1.2">
+        {/* 樹木 1 (最左岸邊小樹, x: 16) */}
+        <path d="M 16 136 L 16 112" />
+        <path d="M 8 112 Q 6 100 16 96 Q 26 100 24 112 Z" />
+
+        {/* 樹木 2 (摩天輪左側大樹 1, x: 55) */}
+        <path d="M 55 136 L 55 92" strokeWidth="1.5" />
+        <path d="M 42 96 Q 38 78 52 74 Q 60 64 72 72 Q 82 82 76 96 Q 66 104 55 102 Z" />
+
+        {/* 樹木 3 (摩天輪左前蓬鬆巨木, x: 128) */}
+        <path d="M 126 136 L 126 78" strokeWidth="1.8" />
+        <path d="M 108 82 Q 102 62 118 56 Q 128 44 144 52 Q 158 60 154 76 Q 148 90 132 90 Z" />
+
+        {/* 樹木 4 (摩天輪右側小屋前綠樹, x: 228) */}
+        <path d="M 226 136 L 226 104" strokeWidth="1.4" />
+        <path d="M 215 106 Q 212 92 224 88 Q 236 86 240 96 Q 242 108 230 112 Z" />
+
+        {/* 樹木 5 (小屋右側伴隨大樹, x: 316) */}
+        <path d="M 316 136 L 316 94" strokeWidth="1.6" />
+        <path d="M 302 96 Q 296 78 312 72 Q 324 64 336 74 Q 346 86 338 100 Q 326 106 314 104 Z" />
+
+        {/* 樹木 6 (都市入口綠化小樹, x: 374) */}
+        <path d="M 374 136 L 374 110" />
+        <path d="M 364 112 Q 360 100 372 96 Q 384 98 384 110 Z" />
+
+        {/* 樹木 7 (都市中庭綠樹, x: 462) */}
+        <path d="M 462 136 L 462 114" />
+        <path d="M 454 114 Q 450 102 462 100 Q 472 102 470 114 Z" />
+
+        {/* 樹木 8 (都市出口自然過渡樹, x: 536) */}
+        <path d="M 536 136 L 536 108" strokeWidth="1.4" />
+        <path d="M 524 110 Q 520 96 534 92 Q 546 94 546 108 Z" />
+
+        {/* 樹木 9 (丘陵坡上茂密綠樹, x: 608) */}
+        <path d="M 608 136 L 608 96" strokeWidth="1.5" />
+        <path d="M 594 98 Q 588 82 604 76 Q 618 72 626 84 Q 632 96 622 106 Z" />
+
+        {/* 樹木 10 (燈塔 1 旁山腰圓樹, x: 722) */}
+        <path d="M 722 136 L 722 104" strokeWidth="1.4" />
+        <path d="M 710 106 Q 706 92 720 88 Q 734 88 736 102 Z" />
+
+        {/* 樹木 11 (吊橋 1 左橋墩大樹, x: 864) */}
+        <path d="M 864 136 L 864 106" strokeWidth="1.5" />
+        <path d="M 850 108 Q 844 92 860 86 Q 874 84 880 98 Q 882 112 868 116 Z" />
+
+        {/* 樹木 12 (吊橋 1 右岸迎客大樹, x: 1042) */}
+        <path d="M 1042 136 L 1042 92" strokeWidth="1.6" />
+        <path d="M 1026 94 Q 1020 74 1038 68 Q 1052 62 1062 74 Q 1070 88 1060 102 Q 1048 108 1038 104 Z" />
+
+        {/* 樹木 13 (田園小屋左護林, x: 1108) */}
+        <path d="M 1108 136 L 1108 86" strokeWidth="1.5" />
+        <path d="M 1094 88 Q 1088 72 1104 66 Q 1118 64 1124 76 Q 1128 88 1120 98 Z" />
+
+        {/* 樹木 14 (田園小屋右護林, x: 1172) */}
+        <path d="M 1172 136 L 1172 84" strokeWidth="1.5" />
+        <path d="M 1158 86 Q 1152 70 1168 64 Q 1182 62 1190 74 Q 1194 86 1184 96 Z" />
+
+        {/* 樹木 15 (高山腳下優美老樹, x: 1256) */}
+        <path d="M 1256 136 L 1256 94" strokeWidth="1.6" />
+        <path d="M 1240 96 Q 1234 78 1250 72 Q 1264 66 1274 78 Q 1282 90 1272 104 Z" />
+
+        {/* 樹木 16 (吊橋 2 左水濱樹, x: 1324) */}
+        <path d="M 1324 136 L 1324 102" strokeWidth="1.4" />
+        <path d="M 1312 104 Q 1308 90 1322 86 Q 1336 86 1338 100 Z" />
+
+        {/* 樹木 17 (吊橋 2 右水濱大樹, x: 1464) */}
+        <path d="M 1464 136 L 1464 96" strokeWidth="1.6" />
+        <path d="M 1448 98 Q 1442 80 1458 74 Q 1472 68 1482 80 Q 1490 92 1480 106 Z" />
+
+        {/* 樹木 18 (右側燈塔 2 崖頂綠樹, x: 1516) */}
+        <path d="M 1516 136 L 1516 98" strokeWidth="1.4" />
+        <path d="M 1504 100 Q 1500 86 1514 82 Q 1528 82 1530 96 Z" />
       </g>
 
-      {/* 14. 雄偉海角燈塔與掃描探照光束 (Coastal Lighthouse) (x: 1350 - 1420) */}
-      <g>
-        {/* 險峻海岸礁石懸崖 */}
-        <path d="M 1345 136 Q 1358 114 1370 102 L 1405 102 Q 1416 118 1430 136" fill="var(--card-bg,#1c222b)" strokeWidth="1.3" />
-        {/* 漸縮式石造燈塔塔身 */}
-        <path d="M 1374 102 L 1380 40 L 1396 40 L 1402 102 Z" fill="var(--card-bg,#1c222b)" strokeWidth="1.5" />
-        {/* 經典紅白螺旋條紋 (Candy Stripe) */}
-        <line x1="1375" y1="92" x2="1401" y2="82" stroke="#e17b62" strokeWidth="2.5" />
-        <line x1="1377" y1="74" x2="1399" y2="64" stroke="#e17b62" strokeWidth="2.5" />
-        <line x1="1379" y1="54" x2="1397" y2="46" stroke="#e17b62" strokeWidth="2.5" />
-        {/* 燈塔觀景圍欄與燈室 (Lantern Room) */}
-        <line x1="1376" y1="40" x2="1400" y2="40" strokeWidth="2" />
-        <rect x="1381" y="28" width="14" height="12" rx="1" fill="#fff0eb" stroke="#f59e0b" />
-        <circle cx="1388" cy="34" r="3" fill="#fbbf24" />
-        {/* 燈塔銅頂與風標針 */}
-        <path d="M 1380 28 Q 1388 20 1396 28 Z" fill="var(--card-bg,#1c222b)" strokeWidth="1.3" />
-        <line x1="1388" y1="20" x2="1388" y2="12" strokeWidth="1.2" />
-        {/* 遠程探照燈光束 (掃射夜空) */}
-        <line x1="1395" y1="32" x2="1490" y2="12" stroke="#fbbf24" strokeDasharray="3 3" strokeWidth="1.2" opacity="0.75" />
-        <line x1="1395" y1="36" x2="1520" y2="42" stroke="#fbbf24" strokeDasharray="3 3" strokeWidth="1.2" opacity="0.75" />
+      {/* 沿途密布的可愛小灌木叢 (Shrub Clusters) */}
+      <g strokeWidth="1.1" fill="var(--paper,#fbfbf9)">
+        <path d="M 24 136 Q 30 128 36 136" />
+        <path d="M 96 136 Q 102 126 110 136" />
+        <path d="M 154 136 Q 160 127 168 136" />
+        <path d="M 218 136 Q 224 128 232 136" />
+        <path d="M 296 136 Q 302 126 310 136" />
+        <path d="M 354 136 Q 360 128 366 136" />
+        <path d="M 412 136 Q 418 127 426 136" />
+        <path d="M 552 136 Q 558 126 566 136" />
+        <path d="M 630 136 Q 636 128 644 136" />
+        <path d="M 736 136 Q 742 126 750 136" />
+        <path d="M 834 136 Q 840 127 848 136" />
+        <path d="M 964 136 Q 970 128 978 136" />
+        <path d="M 1068 136 Q 1074 126 1082 136" />
+        <path d="M 1218 136 Q 1224 128 1232 136" />
+        <path d="M 1294 136 Q 1300 127 1308 136" />
+        <path d="M 1404 136 Q 1410 128 1418 136" />
+        <path d="M 1486 136 Q 1492 126 1500 136" />
+        <path d="M 1582 136 Q 1588 128 1596 136" />
       </g>
 
-      {/* 15. 海港、木棧碼頭與雙桅大帆船 (Ocean Schooner) (x: 1430 - 1600) */}
-      <g>
-        {/* 碼頭木棧道與防波堤繫船柱 */}
-        <rect x="1430" y="132" width="28" height="4" fill="var(--card-bg,#1c222b)" />
-        <line x1="1436" y1="132" x2="1436" y2="128" strokeWidth="2" />
-        <line x1="1450" y1="132" x2="1450" y2="128" strokeWidth="2" />
-        <rect x="1440" y="126" width="6" height="6" rx="1" />
+      {/* ============================================================ */}
+      {/* 6. 第六層：水岸香蒲蘆葦與生動草叢 (Cattails & Grass Tufts)   */}
+      {/* ============================================================ */}
+      {/* 吊橋下與水岸旁的生動水生植物 (香蒲 Cattails) */}
+      <g strokeWidth="1">
+        {/* 吊橋 1 左岸香蒲 (x: 882, 894) */}
+        <line x1="882" y1="136" x2="880" y2="120" stroke="#89959b" />
+        <rect x="878.5" y="120" width="3" height="7" rx="1.5" fill="currentColor" stroke="none" />
+        <line x1="886" y1="136" x2="887" y2="124" stroke="#89959b" />
+        <line x1="894" y1="136" x2="896" y2="118" stroke="#89959b" />
+        <rect x="894.5" y="118" width="3" height="7" rx="1.5" fill="currentColor" stroke="none" />
+        <line x1="890" y1="136" x2="891" y2="123" stroke="#89959b" />
 
-        {/* 雙桅帆船木造船身 */}
-        <path d="M 1475 140 L 1545 140 Q 1558 138 1564 130 L 1468 130 Z" fill="var(--card-bg,#1c222b)" strokeWidth="1.5" />
-        {/* 船艏斜桅 (Bowsprit) */}
-        <line x1="1564" y1="130" x2="1582" y2="122" strokeWidth="1.5" />
-        {/* 主桅與前桅杆 */}
-        <line x1="1496" y1="130" x2="1496" y2="56" strokeWidth="1.8" />
-        <line x1="1530" y1="130" x2="1530" y2="50" strokeWidth="1.8" />
-        {/* 鼓脹的白色主帆布與三角帆 */}
-        <path d="M 1496 62 Q 1475 92 1496 122 L 1496 62 Z" fill="#fff9f6" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M 1530 56 Q 1510 88 1530 120 L 1530 56 Z" fill="#fff9f6" stroke="currentColor" strokeWidth="1.2" />
-        {/* 前三角首帆 (Jib) */}
-        <path d="M 1530 62 L 1572 126 L 1530 120 Z" fill="#fff9f6" stroke="currentColor" strokeWidth="1.2" />
-        {/* 桅頂迎風旗幟 */}
-        <path d="M 1496 56 L 1486 52 L 1496 48 Z" fill="#e17b62" />
-        <path d="M 1530 50 L 1520 46 L 1530 42 Z" fill="#e17b62" />
+        {/* 吊橋 1 右岸香蒲 (x: 1018, 1028) */}
+        <line x1="1018" y1="136" x2="1016" y2="119" stroke="#89959b" />
+        <rect x="1014.5" y="119" width="3" height="7" rx="1.5" fill="currentColor" stroke="none" />
+        <line x1="1022" y1="136" x2="1023" y2="125" stroke="#89959b" />
+        <line x1="1028" y1="136" x2="1030" y2="121" stroke="#89959b" />
+        <rect x="1028.5" y="121" width="3" height="7" rx="1.5" fill="currentColor" stroke="none" />
 
-        {/* 海面飛翔的海鷗 */}
-        <path d="M 1462 82 Q 1466 78 1470 82 Q 1474 78 1478 82" strokeWidth="1" />
-        <path d="M 1570 72 Q 1574 68 1578 72 Q 1582 68 1586 72" strokeWidth="1" />
+        {/* 吊橋 2 左岸香蒲 (x: 1342, 1352) */}
+        <line x1="1342" y1="136" x2="1340" y2="122" stroke="#89959b" />
+        <rect x="1338.5" y="122" width="3" height="6.5" rx="1.5" fill="currentColor" stroke="none" />
+        <line x1="1348" y1="136" x2="1349" y2="125" stroke="#89959b" />
+        <line x1="1354" y1="136" x2="1355" y2="120" stroke="#89959b" />
+        <rect x="1353.5" y="120" width="3" height="6.5" rx="1.5" fill="currentColor" stroke="none" />
 
-        {/* 右側地平線連綿松林海角與波浪 */}
-        <path d="M 1545 136 Q 1572 118 1600 136" />
-        <path d="M 1585 136 L 1585 120 M 1581 130 L 1585 124 L 1589 130" stroke="#3b827e" />
+        {/* 吊橋 2 右岸香蒲 (x: 1438, 1448) */}
+        <line x1="1440" y1="136" x2="1438" y2="121" stroke="#89959b" />
+        <rect x="1436.5" y="121" width="3" height="6.5" rx="1.5" fill="currentColor" stroke="none" />
+        <line x1="1448" y1="136" x2="1450" y2="123" stroke="#89959b" />
+        <rect x="1448.5" y="123" width="3" height="6.5" rx="1.5" fill="currentColor" stroke="none" />
+      </g>
+
+      {/* 遍布山坡與草地的三叉生動草尖 (Grass Tufts) */}
+      <g strokeWidth="0.9" opacity="0.75">
+        <path d="M 68 136 L 66 128 M 68 136 L 70 127 M 68 136 L 73 130" />
+        <path d="M 198 136 L 196 129 M 198 136 L 200 128 M 198 136 L 203 131" />
+        <path d="M 330 136 L 328 128 M 330 136 L 332 127 M 330 136 L 335 130" />
+        <path d="M 590 136 L 588 129 M 590 136 L 592 128 M 590 136 L 595 131" />
+        <path d="M 678 136 L 676 128 M 678 136 L 680 127 M 678 136 L 683 130" />
+        <path d="M 760 114 L 758 107 M 760 114 L 762 106 M 760 114 L 765 109" />
+        <path d="M 945 136 L 943 129 M 945 136 L 947 128 M 945 136 L 950 131" />
+        <path d="M 1152 110 L 1150 103 M 1152 110 L 1154 102 M 1152 110 L 1157 105" />
+        <path d="M 1238 136 L 1236 129 M 1238 136 L 1240 128 M 1238 136 L 1243 131" />
+        <path d="M 1380 136 L 1378 129 M 1380 136 L 1382 128 M 1380 136 L 1385 131" />
+        <path d="M 1505 118 L 1503 111 M 1505 118 L 1507 110 M 1505 118 L 1510 113" />
+      </g>
+
+      {/* ============================================================ */}
+      {/* 7. 第七層：貫穿全景的大地水岸起伏基線 (Continuous Shoreline) */}
+      {/* ============================================================ */}
+      {/* 連綿不斷的起伏水岸大浪與河畔輪廓 */}
+      <path
+        d="M 0 137 Q 35 134 70 138 T 140 136 T 210 138 T 280 136 T 350 138 T 420 136 T 490 138 T 560 136 T 630 138 T 700 136 T 770 138 T 840 136 T 910 138 T 980 136 T 1050 138 T 1120 136 T 1190 138 T 1260 136 T 1330 138 T 1400 136 T 1470 138 T 1540 136 T 1600 137"
+        strokeWidth="1.6"
+      />
+
+      {/* 水面微波與倒影漣漪 */}
+      <g strokeWidth="0.9" opacity="0.5">
+        <path d="M 18 143 Q 32 145 46 143" />
+        <path d="M 85 146 Q 105 148 125 146" />
+        <path d="M 160 144 Q 185 147 210 144" />
+        <path d="M 245 146 Q 270 149 295 146" />
+        <path d="M 360 144 Q 390 147 420 144" />
+        <path d="M 450 147 Q 480 150 510 147" />
+        <path d="M 580 144 Q 610 147 640 144" />
+        <path d="M 710 146 Q 740 149 770 146" />
+        <path d="M 880 143 Q 910 146 940 143" />
+        <path d="M 960 147 Q 990 150 1020 147" />
+        <path d="M 1090 144 Q 1120 147 1150 144" />
+        <path d="M 1220 146 Q 1250 149 1280 146" />
+        <path d="M 1340 143 Q 1370 146 1400 143" />
+        <path d="M 1420 147 Q 1450 150 1480 147" />
+        <path d="M 1520 144 Q 1550 147 1580 144" />
       </g>
     </svg>
   );

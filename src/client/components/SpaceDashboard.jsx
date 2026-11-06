@@ -1108,7 +1108,7 @@ export default function SpaceDashboard({
 
     {/* 底部精緻手繪風全景天際線：全寬展開、完全貼近頁底 */}
     <div className="pt-6 w-full -mb-4 sm:-mb-6 flex justify-center items-end pointer-events-none overflow-hidden">
-      <PanoramicSkyline className="w-full max-w-[1700px] h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink)] opacity-45 dark:opacity-30 pointer-events-none transition-opacity" />
+      <PanoramicSkyline className="w-full max-w-[1700px] h-28 sm:h-36 md:h-48 lg:h-56 text-[var(--ink)] opacity-60 dark:opacity-45 pointer-events-none transition-opacity" />
     </div>
 
     {/* 範本小工具即時試玩預覽彈窗 */}
