@@ -65,6 +65,7 @@ export default function App() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [loginModalRegister, setLoginModalRegister] = useState(false);
 
   // 代管發布、團隊協作、討論抽屜與復原浮動狀態
   const [publishModalOpen, setPublishModalOpen] = useState(false);
@@ -438,26 +439,6 @@ export default function App() {
     url.searchParams.delete('share');
     url.searchParams.set('view', 'landing');
     window.history.pushState({}, '', url.toString());
-  };
-
-  // 快速免登入體驗 Demo
-  const handleQuickDemo = async () => {
-    try {
-      await login('demo', 'demo1234');
-      handleNavigateHome();
-    } catch {
-      try {
-        await register({
-          username: 'demo',
-          password: 'demo1234',
-          displayName: '體驗訪客',
-        });
-        handleNavigateHome();
-      } catch (err) {
-        console.warn('快速體驗失敗', err);
-        setLoginModalOpen(true);
-      }
-    }
   };
 
   // 切換置頂釘選狀態
@@ -1108,17 +1089,21 @@ export default function App() {
             if (user) {
               handleNavigateHome();
             } else {
+              setLoginModalRegister(false);
               setLoginModalOpen(true);
             }
           }}
-          onQuickDemo={handleQuickDemo}
-          onOpenLoginModal={() => setLoginModalOpen(true)}
+          onOpenLoginModal={(isRegister = false) => {
+            setLoginModalRegister(Boolean(isRegister));
+            setLoginModalOpen(true);
+          }}
           theme={theme}
           onToggleDarkMode={handleToggleDarkMode}
         />
         {loginModalOpen && (
           <LoginCard
             isModal={true}
+            defaultIsRegister={loginModalRegister}
             onClose={() => setLoginModalOpen(false)}
             onSuccess={() => {
               setLoginModalOpen(false);
@@ -1450,7 +1435,7 @@ export default function App() {
             className="text-white/60 hover:text-white text-xs p-1"
             title="關閉提示"
           >
-            ✕
+            <X size={12} />
           </button>
         </div>
       )}
@@ -1459,6 +1444,7 @@ export default function App() {
       {loginModalOpen && (
         <LoginCard
           isModal={true}
+          defaultIsRegister={loginModalRegister}
           onClose={() => setLoginModalOpen(false)}
           onSuccess={() => {
             setLoginModalOpen(false);

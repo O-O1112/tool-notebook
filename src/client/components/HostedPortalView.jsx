@@ -16,6 +16,7 @@ import {
   ChevronUp,
   Share2,
   BookOpen,
+  X,
 } from 'lucide-react';
 import SandboxedFrame from './SandboxedFrame';
 import QRCodeView from './QRCodeView';
@@ -399,7 +400,7 @@ export default function HostedPortalView({ hostedCode, onBackToHome }) {
               <span>模式 3：外部網站無縫嵌入代碼</span>
             </div>
             <button type="button" onClick={() => setShowEmbedCode(false)} className="text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]">
-              ✕
+              <X size={14} />
             </button>
           </div>
           <p className="text-[11px] text-[var(--muted,#89959b)] leading-relaxed">
@@ -425,7 +426,7 @@ export default function HostedPortalView({ hostedCode, onBackToHome }) {
           <div className="flex items-center justify-between pb-1 border-b border-[var(--line,#e4e8e5)]">
             <span className="font-bold text-[var(--ink,#1f2a2e)]">手機掃碼立即使用</span>
             <button type="button" onClick={() => setShowQr(false)} className="text-[var(--muted,#89959b)] hover:text-[var(--ink,#1f2a2e)]">
-              ✕
+              <X size={14} />
             </button>
           </div>
           <div className="p-3 bg-white rounded-xl inline-block border border-[var(--line,#e4e8e5)] shadow-inner">

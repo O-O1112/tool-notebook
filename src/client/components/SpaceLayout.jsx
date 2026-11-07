@@ -338,9 +338,9 @@ export default function SpaceLayout({
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] text-xs"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] text-xs p-0.5"
                 >
-                  ✕
+                  <X size={12} />
                 </button>
               )}
             </div>

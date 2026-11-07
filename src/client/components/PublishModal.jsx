@@ -354,14 +354,14 @@ export default function PublishModal({
           ) : (
             /* 發布完成結果頁 */
             <div className="space-y-6 animate-fadeIn">
-              <div className="p-4 rounded-2xl bg-[var(--card-bg)] border-2 border-emerald-600/40 shadow-sm flex items-center gap-3.5">
+              <div className="p-4 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border-2 border-emerald-600/40 shadow-sm flex items-center gap-3.5">
                 <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                   <Check size={20} strokeWidth={2.5} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300">微應用代管發布成功！</h4>
-                  <p className="text-xs text-[var(--ink)] opacity-90 mt-0.5 leading-relaxed">
-                    已產生專屬代碼 <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--paper)] border border-[var(--line)] text-emerald-700 dark:text-emerald-300">{publishedShare?.share_code}</span>，任何訪客打開皆能直接運行。
+                  <h4 className="text-sm font-bold text-emerald-950 dark:text-emerald-100">微應用代管發布成功！</h4>
+                  <p className="text-xs text-emerald-900/90 dark:text-emerald-200/90 mt-0.5 leading-relaxed">
+                    已產生專屬代碼 <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-100/90 dark:bg-emerald-900/70 border border-emerald-400/50 dark:border-emerald-600 text-emerald-950 dark:text-emerald-100">{publishedShare?.share_code}</span>，任何訪客打開皆能直接全版運行。
                   </p>
                 </div>
               </div>

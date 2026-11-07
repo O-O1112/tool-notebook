@@ -29,7 +29,6 @@ import { WashiTapePinDoodle, LoginWelcomeIllustration } from './Illustrations';
 export default function LandingView({
   user,
   onGoToDashboard,
-  onQuickDemo,
   onOpenLoginModal,
   theme = 'warm',
   onToggleDarkMode,
@@ -126,19 +125,17 @@ export default function LandingView({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={onQuickDemo}
-                  className="notebook-btn-secondary text-xs py-2 px-3 hidden sm:inline-flex items-center gap-1.5 font-semibold text-[var(--coral)]"
-                  title="一鍵以體驗帳號快速試用"
+                  onClick={() => onOpenLoginModal(false)}
+                  className="notebook-btn-secondary text-xs py-2 px-3 font-semibold text-[var(--ink)]"
                 >
-                  <Sparkles size={13} />
-                  <span>免登入體驗 Demo</span>
+                  登入
                 </button>
                 <button
                   type="button"
-                  onClick={onOpenLoginModal}
+                  onClick={() => onOpenLoginModal(true)}
                   className="notebook-btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5 shadow-xs font-semibold"
                 >
-                  <span>登入 / 註冊</span>
+                  <span>免費註冊</span>
                 </button>
               </div>
             )}
@@ -171,30 +168,27 @@ export default function LandingView({
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
               <button
                 type="button"
-                onClick={onGoToDashboard}
+                onClick={() => (user ? onGoToDashboard() : onOpenLoginModal(true))}
                 className="notebook-btn-primary py-3 px-6 text-sm flex items-center gap-2 shadow-md hover:scale-[1.02] transition-transform font-bold"
               >
-                <span>開啟工具主頁</span>
+                <span>免費開始使用</span>
                 <ArrowRight size={16} />
               </button>
-
-              {!user && (
-                <button
-                  type="button"
-                  onClick={onQuickDemo}
-                  className="notebook-btn-secondary py-3 px-5 text-sm flex items-center gap-2 font-semibold hover:border-[var(--coral)] transition-colors"
-                >
-                  <Sparkles size={15} className="text-[var(--coral)]" />
-                  <span>一鍵免登入體驗 Demo</span>
-                </button>
-              )}
 
               <button
                 type="button"
                 onClick={() => scrollToSection('section-modes')}
-                className="notebook-btn-secondary py-3 px-4 text-sm text-[var(--muted)] hover:text-[var(--ink)]"
+                className="notebook-btn-secondary py-3 px-5 text-sm font-semibold hover:border-[var(--coral)] transition-colors"
               >
                 探索三大代管模式
+              </button>
+
+              <button
+                type="button"
+                onClick={() => scrollToSection('section-templates')}
+                className="notebook-btn-secondary py-3 px-4 text-sm text-[var(--muted)] hover:text-[var(--ink)]"
+              >
+                瀏覽範本專區
               </button>
             </div>
 
@@ -228,7 +222,7 @@ export default function LandingView({
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-[var(--coral)]" />
                   <span className="font-bold text-sm text-[var(--ink)]">
-                    即時體驗：{demoTool.title}
+                    互動預覽：{demoTool.title}
                   </span>
                   <span className="notebook-badge text-[10px]">自訂程式</span>
                 </div>
@@ -248,14 +242,14 @@ export default function LandingView({
 
               <div className="mt-3 pt-2 flex items-center justify-between text-xs text-[var(--muted)]">
                 <span className="text-[11px]">
-                  無需安裝任何環境，貼上代碼或範本即刻運行
+                  無需安裝任何本機環境，輸入或匯入代碼即可安全運行
                 </span>
                 <button
                   type="button"
-                  onClick={onGoToDashboard}
+                  onClick={() => (user ? onGoToDashboard() : onOpenLoginModal(true))}
                   className="text-[var(--coral)] font-semibold hover:underline flex items-center gap-1"
                 >
-                  <span>收錄到我的手帳</span>
+                  <span>立即建立您的手帳</span>
                   <ChevronRight size={12} />
                 </button>
               </div>
@@ -621,10 +615,10 @@ export default function LandingView({
           <div className="flex items-center gap-4 font-medium">
             <button
               type="button"
-              onClick={onGoToDashboard}
+              onClick={() => (user ? onGoToDashboard() : onOpenLoginModal(true))}
               className="text-[var(--coral)] hover:underline font-bold"
             >
-              進入工具主頁
+              {user ? '進入工作空間' : '免費註冊使用'}
             </button>
             <span>•</span>
             <button

@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
-import { BookOpen, ArrowRight, Sparkles, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, ArrowRight, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { LoginWelcomeIllustration } from './Illustrations';
 
-export default function LoginCard({ isModal = false, onClose = null, onSuccess = null }) {
+export default function LoginCard({
+  isModal = false,
+  onClose = null,
+  onSuccess = null,
+  defaultIsRegister = false,
+}) {
   const { login, register } = useAuth();
-  const [isRegister, setIsRegister] = useState(false);
+  const [isRegister, setIsRegister] = useState(defaultIsRegister);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setIsRegister(defaultIsRegister);
+  }, [defaultIsRegister]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,30 +40,6 @@ export default function LoginCard({ isModal = false, onClose = null, onSuccess =
       if (onClose) onClose();
     } catch (err) {
       setError(err.message || '操作失敗，請確認輸入資料');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleQuickDemo = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      await login('demo', 'demo1234');
-      if (onSuccess) onSuccess();
-      if (onClose) onClose();
-    } catch (err) {
-      try {
-        await register({
-          username: 'demo',
-          password: 'demo1234',
-          displayName: '體驗訪客',
-        });
-        if (onSuccess) onSuccess();
-        if (onClose) onClose();
-      } catch (regErr) {
-        setError(regErr.message || '無法啟用體驗帳號，請手動註冊專屬帳號');
-      }
     } finally {
       setLoading(false);
     }
@@ -147,44 +132,24 @@ export default function LoginCard({ isModal = false, onClose = null, onSuccess =
         <button
           type="submit"
           disabled={loading}
-          className="notebook-btn-primary w-full py-2.5 mt-2"
+          className="notebook-btn-primary w-full py-2.5 mt-2 font-bold"
         >
-          <span>{loading ? '處理中…' : isRegister ? '註冊並建立空間' : '登入工作空間'}</span>
+          <span>{loading ? '處理中…' : isRegister ? '免費註冊並開啟空間' : '登入工作空間'}</span>
           <ArrowRight size={16} />
         </button>
       </form>
 
-      {/* 一鍵體驗帳號快速試用 */}
-      <div className="relative my-4">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-[var(--line)]" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-[var(--card-bg)] px-2 text-[var(--muted)]">或免填寫快速試用</span>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={handleQuickDemo}
-        disabled={loading}
-        className="notebook-btn-secondary w-full py-2.5 flex items-center justify-center gap-2 text-xs font-semibold"
-      >
-        <Sparkles size={14} className="text-[var(--coral)]" />
-        <span>一鍵以體驗帳號快速進入</span>
-      </button>
-
       {/* 切換登入 / 註冊 */}
-      <div className="mt-5 text-center">
+      <div className="mt-5 text-center pt-3 border-t border-[var(--line)]">
         <button
           type="button"
           onClick={() => {
             setIsRegister(!isRegister);
             setError('');
           }}
-          className="text-xs text-[var(--muted)] hover:text-[var(--coral)] transition-colors"
+          className="text-xs text-[var(--muted)] hover:text-[var(--coral)] transition-colors font-medium"
         >
-          {isRegister ? '已有帳號？返回登入' : '還沒有帳號？立即註冊'}
+          {isRegister ? '已有帳號？返回登入' : '還沒有帳號？立即免費註冊'}
         </button>
       </div>
     </div>

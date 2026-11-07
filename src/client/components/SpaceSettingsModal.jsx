@@ -490,7 +490,7 @@ export default function SpaceSettingsModal({
                             className="w-4 h-4 rounded-full border shadow-xs"
                             style={{ backgroundColor: t.color, borderColor: t.border }}
                           />
-                          {isSelected && <span className="text-xs font-bold text-[var(--coral)]">✓</span>}
+                          {isSelected && <Check size={14} className="text-[var(--coral)]" strokeWidth={2.5} />}
                         </div>
                         <div className="text-xs font-bold text-[var(--ink)]">{t.name}</div>
                         <div className="text-[10px] text-[var(--muted)] mt-0.5 leading-relaxed">{t.desc}</div>
