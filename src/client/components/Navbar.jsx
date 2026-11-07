@@ -319,7 +319,7 @@ export default function Navbar({
                 </div>
               )}
 
-              {/* 4. 團隊與發布整合選單 (非訪客模式) */}
+              {/* 4. Canva 風格核心「分享 (Share)」整合中心 (非訪客模式) */}
               {!isGuest && currentSpace && (
                 <div className="relative">
                   <button
@@ -328,36 +328,38 @@ export default function Navbar({
                       setTeamMenuOpen(!teamMenuOpen);
                       setMoreMenuOpen(false);
                     }}
-                    className={`notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 font-medium ${
-                      teamMenuOpen ? 'bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)]' : ''
+                    className={`notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 whitespace-nowrap shrink-0 font-semibold transition-all ${
+                      teamMenuOpen
+                        ? 'bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)] shadow-xs'
+                        : 'text-[var(--ink)] hover:border-[var(--coral)]'
                     }`}
-                    title="團隊討論、成員權限與代管發布中心"
+                    title="分享、代管發布、協作邀請與 QR Code"
                   >
-                    <Users size={14} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                    <span className="hidden md:inline">團隊與發布</span>
+                    <Share2 size={14} className="shrink-0 text-[var(--coral)]" />
+                    <span>分享</span>
                     <ChevronDown size={13} className="text-[var(--muted)] shrink-0" />
                   </button>
 
                   {teamMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setTeamMenuOpen(false)} />
-                      <div className="absolute right-0 mt-1.5 w-56 notebook-card bg-[var(--card-bg)] shadow-xl z-50 p-1.5 animate-fadeIn border border-[var(--line)] text-xs">
+                      <div className="absolute right-0 mt-1.5 w-60 notebook-card bg-[var(--card-bg)] shadow-xl z-50 p-1.5 animate-fadeIn border border-[var(--line)] text-xs">
                         <div className="px-2.5 py-1 text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider">
-                          團隊協作與發布
+                          分享、協作與發布
                         </div>
-                        {onOpenTeamChat && (
+                        {onOpenPublishModal && (
                           <button
                             type="button"
                             onClick={() => {
                               setTeamMenuOpen(false);
-                              onOpenTeamChat();
+                              onOpenPublishModal();
                             }}
-                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors group"
                           >
-                            <MessageSquare size={14} className="text-amber-500 shrink-0" />
+                            <Share2 size={14} className="text-indigo-500 shrink-0 group-hover:scale-110 transition-transform" />
                             <div className="min-w-0 flex-1">
-                              <div className="font-semibold">團隊討論室</div>
-                              <div className="text-[10px] text-[var(--muted)]">即時協作對話與成員動態</div>
+                              <div className="font-semibold text-indigo-600 dark:text-indigo-400">發布獨立代管微應用</div>
+                              <div className="text-[10px] text-[var(--muted)]">模式 1、2、3 專屬網址與嵌入代碼</div>
                             </div>
                           </button>
                         )}
@@ -368,28 +370,12 @@ export default function Navbar({
                               setTeamMenuOpen(false);
                               onOpenTeamModal();
                             }}
-                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors group"
                           >
-                            <Users size={14} className="text-emerald-500 shrink-0" />
+                            <Users size={14} className="text-emerald-500 shrink-0 group-hover:scale-110 transition-transform" />
                             <div className="min-w-0 flex-1">
                               <div className="font-semibold">團隊成員與角色</div>
-                              <div className="text-[10px] text-[var(--muted)]">管理協作者權限與成員清單</div>
-                            </div>
-                          </button>
-                        )}
-                        {onOpenPublishModal && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTeamMenuOpen(false);
-                              onOpenPublishModal();
-                            }}
-                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
-                          >
-                            <Share2 size={14} className="text-indigo-500 shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <div className="font-semibold text-indigo-600 dark:text-indigo-400">發布獨立代管微應用</div>
-                              <div className="text-[10px] text-[var(--muted)]">打包為專屬網址與嵌入代碼</div>
+                              <div className="text-[10px] text-[var(--muted)]">管理協作者權限與邀請碼</div>
                             </div>
                           </button>
                         )}
@@ -400,12 +386,28 @@ export default function Navbar({
                               setTeamMenuOpen(false);
                               onOpenQRCode();
                             }}
-                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors group"
                           >
-                            <QrCode size={14} className="text-[#3b827e] shrink-0" />
+                            <QrCode size={14} className="text-[#3b827e] shrink-0 group-hover:scale-110 transition-transform" />
                             <div className="min-w-0 flex-1">
                               <div className="font-semibold">空間 QR Code</div>
                               <div className="text-[10px] text-[var(--muted)]">手機掃描免登入直達</div>
+                            </div>
+                          </button>
+                        )}
+                        {onOpenTeamChat && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTeamMenuOpen(false);
+                              onOpenTeamChat();
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors group"
+                          >
+                            <MessageSquare size={14} className="text-amber-500 shrink-0 group-hover:scale-110 transition-transform" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold">團隊討論室</div>
+                              <div className="text-[10px] text-[var(--muted)]">即時協作對話與成員動態</div>
                             </div>
                           </button>
                         )}
