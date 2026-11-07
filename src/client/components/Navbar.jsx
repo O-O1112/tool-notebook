@@ -29,6 +29,7 @@ import {
   MessageSquare,
   Shield,
   ShieldCheck,
+  MoreHorizontal,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -63,6 +64,8 @@ export default function Navbar({
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [teamMenuOpen, setTeamMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   const handleCopyCode = () => {
     if (!currentSpace?.invite_code) return;
@@ -223,9 +226,9 @@ export default function Navbar({
         {/* 右側工具列 */}
         <div className="flex items-center gap-2">
           {currentView === 'space' ? (
-            /* 空間內部右側：佈局切換、QR Code、設定、新增工具 */
+            /* 空間內部右側：佈局切換、搜尋、團隊與發布整合選單、更多功能、新增工具、外觀模式 */
             <>
-              {/* 佈局切換器 (貨架分欄 | 瀑布流 | 網格 | 分頁 | 折起專注) */}
+              {/* 1. 佈局切換器 (貨架分欄 | 瀑布流 | 網格 | 分頁 | 折起專注) */}
               <div className="bg-[var(--paper)] p-0.5 rounded-xl flex items-center border border-[var(--line)] shrink-0">
                 <button
                   onClick={() => onToggleLayout('shelf')}
@@ -245,7 +248,7 @@ export default function Navbar({
                       ? 'bg-[var(--card-bg)] text-[var(--coral)] shadow-xs font-semibold'
                       : 'text-[var(--muted)] hover:text-[var(--ink)]'
                   }`}
-                  title="緊湊瀑布流模式 (高矮無縫自適應)"
+                  title="緊湊瀑布流模式"
                 >
                   <Columns3 size={15} />
                 </button>
@@ -256,7 +259,7 @@ export default function Navbar({
                       ? 'bg-[var(--card-bg)] text-[var(--coral)] shadow-xs font-semibold'
                       : 'text-[var(--muted)] hover:text-[var(--ink)]'
                   }`}
-                  title="網格並排模式 (支援拖曳重排與縮放)"
+                  title="網格並排模式"
                 >
                   <LayoutGrid size={15} />
                 </button>
@@ -278,13 +281,13 @@ export default function Navbar({
                       ? 'bg-[var(--card-bg)] text-[var(--coral)] shadow-xs font-semibold'
                       : 'text-[var(--muted)] hover:text-[var(--ink)]'
                   }`}
-                  title="折起專注模式 (全部只顯示名稱，點開就放大)"
+                  title="折起專注模式"
                 >
                   <ListCollapse size={15} />
                 </button>
               </div>
 
-              {/* 快捷指令面板按鈕 (Ctrl + K) */}
+              {/* 2. 快捷指令面板按鈕 (Ctrl + K) */}
               {onOpenCommandPalette && (
                 <button
                   type="button"
@@ -293,26 +296,208 @@ export default function Navbar({
                   title="全域快捷指令面板 (Ctrl + K)"
                 >
                   <Search size={14} className="shrink-0" />
-                  <span className="hidden md:inline font-normal">搜尋...</span>
-                  <kbd className="hidden lg:inline-flex items-center text-[10px] font-mono bg-[var(--paper)] px-1.5 py-0.5 rounded border border-[var(--line)] text-[var(--muted)]">
+                  <span className="hidden xl:inline font-normal">搜尋...</span>
+                  <kbd className="hidden 2xl:inline-flex items-center text-[10px] font-mono bg-[var(--paper)] px-1.5 py-0.5 rounded border border-[var(--line)] text-[var(--muted)]">
                     Ctrl K
                   </kbd>
                 </button>
               )}
 
-              {/* 大螢幕投影簡報模式 */}
-              {onTogglePresentation && (
+              {/* 3. 訪客唯讀標籤 */}
+              {isGuest && (
+                <div className="flex items-center gap-1 bg-[#f0f7f6] dark:bg-[#152723] text-[#3b827e] border border-[#b8dfd9] dark:border-[#21473f] px-2.5 py-1 rounded-xl text-xs font-medium whitespace-nowrap shrink-0">
+                  <Eye size={13} className="shrink-0" />
+                  <span>訪客唯讀</span>
+                </div>
+              )}
+
+              {/* 4. 團隊與發布整合選單 (非訪客模式) */}
+              {!isGuest && currentSpace && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTeamMenuOpen(!teamMenuOpen);
+                      setMoreMenuOpen(false);
+                    }}
+                    className={`notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 font-medium ${
+                      teamMenuOpen ? 'bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)]' : ''
+                    }`}
+                    title="團隊討論、成員權限與代管發布中心"
+                  >
+                    <Users size={14} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    <span className="hidden md:inline">團隊與發布</span>
+                    <ChevronDown size={13} className="text-[var(--muted)] shrink-0" />
+                  </button>
+
+                  {teamMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setTeamMenuOpen(false)} />
+                      <div className="absolute right-0 mt-1.5 w-56 notebook-card bg-[var(--card-bg)] shadow-xl z-50 p-1.5 animate-fadeIn border border-[var(--line)] text-xs">
+                        <div className="px-2.5 py-1 text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider">
+                          團隊協作與發布
+                        </div>
+                        {onOpenTeamChat && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTeamMenuOpen(false);
+                              onOpenTeamChat();
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                          >
+                            <MessageSquare size={14} className="text-amber-500 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold">團隊討論室</div>
+                              <div className="text-[10px] text-[var(--muted)]">即時協作對話與成員動態</div>
+                            </div>
+                          </button>
+                        )}
+                        {onOpenTeamModal && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTeamMenuOpen(false);
+                              onOpenTeamModal();
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                          >
+                            <Users size={14} className="text-emerald-500 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold">團隊成員與角色</div>
+                              <div className="text-[10px] text-[var(--muted)]">管理協作者權限與成員清單</div>
+                            </div>
+                          </button>
+                        )}
+                        {onOpenPublishModal && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTeamMenuOpen(false);
+                              onOpenPublishModal();
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                          >
+                            <Share2 size={14} className="text-indigo-500 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold text-indigo-600 dark:text-indigo-400">發布獨立代管微應用</div>
+                              <div className="text-[10px] text-[var(--muted)]">打包為專屬網址與嵌入代碼</div>
+                            </div>
+                          </button>
+                        )}
+                        {onOpenQRCode && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTeamMenuOpen(false);
+                              onOpenQRCode();
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                          >
+                            <QrCode size={14} className="text-[#3b827e] shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold">空間 QR Code</div>
+                              <div className="text-[10px] text-[var(--muted)]">手機掃描免登入直達</div>
+                            </div>
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* 5. 更多操作選單 (...) */}
+              {!isGuest && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMoreMenuOpen(!moreMenuOpen);
+                      setTeamMenuOpen(false);
+                    }}
+                    className={`notebook-btn-secondary text-xs p-1.5 flex items-center justify-center shrink-0 ${
+                      moreMenuOpen ? 'bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)]' : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                    }`}
+                    title="更多空間功能"
+                  >
+                    <MoreHorizontal size={15} />
+                  </button>
+
+                  {moreMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
+                      <div className="absolute right-0 mt-1.5 w-52 notebook-card bg-[var(--card-bg)] shadow-xl z-50 p-1.5 animate-fadeIn border border-[var(--line)] text-xs">
+                        <div className="px-2.5 py-1 text-[10px] font-semibold text-[var(--muted)] uppercase tracking-wider">
+                          工具箱擴充
+                        </div>
+                        {effectiveCanEdit && onOpenAIModal && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMoreMenuOpen(false);
+                              onOpenAIModal();
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                          >
+                            <Sparkles size={14} className="text-purple-500 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold text-purple-600 dark:text-purple-400">AI 智慧代寫</div>
+                              <div className="text-[10px] text-[var(--muted)]">自動生成獨立小工具代碼</div>
+                            </div>
+                          </button>
+                        )}
+                        {onTogglePresentation && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMoreMenuOpen(false);
+                              onTogglePresentation();
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                          >
+                            <Tv size={14} className="text-purple-600 shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold">投影簡報模式</div>
+                              <div className="text-[10px] text-[var(--muted)]">大螢幕無干擾純淨展示 (Shift+P)</div>
+                            </div>
+                          </button>
+                        )}
+                        {currentSpace && onOpenSettings && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMoreMenuOpen(false);
+                              onOpenSettings('info');
+                            }}
+                            className="w-full text-left px-2.5 py-2 hover:bg-[var(--paper)] rounded-xl flex items-center gap-2.5 text-[var(--ink)] transition-colors"
+                          >
+                            <Settings size={14} className="text-[var(--coral)] shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold">空間設定與備份</div>
+                              <div className="text-[10px] text-[var(--muted)]">修改名稱、備忘與匯出 JSON</div>
+                            </div>
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* 6. 主要行動按鈕：+ 新增工具 */}
+              {!isGuest && effectiveCanEdit && (
                 <button
-                  type="button"
-                  onClick={onTogglePresentation}
-                  className="notebook-btn-secondary text-xs p-1.5 flex items-center justify-center text-purple-600 hover:text-purple-700"
-                  title="切換大螢幕投影簡報模式 (Shift + P)"
+                  onClick={onAddToolClick}
+                  className="notebook-btn-primary text-xs py-1.5 px-3 whitespace-nowrap shrink-0 shadow-xs flex items-center gap-1.5"
+                  title="新增或貼上小工具"
                 >
-                  <Tv size={15} />
+                  <Plus size={14} className="shrink-0" />
+                  <span className="font-semibold">新增工具</span>
                 </button>
               )}
 
-              {/* 深色模式一鍵切換按鈕 (Sun / Moon) */}
+              {/* 7. 深色模式一鍵切換按鈕 (Sun / Moon) */}
               <button
                 type="button"
                 onClick={onToggleDarkMode}
@@ -325,101 +510,6 @@ export default function Navbar({
                   <Moon size={15} className="text-[var(--muted)] hover:-rotate-12 transition-transform shrink-0" />
                 )}
               </button>
-
-              {/* 空間 QR Code 分享按鈕 */}
-              {currentSpace && onOpenQRCode && (
-                <button
-                  type="button"
-                  onClick={onOpenQRCode}
-                  className="notebook-btn-secondary text-xs p-1.5 flex items-center justify-center text-[#3b827e] hover:text-[#285d5a]"
-                  title="空間 QR Code 與免登入分享"
-                >
-                  <QrCode size={15} />
-                </button>
-              )}
-
-              {/* 訪客模式標籤 */}
-              {isGuest && (
-                <div className="flex items-center gap-1 bg-[#f0f7f6] dark:bg-[#152723] text-[#3b827e] border border-[#b8dfd9] dark:border-[#21473f] px-2.5 py-1 rounded-xl text-xs font-medium whitespace-nowrap shrink-0">
-                  <Eye size={13} className="shrink-0" />
-                  <span>訪客唯讀</span>
-                </div>
-              )}
-
-              {/* 獨立代管發布中心按鈕 */}
-              {!isGuest && currentSpace && onOpenPublishModal && (
-                <button
-                  type="button"
-                  onClick={onOpenPublishModal}
-                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-indigo-600 hover:text-indigo-700 bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 font-semibold"
-                  title="小工具獨立代管與外部嵌入發布中心"
-                >
-                  <Share2 size={13} className="shrink-0" />
-                  <span className="hidden md:inline">發布代管</span>
-                </button>
-              )}
-
-              {/* 團隊成員管理按鈕 */}
-              {!isGuest && currentSpace && onOpenTeamModal && (
-                <button
-                  type="button"
-                  onClick={onOpenTeamModal}
-                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-emerald-600 hover:text-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 font-semibold"
-                  title="管理團隊成員與角色權限 (RBAC)"
-                >
-                  <Users size={13} className="shrink-0" />
-                  <span className="hidden md:inline">團隊成員</span>
-                </button>
-              )}
-
-              {/* 團隊即時討論抽屜按鈕 */}
-              {!isGuest && currentSpace && onOpenTeamChat && (
-                <button
-                  type="button"
-                  onClick={onOpenTeamChat}
-                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-amber-600 hover:text-amber-700 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 font-semibold"
-                  title="開啟團隊討論室與即時操作動態"
-                >
-                  <MessageSquare size={13} className="shrink-0" />
-                  <span className="hidden md:inline">團隊對話</span>
-                </button>
-              )}
-
-              {/* 空間設定按鈕 */}
-              {!isGuest && currentSpace && onOpenSettings && (
-                <button
-                  onClick={() => onOpenSettings('info')}
-                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-[var(--coral)] hover:bg-[var(--coral-light)]"
-                  title="空間設定 (名稱、備忘、JSON 工具備份)"
-                >
-                  <Settings size={13} className="shrink-0" />
-                  <span className="font-semibold hidden sm:inline">空間設定</span>
-                </button>
-              )}
-
-              {/* AI 智慧代寫小工具按鈕 */}
-              {!isGuest && effectiveCanEdit && onOpenAIModal && (
-                <button
-                  type="button"
-                  onClick={onOpenAIModal}
-                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-purple-600 hover:text-purple-700 bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800 font-semibold"
-                  title="使用 AI 自動生成獨立小工具代碼"
-                >
-                  <Sparkles size={14} className="shrink-0" />
-                  <span className="hidden sm:inline">AI 代寫</span>
-                </button>
-              )}
-
-              {/* 貼上工具按鈕 (擁有者與協作者皆可新增) */}
-              {!isGuest && effectiveCanEdit && (
-                <button
-                  onClick={onAddToolClick}
-                  className="notebook-btn-primary text-xs py-1.5 px-3 whitespace-nowrap shrink-0"
-                >
-                  <Plus size={14} className="shrink-0" />
-                  <span className="hidden sm:inline">新增工具</span>
-                </button>
-              )}
             </>
           ) : (
             /* 大廳模式右側：快捷指令面板、加入空間、建立空間、主題切換 */

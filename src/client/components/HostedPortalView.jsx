@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import SandboxedFrame from './SandboxedFrame';
 import QRCodeView from './QRCodeView';
+import { parseToolInput } from '../utils/codeParser';
 
 export default function HostedPortalView({ hostedCode, onBackToHome }) {
   const [loading, setLoading] = useState(true);
@@ -258,9 +259,9 @@ export default function HostedPortalView({ hostedCode, onBackToHome }) {
           // 模式 1 / 模式 2 (分頁): 單一工具全視窗填滿
           <div className="w-full h-full p-0">
             <SandboxedFrame
-              code={activeTool.content}
-              type={activeTool.type}
-              title={activeTool.title}
+              htmlContent={parseToolInput(activeTool?.content || activeTool?.code || '').htmlContent}
+              code={activeTool?.content || activeTool?.code}
+              title={activeTool?.title}
               className="w-full h-full border-0 rounded-none shadow-none bg-transparent"
             />
           </div>
@@ -269,20 +270,30 @@ export default function HostedPortalView({ hostedCode, onBackToHome }) {
           <div className="w-full h-full flex flex-col md:flex-row items-stretch divide-y md:divide-y-0 md:divide-x divide-[var(--line,#e4e8e5)]">
             <div className="flex-1 h-1/2 md:h-full relative overflow-hidden flex flex-col">
               <div className="px-3 py-1 bg-[var(--card-bg,#ffffff)]/80 border-b border-[var(--line,#e4e8e5)] text-[11px] font-bold text-[var(--muted,#89959b)] flex items-center justify-between">
-                <span>{customTabs[tools[0].id] || tools[0].title}</span>
+                <span>{customTabs[tools[0]?.id] || tools[0]?.title}</span>
                 <span className="text-[10px] text-[var(--coral,#e17b62)] font-normal">左欄工具</span>
               </div>
               <div className="flex-1 w-full h-full">
-                <SandboxedFrame code={tools[0].content} type={tools[0].type} title={tools[0].title} className="w-full h-full border-0" />
+                <SandboxedFrame
+                  htmlContent={parseToolInput(tools[0]?.content || tools[0]?.code || '').htmlContent}
+                  code={tools[0]?.content || tools[0]?.code}
+                  title={tools[0]?.title}
+                  className="w-full h-full border-0"
+                />
               </div>
             </div>
             <div className="flex-1 h-1/2 md:h-full relative overflow-hidden flex flex-col">
               <div className="px-3 py-1 bg-[var(--card-bg,#ffffff)]/80 border-b border-[var(--line,#e4e8e5)] text-[11px] font-bold text-[var(--muted,#89959b)] flex items-center justify-between">
-                <span>{customTabs[tools[1].id] || tools[1].title}</span>
+                <span>{customTabs[tools[1]?.id] || tools[1]?.title}</span>
                 <span className="text-[10px] text-[#3b827e] font-normal">右欄工具</span>
               </div>
               <div className="flex-1 w-full h-full">
-                <SandboxedFrame code={tools[1].content} type={tools[1].type} title={tools[1].title} className="w-full h-full border-0" />
+                <SandboxedFrame
+                  htmlContent={parseToolInput(tools[1]?.content || tools[1]?.code || '').htmlContent}
+                  code={tools[1]?.content || tools[1]?.code}
+                  title={tools[1]?.title}
+                  className="w-full h-full border-0"
+                />
               </div>
             </div>
           </div>

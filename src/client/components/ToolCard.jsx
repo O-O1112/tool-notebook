@@ -179,7 +179,7 @@ export default function ToolCard({
 
           <div className="w-2 h-2 rounded-full bg-[var(--coral)] shrink-0" />
           <h3
-            className="text-sm font-semibold text-[var(--ink)] truncate shrink"
+            className="text-sm font-semibold text-[var(--ink)] truncate max-w-[130px] sm:max-w-[200px]"
             title={`${tool.title}${tool.updated_by_name ? ` (最後由 ${tool.updated_by_name} 編輯)` : ''}`}
           >
             {tool.title}
@@ -193,167 +193,14 @@ export default function ToolCard({
             </span>
           )}
 
-          <span className="notebook-badge shrink-0 text-[10px]" title={getTypeName(tool.type)}>
+          <span className="notebook-badge shrink-0 text-[10px] inline-flex items-center gap-1" title={getTypeName(tool.type)}>
             <span className="shrink-0">{getTypeIcon(tool.type)}</span>
-            <span className="hidden xl:inline">{getTypeName(tool.type)}</span>
+            <span className="hidden sm:inline">{getTypeName(tool.type)}</span>
           </span>
         </div>
 
-        {/* 控制按鈕組 */}
-        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-          {/* 便箋色票切換 */}
-          {effectiveCanEdit && !isPresentationMode && onChangeColor && (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setColorMenuOpen(!colorMenuOpen)}
-                className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
-                title="選擇便箋紙質色彩"
-              >
-                <Palette size={14} />
-              </button>
-
-              {colorMenuOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setColorMenuOpen(false)} />
-                  <div className="absolute right-0 mt-1 w-36 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn">
-                    <div className="text-[10px] font-semibold text-[var(--muted)] px-2 py-1 uppercase tracking-wider">
-                      便箋底色
-                    </div>
-                    <div className="grid grid-cols-3 gap-1.5 p-1">
-                      {CARD_COLORS.map((c) => (
-                        <button
-                          key={c.id}
-                          onClick={() => {
-                            onChangeColor(tool.id, c.id);
-                            setColorMenuOpen(false);
-                          }}
-                          className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-transform hover:scale-110 ${
-                            (tool.color || 'default') === c.id ? 'ring-2 ring-[var(--coral)]' : ''
-                          }`}
-                          style={{ backgroundColor: c.bg, borderColor: c.border }}
-                          title={c.label}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* 更多操作選單 (獨立發布代管、建立副本、複製至其他空間、匯出 JSON) */}
-          {!isPresentationMode && (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
-                title="更多小工具動作"
-              >
-                <MoreVertical size={14} />
-              </button>
-
-              {moreMenuOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
-                  <div
-                    className="absolute right-0 mt-1 w-48 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn text-xs"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {onPublishHosted && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMoreMenuOpen(false);
-                          onPublishHosted(tool);
-                        }}
-                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium transition-colors"
-                      >
-                        <Share2 size={13} className="shrink-0" />
-                        <span>發布為獨立代管網站...</span>
-                      </button>
-                    )}
-                    {effectiveCanEdit && onDuplicate && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMoreMenuOpen(false);
-                          onDuplicate(tool);
-                        }}
-                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
-                      >
-                        <Copy size={13} className="text-[var(--coral)]" />
-                        <span>建立副本</span>
-                      </button>
-                    )}
-                    {onCloneToSpace && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMoreMenuOpen(false);
-                          onCloneToSpace(tool);
-                        }}
-                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
-                      >
-                        <Send size={13} className="text-blue-500" />
-                        <span>複製到其他空間...</span>
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={handleExportTool}
-                      className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
-                    >
-                      <Download size={13} className="text-emerald-500" />
-                      <span>匯出小工具 (.json)</span>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* 置頂釘選按鈕 */}
-          {!isPresentationMode && onTogglePin && effectiveCanEdit && (
-            <button
-              onClick={() => onTogglePin(tool.id)}
-              className={`p-1.5 rounded-lg transition-colors ${
-                tool.isPinned
-                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-semibold'
-                  : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)]'
-              }`}
-              title={tool.isPinned ? '取消置頂釘選' : '置頂釘選至最前'}
-            >
-              <Pin size={14} className={tool.isPinned ? 'fill-current' : ''} />
-            </button>
-          )}
-
-          {/* 獨立快顯浮動視窗 (Pop-out) */}
-          <button
-            onClick={handlePopout}
-            className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
-            title="以獨立浮動視窗彈出 (便於多螢幕/側邊小工具)"
-          >
-            <ExternalLink size={14} />
-          </button>
-
-          {/* 寬度尺寸切換 (1x / 2x - 僅在非貨架與非瀑布流下呈現) */}
-          {effectiveCanEdit && !isPresentationMode && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
-            <button
-              onClick={() => onToggleColSpan(tool.id, colSpan === 1 ? 2 : 1)}
-              className={`p-1.5 rounded-lg transition-colors text-xs flex items-center gap-1 ${
-                colSpan >= 2
-                  ? 'bg-[var(--coral-light)] text-[var(--coral)] font-semibold'
-                  : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)]'
-              }`}
-              title={colSpan === 1 ? '切換為加寬展示 (2x)' : '還原為標準寬度 (1x)'}
-            >
-              <MoveHorizontal size={14} />
-              <span className="text-[10px] hidden sm:inline">{colSpan === 1 ? '1x' : '2x'}</span>
-            </button>
-          )}
-
+        {/* 控制按鈕組 (簡潔 4 鍵，其餘整合至更多選單防擠壓折行) */}
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => setReloadKey((k) => k + 1)}
             className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
@@ -361,6 +208,7 @@ export default function ToolCard({
           >
             <RotateCcw size={14} />
           </button>
+
           {effectiveCanEdit && !isPresentationMode && onEdit && (
             <button
               onClick={() => onEdit(tool)}
@@ -370,6 +218,7 @@ export default function ToolCard({
               <Pencil size={14} />
             </button>
           )}
+
           <button
             onClick={() => onFocus(tool)}
             className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] rounded-lg transition-colors"
@@ -377,14 +226,179 @@ export default function ToolCard({
           >
             <Maximize2 size={14} />
           </button>
-          {effectiveCanEdit && !isPresentationMode && (
-            <button
-              onClick={() => onDelete(tool.id)}
-              className="p-1.5 text-[var(--muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
-              title="刪除此小工具"
-            >
-              <Trash2 size={14} />
-            </button>
+
+          {/* 更多操作選單 (置頂、色票、加寬、獨立彈出、代管發布、副本、匯出、刪除) */}
+          {!isPresentationMode && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  moreMenuOpen ? 'bg-[var(--coral-light)] text-[var(--coral)]' : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)]'
+                }`}
+                title="更多小工具動作"
+              >
+                <MoreVertical size={14} />
+              </button>
+
+              {moreMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => { setMoreMenuOpen(false); setColorMenuOpen(false); }} />
+                  <div
+                    className="absolute right-0 mt-1 w-52 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn text-xs divide-y divide-[var(--line)]/60"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="pb-1 space-y-0.5">
+                      {/* 置頂釘選 */}
+                      {effectiveCanEdit && onTogglePin && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            onTogglePin(tool.id);
+                          }}
+                          className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                        >
+                          <Pin size={13} className={tool.isPinned ? 'text-[var(--coral)] fill-current' : 'text-[var(--muted)]'} />
+                          <span>{tool.isPinned ? '取消置頂釘選' : '置頂釘選至最前'}</span>
+                        </button>
+                      )}
+
+                      {/* 寬度切換 (1x / 2x) */}
+                      {effectiveCanEdit && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            onToggleColSpan(tool.id, colSpan === 1 ? 2 : 1);
+                          }}
+                          className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                        >
+                          <MoveHorizontal size={13} className="text-[var(--muted)]" />
+                          <span>{colSpan === 1 ? '切換為加寬展示 (2x)' : '還原為標準寬度 (1x)'}</span>
+                        </button>
+                      )}
+
+                      {/* 獨立外開視窗 */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMoreMenuOpen(false);
+                          handlePopout();
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                      >
+                        <ExternalLink size={13} className="text-[var(--muted)]" />
+                        <span>獨立浮動視窗彈出</span>
+                      </button>
+
+                      {/* 便箋色彩選擇器 */}
+                      {effectiveCanEdit && onChangeColor && (
+                        <div className="px-2.5 py-1.5">
+                          <div className="flex items-center justify-between text-[11px] text-[var(--muted)] font-medium mb-1.5">
+                            <span className="flex items-center gap-1.5">
+                              <Palette size={12} />
+                              <span>便箋色彩</span>
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-6 gap-1">
+                            {CARD_COLORS.map((c) => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => {
+                                  onChangeColor(tool.id, c.id);
+                                  setMoreMenuOpen(false);
+                                }}
+                                className={`w-5 h-5 rounded-md border flex items-center justify-center transition-transform hover:scale-110 ${
+                                  (tool.color || 'default') === c.id ? 'ring-2 ring-[var(--coral)]' : ''
+                                }`}
+                                style={{ backgroundColor: c.bg, borderColor: c.border }}
+                                title={c.label}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="py-1 space-y-0.5">
+                      {/* 獨立代管發布 */}
+                      {onPublishHosted && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            onPublishHosted(tool);
+                          }}
+                          className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium transition-colors"
+                        >
+                          <Share2 size={13} className="shrink-0" />
+                          <span>發布為獨立代管網站...</span>
+                        </button>
+                      )}
+
+                      {/* 建立副本 */}
+                      {effectiveCanEdit && onDuplicate && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            onDuplicate(tool);
+                          }}
+                          className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                        >
+                          <Copy size={13} className="text-[var(--coral)]" />
+                          <span>建立副本</span>
+                        </button>
+                      )}
+
+                      {/* 複製到其他空間 */}
+                      {onCloneToSpace && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            onCloneToSpace(tool);
+                          }}
+                          className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                        >
+                          <Send size={13} className="text-blue-500" />
+                          <span>複製到其他空間...</span>
+                        </button>
+                      )}
+
+                      {/* 匯出小工具 JSON */}
+                      <button
+                        type="button"
+                        onClick={handleExportTool}
+                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-[var(--ink)] transition-colors"
+                      >
+                        <Download size={13} className="text-emerald-500" />
+                        <span>匯出小工具 (.json)</span>
+                      </button>
+                    </div>
+
+                    {/* 刪除小工具 */}
+                    {effectiveCanEdit && (
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            onDelete(tool.id);
+                          }}
+                          className="w-full text-left px-2.5 py-1.5 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg flex items-center gap-2 text-red-600 dark:text-red-400 font-medium transition-colors"
+                        >
+                          <Trash2 size={13} />
+                          <span>刪除此小工具</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>

@@ -94,6 +94,19 @@ export default function PublishModal({
       }
 
       const data = await res.json();
+      
+      // 同步寫入本機備援，確保若部署於 GitHub Pages 等靜態託管時亦能即時離線解析
+      const selectedToolsData = tools.filter((t) => selectedToolIds.includes(t.id));
+      const backupShare = {
+        share: data.share,
+        space_name: space?.name || '手帳空間',
+        owner_name: space?.owner_name || '創作者',
+        tools: selectedToolsData,
+      };
+      const existing = JSON.parse(localStorage.getItem('notebook_local_hosted_shares') || '{}');
+      existing[data.share.share_code] = backupShare;
+      localStorage.setItem('notebook_local_hosted_shares', JSON.stringify(existing));
+
       setPublishedShare(data.share);
       setActiveTab('result');
     } catch (err) {
@@ -341,14 +354,14 @@ export default function PublishModal({
           ) : (
             /* 發布完成結果頁 */
             <div className="space-y-6 animate-fadeIn">
-              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 text-emerald-800 dark:text-emerald-300 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
-                  <Check size={18} />
+              <div className="p-4 rounded-2xl bg-[var(--card-bg)] border-2 border-emerald-600/40 shadow-sm flex items-center gap-3.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Check size={20} strokeWidth={2.5} />
                 </div>
-                <div>
-                  <h4 className="text-xs font-bold">微應用代管發布成功！</h4>
-                  <p className="text-[11px] opacity-80">
-                    已產生專屬代碼 <span className="font-mono font-bold">{publishedShare?.share_code}</span>，任何訪客打開皆能直接運行。
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300">微應用代管發布成功！</h4>
+                  <p className="text-xs text-[var(--ink)] opacity-90 mt-0.5 leading-relaxed">
+                    已產生專屬代碼 <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--paper)] border border-[var(--line)] text-emerald-700 dark:text-emerald-300">{publishedShare?.share_code}</span>，任何訪客打開皆能直接運行。
                   </p>
                 </div>
               </div>

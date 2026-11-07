@@ -37,7 +37,7 @@ import {
 import ToolCard, { CARD_COLORS } from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput, openSandboxedPopout } from '../utils/codeParser';
-import { ToolsEmptyIllustration, SearchEmptyIllustration, EmptyShelfBasketDoodle, SpaceStationeryBannerDoodle } from './Illustrations';
+import { ToolsEmptyIllustration, SearchEmptyIllustration, EmptyShelfBasketDoodle } from './Illustrations';
 
 export default function SpaceLayout({
   tools = [],
@@ -323,13 +323,8 @@ export default function SpaceLayout({
     <div className="w-full flex-1 flex flex-col space-y-4 animate-fadeIn">
       {/* 頂部搜尋、標籤與過濾篩選工具列 (簡報模式下隱藏以維持純淨無干擾展示) */}
       {!isPresentationMode && (
-        <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-2xl border border-[var(--line)] shadow-xs relative overflow-hidden">
-          {/* 背景文具橫幅微型飾紋 */}
-          <div className="absolute right-4 top-1 pointer-events-none opacity-25 dark:opacity-15 hidden lg:block">
-            <SpaceStationeryBannerDoodle className="w-36 h-9 text-[var(--muted)]" />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 z-10">
+        <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-2xl border border-[var(--line)] shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             {/* 搜尋框 */}
             <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none shrink-0" />
@@ -350,7 +345,7 @@ export default function SpaceLayout({
               )}
             </div>
 
-            {/* 類型篩選標籤 */}
+            {/* 類型篩選標籤與操作 */}
             <div className="flex items-center gap-1.5 text-xs flex-wrap">
               <button
                 type="button"
@@ -386,86 +381,18 @@ export default function SpaceLayout({
                 Iframe 視窗
               </button>
 
-              <div className="h-4 w-px bg-[var(--line)] mx-0.5 hidden sm:block" />
+              <div className="h-4 w-px bg-[var(--line)] mx-1 hidden sm:block" />
 
               {/* 範本專區快捷按鈕 */}
               <button
                 type="button"
                 onClick={() => onOpenAddModal && onOpenAddModal('一般工具', 'templates')}
-                className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-[var(--coral)] hover:bg-[var(--coral-light)] shrink-0"
+                className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-[var(--coral)] hover:bg-[var(--coral-light)] shrink-0 font-medium"
                 title="瀏覽精選小工具範本並加入空間"
               >
                 <BookTemplate size={13} />
                 <span>範本專區</span>
               </button>
-
-              {/* 發布獨立代管微應用按鈕 */}
-              {onOpenPublishModal && (
-                <button
-                  type="button"
-                  onClick={onOpenPublishModal}
-                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700 bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 shrink-0 font-medium"
-                  title="將小工具打包發布為獨立代管網站或外部嵌入網址"
-                >
-                  <Share2 size={13} />
-                  <span>發布代管</span>
-                </button>
-              )}
-
-              {/* 團隊成員協作與權限管理按鈕 */}
-              {onOpenTeamModal && (
-                <button
-                  type="button"
-                  onClick={onOpenTeamModal}
-                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 shrink-0 font-medium"
-                  title="管理團隊成員角色、協作邀請碼與回收庫"
-                >
-                  <Users size={13} />
-                  <span>團隊成員</span>
-                </button>
-              )}
-
-              {/* 團隊討論室抽屜按鈕 */}
-              {onOpenTeamChat && (
-                <button
-                  type="button"
-                  onClick={onOpenTeamChat}
-                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-amber-600 hover:text-amber-700 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 shrink-0 font-medium relative"
-                  title="開啟團隊討論室與即時協作動態"
-                >
-                  <MessageSquare size={13} />
-                  <span>團隊對話</span>
-                  {unreadCount > 0 && (
-                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 animate-ping absolute -top-0.5 -right-0.5" />
-                  )}
-                </button>
-              )}
-
-              {/* AI 智慧代寫按鈕 */}
-              {effectiveCanEdit && onOpenAIModal && (
-                <button
-                  type="button"
-                  onClick={onOpenAIModal}
-                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-purple-600 hover:text-purple-700 bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800 shrink-0 font-medium"
-                  title="使用 AI 自動編寫並生成小工具"
-                >
-                  <Sparkles size={13} />
-                  <span>AI 代寫</span>
-                </button>
-              )}
-
-              {/* 投影簡報按鈕 */}
-              {onTogglePresentation && (
-                <button
-                  type="button"
-                  onClick={onTogglePresentation}
-                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 shrink-0 text-purple-600 hover:text-purple-700"
-                  title="切換大螢幕投影簡報模式 (Shift + P)"
-                >
-                  <Tv size={13} />
-                  <span className="hidden sm:inline">投影簡報</span>
-                </button>
-              )}
 
               {/* 批次操作模式切換按鈕 */}
               {effectiveCanEdit && (
@@ -581,7 +508,7 @@ export default function SpaceLayout({
                     onClick={() => setExpandedToolId(isExpanded ? null : tool.id)}
                     className="flex items-center justify-between px-4 py-3 bg-[var(--card-bg)] cursor-pointer select-none transition-colors hover:bg-[var(--paper)]"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       {/* 批次選取框 */}
                       {isBatchMode && !isPresentationMode && (
                         <button
@@ -600,11 +527,11 @@ export default function SpaceLayout({
                           )}
                         </button>
                       )}
-                      <span className="text-xs font-mono font-medium text-[var(--faint)] w-4">
+                      <span className="text-xs font-mono font-medium text-[var(--faint)] w-4 shrink-0">
                         #{index + 1}
                       </span>
                       <div className="w-2.5 h-2.5 rounded-full bg-[var(--coral)] shrink-0" />
-                      <span className="text-sm font-bold text-[var(--ink)] truncate">
+                      <span className="text-sm font-bold text-[var(--ink)] truncate max-w-xs md:max-w-md">
                         {tool.title}
                       </span>
                       {tool.isPinned && (
@@ -613,7 +540,7 @@ export default function SpaceLayout({
                           <span className="hidden sm:inline">置頂</span>
                         </span>
                       )}
-                      <span className="notebook-badge shrink-0 text-[10px]" title={getTypeName(tool.type)}>
+                      <span className="notebook-badge shrink-0 text-[10px] inline-flex items-center gap-1.5" title={getTypeName(tool.type)}>
                         <span className="shrink-0">{getTypeIcon(tool.type)}</span>
                         <span className="hidden sm:inline">{getTypeName(tool.type)}</span>
                       </span>
