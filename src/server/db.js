@@ -25,6 +25,17 @@ export function generateInviteCode() {
   return `SPC-${code}`;
 }
 
+// 生成 8 碼獨立代管發布代碼 (如 HOST-9X82)
+export function generateHostedCode() {
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    const r = crypto.randomInt(0, chars.length);
+    code += chars[r];
+  }
+  return `HOST-${code}`;
+}
+
 // 初始化資料庫綱要與自動遷移
 export function initDB() {
   db.exec(`
@@ -65,8 +76,46 @@ export function initDB() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       space_id INTEGER NOT NULL,
       user_id INTEGER NOT NULL,
+      role TEXT DEFAULT 'editor',
       joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(space_id, user_id),
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS hosted_shares (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      share_code TEXT UNIQUE NOT NULL,
+      user_id INTEGER NOT NULL,
+      space_id INTEGER NOT NULL,
+      mode TEXT NOT NULL,
+      tool_ids TEXT NOT NULL,
+      title TEXT NOT NULL,
+      custom_config TEXT DEFAULT '{}',
+      is_active INTEGER DEFAULT 1,
+      views INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS space_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      space_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      content TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS space_activities (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      space_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      action TEXT NOT NULL,
+      details TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
@@ -83,6 +132,38 @@ export function initDB() {
 
   try {
     db.exec('ALTER TABLE tools ADD COLUMN col_span INTEGER DEFAULT 1');
+  } catch (e) {}
+
+  try {
+    db.exec("ALTER TABLE space_members ADD COLUMN role TEXT DEFAULT 'editor'");
+  } catch (e) {}
+
+  try {
+    db.exec('ALTER TABLE tools ADD COLUMN deleted_at DATETIME DEFAULT NULL');
+  } catch (e) {}
+
+  try {
+    db.exec('ALTER TABLE tools ADD COLUMN created_by_user_id INTEGER DEFAULT NULL');
+  } catch (e) {}
+
+  try {
+    db.exec('ALTER TABLE tools ADD COLUMN updated_by_user_id INTEGER DEFAULT NULL');
+  } catch (e) {}
+
+  try {
+    db.exec('CREATE INDEX IF NOT EXISTS idx_tools_deleted_at ON tools(deleted_at)');
+  } catch (e) {}
+
+  try {
+    db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_hosted_shares_code ON hosted_shares(share_code)');
+  } catch (e) {}
+
+  try {
+    db.exec('CREATE INDEX IF NOT EXISTS idx_space_messages_space ON space_messages(space_id)');
+  } catch (e) {}
+
+  try {
+    db.exec('CREATE INDEX IF NOT EXISTS idx_space_activities_space ON space_activities(space_id)');
   } catch (e) {}
 
   // 為尚無邀請碼的空間補齊邀請碼

@@ -19,6 +19,7 @@ import {
   MoreVertical,
   CheckSquare,
   Square,
+  Share2,
 } from 'lucide-react';
 import SandboxedFrame from './SandboxedFrame';
 import { parseToolInput, openSandboxedPopout } from '../utils/codeParser';
@@ -46,8 +47,12 @@ export default function ToolCard({
   onDrop,
   index,
   isOwner = true,
+  userRole = 'owner',
+  canEdit = null,
   isPresentationMode = false,
+  onPublishHosted,
 }) {
+  const effectiveCanEdit = canEdit !== null ? canEdit : (isOwner || userRole === 'editor');
   const [reloadKey, setReloadKey] = useState(0);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -127,7 +132,7 @@ export default function ToolCard({
     <div
       id={`tool-card-${tool.id}`}
       data-tool-id={tool.id}
-      draggable={draggable && isOwner && !isPresentationMode}
+      draggable={draggable && effectiveCanEdit && !isPresentationMode}
       onDragStart={handleDragStartInternal}
       onDragOver={(e) => onDragOver && onDragOver(e, index)}
       onDrop={(e) => onDrop && onDrop(e, index)}
@@ -163,7 +168,7 @@ export default function ToolCard({
           )}
 
           {/* 拖曳把手 */}
-          {isOwner && !isBatchMode && !isPresentationMode && (
+          {effectiveCanEdit && !isBatchMode && !isPresentationMode && (
             <div
               className="cursor-grab active:cursor-grabbing p-1 text-[var(--faint)] hover:text-[var(--ink)] rounded-lg transition-colors shrink-0"
               title="拖曳以重新排列工具順序"
@@ -173,7 +178,10 @@ export default function ToolCard({
           )}
 
           <div className="w-2 h-2 rounded-full bg-[var(--coral)] shrink-0" />
-          <h3 className="text-sm font-semibold text-[var(--ink)] truncate shrink" title={tool.title}>
+          <h3
+            className="text-sm font-semibold text-[var(--ink)] truncate shrink"
+            title={`${tool.title}${tool.updated_by_name ? ` (最後由 ${tool.updated_by_name} 編輯)` : ''}`}
+          >
             {tool.title}
           </h3>
 
@@ -194,7 +202,7 @@ export default function ToolCard({
         {/* 控制按鈕組 */}
         <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           {/* 便箋色票切換 */}
-          {isOwner && !isPresentationMode && onChangeColor && (
+          {effectiveCanEdit && !isPresentationMode && onChangeColor && (
             <div className="relative">
               <button
                 type="button"
@@ -234,7 +242,7 @@ export default function ToolCard({
             </div>
           )}
 
-          {/* 更多操作選單 (建立副本、複製至其他空間、匯出 JSON) */}
+          {/* 更多操作選單 (獨立發布代管、建立副本、複製至其他空間、匯出 JSON) */}
           {!isPresentationMode && (
             <div className="relative">
               <button
@@ -250,10 +258,23 @@ export default function ToolCard({
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
                   <div
-                    className="absolute right-0 mt-1 w-44 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn text-xs"
+                    className="absolute right-0 mt-1 w-48 bg-[var(--card-bg)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-1.5 animate-fadeIn text-xs"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {isOwner && onDuplicate && (
+                    {onPublishHosted && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMoreMenuOpen(false);
+                          onPublishHosted(tool);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 hover:bg-[var(--paper)] rounded-lg flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium transition-colors"
+                      >
+                        <Share2 size={13} className="shrink-0" />
+                        <span>發布為獨立代管網站...</span>
+                      </button>
+                    )}
+                    {effectiveCanEdit && onDuplicate && (
                       <button
                         type="button"
                         onClick={() => {
@@ -294,7 +315,7 @@ export default function ToolCard({
           )}
 
           {/* 置頂釘選按鈕 */}
-          {!isPresentationMode && onTogglePin && (
+          {!isPresentationMode && onTogglePin && effectiveCanEdit && (
             <button
               onClick={() => onTogglePin(tool.id)}
               className={`p-1.5 rounded-lg transition-colors ${
@@ -318,7 +339,7 @@ export default function ToolCard({
           </button>
 
           {/* 寬度尺寸切換 (1x / 2x - 僅在非貨架與非瀑布流下呈現) */}
-          {isOwner && !isPresentationMode && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
+          {effectiveCanEdit && !isPresentationMode && onToggleColSpan && layout !== 'shelf' && layout !== 'wall' && (
             <button
               onClick={() => onToggleColSpan(tool.id, colSpan === 1 ? 2 : 1)}
               className={`p-1.5 rounded-lg transition-colors text-xs flex items-center gap-1 ${
@@ -340,7 +361,7 @@ export default function ToolCard({
           >
             <RotateCcw size={14} />
           </button>
-          {isOwner && !isPresentationMode && onEdit && (
+          {effectiveCanEdit && !isPresentationMode && onEdit && (
             <button
               onClick={() => onEdit(tool)}
               className="p-1.5 text-[var(--muted)] hover:text-[var(--coral)] hover:bg-[var(--coral-light)] rounded-lg transition-colors"
@@ -356,7 +377,7 @@ export default function ToolCard({
           >
             <Maximize2 size={14} />
           </button>
-          {isOwner && !isPresentationMode && (
+          {effectiveCanEdit && !isPresentationMode && (
             <button
               onClick={() => onDelete(tool.id)}
               className="p-1.5 text-[var(--muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"

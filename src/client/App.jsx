@@ -12,11 +12,20 @@ import JoinSpaceModal from './components/JoinSpaceModal';
 import QRCodeModal from './components/QRCodeModal';
 import CommandPalette from './components/CommandPalette';
 import AIToolModal from './components/AIToolModal';
-import { Tv, Sun, Moon, X } from 'lucide-react';
+import HostedPortalView from './components/HostedPortalView';
+import PublishModal from './components/PublishModal';
+import TeamModal from './components/TeamModal';
+import TeamChatDrawer from './components/TeamChatDrawer';
+import { Tv, Sun, Moon, X, RotateCcw } from 'lucide-react';
 import { api } from './utils/api';
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
+
+  const [hostedCode, setHostedCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('host') || null;
+  });
 
   const [currentView, setCurrentView] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -48,6 +57,15 @@ export default function App() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
+
+  // 代管發布、團隊協作、討論抽屜與復原浮動狀態
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [publishModalToolId, setPublishModalToolId] = useState(null);
+  const [publishModalMode, setPublishModalMode] = useState('single');
+  const [teamModalOpen, setTeamModalOpen] = useState(false);
+  const [teamChatOpen, setTeamChatOpen] = useState(false);
+  const [undoToast, setUndoToast] = useState(null);
+  const undoTimeoutRef = React.useRef(null);
 
   // 空間延伸狀態 (我的最愛、垃圾桶回收、最近存取紀錄)
   const [favoriteSpaceIds, setFavoriteSpaceIds] = useState(() => {
@@ -311,15 +329,22 @@ export default function App() {
   useEffect(() => {
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search);
+      const hostCode = params.get('host');
       const spaceId = params.get('space');
       const shareCode = params.get('share');
-      if (shareCode) {
-        setCurrentView('space');
-      } else if (spaceId) {
-        loadSpaceDetail(spaceId);
-        setCurrentView('space');
+
+      if (hostCode) {
+        setHostedCode(hostCode);
       } else {
-        setCurrentView('dashboard');
+        setHostedCode(null);
+        if (shareCode) {
+          setCurrentView('space');
+        } else if (spaceId) {
+          loadSpaceDetail(spaceId);
+          setCurrentView('space');
+        } else {
+          setCurrentView('dashboard');
+        }
       }
     };
 
@@ -593,11 +618,12 @@ export default function App() {
     );
   };
 
-  // 11. 刪除工具
+  // 11. 刪除工具 (軟刪除並提供即時復原 Toast)
   const handleDeleteTool = async (toolId) => {
     if (!currentSpace) return;
-    if (!window.confirm('確定要刪除這個小工具嗎？')) return;
+    if (!window.confirm('確定要刪除這個小工具嗎？已刪除的小工具可在回收庫中復原。')) return;
 
+    const targetTool = tools.find((t) => t.id === toolId);
     try {
       await api.deleteTool(currentSpace.id, toolId);
       setTools((prev) => prev.filter((t) => t.id !== toolId));
@@ -608,9 +634,56 @@ export default function App() {
             : s
         )
       );
+
+      if (targetTool) {
+        setUndoToast({ tool: targetTool, spaceId: currentSpace.id });
+        if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+        undoTimeoutRef.current = setTimeout(() => {
+          setUndoToast(null);
+        }, 8000);
+      }
     } catch (err) {
       alert(err.message || '刪除工具失敗');
     }
+  };
+
+  // 即時復原剛剛刪除的小工具 (Undo)
+  const handleUndoRestore = async (toolId = null) => {
+    const targetId = toolId || undoToast?.tool?.id;
+    const spaceId = undoToast?.spaceId || currentSpace?.id;
+    if (!targetId || !spaceId) return;
+
+    try {
+      const res = await api.restoreTool(spaceId, targetId);
+      if (res?.tool) {
+        setTools((prev) => {
+          if (prev.some((t) => t.id === res.tool.id)) return prev;
+          return [res.tool, ...prev];
+        });
+        setSpaces((prev) =>
+          prev.map((s) =>
+            s.id === spaceId
+              ? { ...s, tool_count: (s.tool_count || 0) + 1 }
+              : s
+          )
+        );
+      }
+      setUndoToast(null);
+    } catch (err) {
+      alert(err.message || '復原工具失敗');
+    }
+  };
+
+  // 開啟獨立代管網站發布精靈
+  const handlePublishHosted = (tool = null) => {
+    if (tool) {
+      setPublishModalToolId(tool.id);
+      setPublishModalMode('single');
+    } else {
+      setPublishModalToolId(tools[0]?.id || null);
+      setPublishModalMode('multi');
+    }
+    setPublishModalOpen(true);
   };
 
   // 12. 更新空間資訊 (名稱、描述)
@@ -925,6 +998,48 @@ export default function App() {
   };
 
   const isOwner = currentSpace?.is_owner === 1 || currentSpace?.user_id === user?.id;
+  const userRole = currentSpace?.user_role || (isOwner ? 'owner' : 'editor');
+  const canEdit = !isGuest && (userRole === 'owner' || userRole === 'editor');
+
+  // 協作探測：在空間內定時檢查後端狀態 (每 12 秒輕量輪詢)
+  useEffect(() => {
+    if (currentView !== 'space' || !currentSpace?.id || isGuest) return;
+    let isCancelled = false;
+
+    const pollSync = async () => {
+      try {
+        const data = await api.getSpaceSyncStatus(currentSpace.id);
+        if (isCancelled || !data) return;
+        if (data.toolCount !== undefined && data.toolCount !== tools.length) {
+          loadSpaceDetail(currentSpace.id);
+        }
+      } catch (e) {
+        // 靜默捕捉探測異常
+      }
+    };
+
+    const interval = setInterval(pollSync, 12000);
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
+  }, [currentView, currentSpace?.id, tools.length, isGuest, loadSpaceDetail]);
+
+  // 若 URL 為獨立代管微應用網站直達 (?host=HOST-XXXX)
+  if (hostedCode) {
+    return (
+      <HostedPortalView
+        hostedCode={hostedCode}
+        onBackToHome={() => {
+          setHostedCode(null);
+          const url = new URL(window.location);
+          url.searchParams.delete('host');
+          window.history.pushState({}, '', url.toString());
+          setCurrentView('dashboard');
+        }}
+      />
+    );
+  }
 
   // 驗證載入中狀態
   if (authLoading) {
@@ -969,6 +1084,11 @@ export default function App() {
           onSelectTheme={handleSelectTheme}
           onToggleDarkMode={handleToggleDarkMode}
           isGuest={isGuest}
+          userRole={userRole}
+          canEdit={canEdit}
+          onOpenPublishModal={() => handlePublishHosted()}
+          onOpenTeamModal={() => setTeamModalOpen(true)}
+          onOpenTeamChat={() => setTeamChatOpen((prev) => !prev)}
           onOpenAIModal={() => setAiModalOpen(true)}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
           onTogglePresentation={() => setIsPresentationMode(!isPresentationMode)}
@@ -1065,6 +1185,12 @@ export default function App() {
             onDeleteSection={handleDeleteSection}
             availableSpaces={spaces.filter((s) => s.id !== currentSpace?.id && !trashSpaceIds.includes(s.id))}
             isOwner={!isGuest && isOwner}
+            userRole={userRole}
+            canEdit={canEdit}
+            onPublishHosted={handlePublishHosted}
+            onOpenPublishModal={() => handlePublishHosted()}
+            onOpenTeamModal={() => setTeamModalOpen(true)}
+            onOpenTeamChat={() => setTeamChatOpen((prev) => !prev)}
             isPresentationMode={isPresentationMode}
             onTogglePresentation={() => setIsPresentationMode(!isPresentationMode)}
           />
@@ -1164,6 +1290,79 @@ export default function App() {
         currentSpaceName={currentSpace?.name}
         initialSection={addModalSection}
       />
+
+      {/* 獨立代管網站發布精靈對話框 (模式 1 / 模式 2 / 模式 3) */}
+      {publishModalOpen && currentSpace && (
+        <PublishModal
+          space={currentSpace}
+          tools={tools}
+          initialToolId={publishModalToolId}
+          initialMode={publishModalMode}
+          onClose={() => setPublishModalOpen(false)}
+        />
+      )}
+
+      {/* 團隊成員協作與 RBAC 權限管理對話框 */}
+      {teamModalOpen && currentSpace && (
+        <TeamModal
+          space={currentSpace}
+          currentUser={user}
+          onClose={() => setTeamModalOpen(false)}
+          onToolRestored={(restoredTool) => {
+            setTools((prev) => {
+              if (prev.some((t) => t.id === restoredTool.id)) return prev;
+              return [restoredTool, ...prev];
+            });
+            setSpaces((prev) =>
+              prev.map((s) =>
+                s.id === currentSpace.id
+                  ? { ...s, tool_count: (s.tool_count || 0) + 1 }
+                  : s
+              )
+            );
+          }}
+          onLeaveSpaceSuccess={() => {
+            handleNavigateHome();
+          }}
+        />
+      )}
+
+      {/* 團隊討論室與即時動態抽屜 */}
+      {currentSpace && (
+        <TeamChatDrawer
+          space={currentSpace}
+          currentUser={user}
+          isOpen={teamChatOpen}
+          onClose={() => setTeamChatOpen(false)}
+          onRestoreTool={(toolId) => handleUndoRestore(toolId)}
+        />
+      )}
+
+      {/* 軟刪除即時復原 Toast (Undo) */}
+      {undoToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[var(--ink)] text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fadeIn border border-[var(--line)]">
+          <div className="text-xs">
+            <span className="font-semibold">「{undoToast.tool.title}」</span> 已移至回收庫
+          </div>
+          <button
+            type="button"
+            onClick={() => handleUndoRestore()}
+            className="px-2.5 py-1 rounded-xl bg-[var(--coral)] hover:bg-[var(--coral-hover)] text-white font-bold text-xs flex items-center gap-1 transition-colors shadow-xs"
+            title="立即復原剛才刪除的工具"
+          >
+            <RotateCcw size={12} />
+            <span>復原 (Undo)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setUndoToast(null)}
+            className="text-white/60 hover:text-white text-xs p-1"
+            title="關閉提示"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

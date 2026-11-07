@@ -57,6 +57,25 @@ function generateInviteCode() {
   return `SPC-${code}`;
 }
 
+function generateHostedCode() {
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `HOST-${code}`;
+}
+
+async function getWorkerSpaceRole(env, spaceId, userId) {
+  if (!spaceId || !userId) return null;
+  const space = await env.DB.prepare('SELECT id, user_id FROM spaces WHERE id = ?').bind(spaceId).first();
+  if (!space) return null;
+  if (space.user_id === userId) return 'owner';
+  const member = await env.DB.prepare('SELECT role FROM space_members WHERE space_id = ? AND user_id = ?').bind(spaceId, userId).first();
+  if (member) return member.role || 'editor';
+  return null;
+}
+
 // Web Crypto PBKDF2 密碼雜湊
 async function hashPassword(password) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -339,6 +358,72 @@ export default {
       return jsonResponse({ space, tools: tools || [], isGuest: true });
     }
 
+    // 2.6 獨立代管網站微應用公開讀取 (模式 1 / 模式 2 / 模式 3)
+    const hostedMatch = path.match(/^\/api\/hosted\/([A-Za-z0-9\-]+)$/);
+    if (hostedMatch && method === 'GET') {
+      const clientIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'edge-client';
+      const rl = checkEdgeRateLimit(`hosted:${clientIp}`, 60, 60 * 1000);
+      if (!rl.allowed) return jsonResponse({ error: '請求過於頻繁，請稍後再試' }, 429, { 'Retry-After': rl.retryAfter });
+
+      const cleanCode = decodeURIComponent(hostedMatch[1]).trim().toUpperCase();
+      const share = await env.DB.prepare(`
+        SELECT h.*, s.name as space_name, u.display_name as owner_name
+        FROM hosted_shares h
+        JOIN spaces s ON h.space_id = s.id
+        JOIN users u ON h.user_id = u.id
+        WHERE UPPER(h.share_code) = ? AND h.is_active = 1
+      `).bind(cleanCode).first();
+
+      if (!share) return jsonResponse({ error: '找不到此代管分享或已被發布者關閉' }, 404);
+
+      try {
+        await env.DB.prepare('UPDATE hosted_shares SET views = views + 1 WHERE id = ?').bind(share.id).run();
+      } catch (e) {}
+
+      let toolIds = [];
+      try {
+        toolIds = JSON.parse(share.tool_ids);
+      } catch (e) {
+        toolIds = [];
+      }
+
+      let tools = [];
+      if (toolIds.length > 0) {
+        const placeholders = toolIds.map(() => '?').join(',');
+        const { results } = await env.DB.prepare(`
+          SELECT id, space_id, title, type, content, col_span, sort_order, created_at
+          FROM tools
+          WHERE id IN (${placeholders}) AND deleted_at IS NULL
+        `).bind(...toolIds).all();
+        const toolMap = new Map((results || []).map(t => [t.id, t]));
+        tools = toolIds.map(id => toolMap.get(id)).filter(Boolean);
+      }
+
+      let customConfig = {};
+      try {
+        customConfig = JSON.parse(share.custom_config || '{}');
+      } catch (e) {}
+
+      const urlObj = new URL(request.url);
+      const isEmbed = urlObj.searchParams.get('embed') === 'true';
+
+      return jsonResponse({
+        share: {
+          id: share.id,
+          share_code: share.share_code,
+          mode: share.mode,
+          title: share.title,
+          views: share.views + 1,
+          created_at: share.created_at,
+          custom_config: customConfig,
+        },
+        space_name: share.space_name,
+        owner_name: share.owner_name,
+        tools,
+        is_embed: isEmbed,
+      });
+    }
+
     // 驗證後續需要登入之 API
     const user = await getAuthUser(request, secret);
     if (!user) {
@@ -523,10 +608,13 @@ export default {
       return jsonResponse({ inviteCode: newCode });
     }
 
-    // 10. 新增工具 /api/spaces/:id/tools
+    // 10. 新增工具 /api/spaces/:id/tools (擁有者與協作者)
     const addToolMatch = path.match(/^\/api\/spaces\/(\d+)\/tools$/);
     if (addToolMatch && method === 'POST') {
       const spaceId = Number(addToolMatch[1]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role || role === 'viewer') return jsonResponse({ error: '檢視者無權限新增工具' }, 403);
+
       const body = await request.json().catch(() => ({}));
       const { title, type = 'html', content, colSpan = 1 } = body;
 
@@ -542,16 +630,13 @@ export default {
       const safeType = validTypes.includes(type) ? type : 'html';
       const safeColSpan = Number(colSpan) === 2 ? 2 : 1;
 
-      const check = await env.DB.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?').bind(spaceId, user.id).first();
-      if (!check) return jsonResponse({ error: '只有建立者可新增工具' }, 403);
-
-      const maxOrder = await env.DB.prepare('SELECT MAX(sort_order) as m FROM tools WHERE space_id = ?').bind(spaceId).first();
+      const maxOrder = await env.DB.prepare('SELECT MAX(sort_order) as m FROM tools WHERE space_id = ? AND deleted_at IS NULL').bind(spaceId).first();
       const sortOrder = (maxOrder?.m ?? -1) + 1;
 
       const res = await env.DB.prepare(`
-        INSERT INTO tools (space_id, title, type, content, sort_order, col_span)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `).bind(spaceId, cleanTitle, safeType, cleanContent, sortOrder, safeColSpan).run();
+        INSERT INTO tools (space_id, title, type, content, sort_order, col_span, created_by_user_id, updated_by_user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(spaceId, cleanTitle, safeType, cleanContent, sortOrder, safeColSpan, user.id, user.id).run();
 
       const newTool = await env.DB.prepare('SELECT * FROM tools WHERE id = ?').bind(res.meta.last_row_id).first();
       return jsonResponse({ tool: newTool }, 201);
@@ -561,13 +646,12 @@ export default {
     const reorderMatch = path.match(/^\/api\/spaces\/(\d+)\/tools\/reorder$/);
     if (reorderMatch && method === 'PATCH') {
       const spaceId = Number(reorderMatch[1]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role || role === 'viewer') return jsonResponse({ error: '檢視者無權限調整排序' }, 403);
+
       const body = await request.json().catch(() => ({}));
       const { toolIds } = body;
-
       if (!Array.isArray(toolIds)) return jsonResponse({ error: 'toolIds 必須為陣列' }, 400);
-
-      const check = await env.DB.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?').bind(spaceId, user.id).first();
-      if (!check) return jsonResponse({ error: '只有建立者可排序' }, 403);
 
       for (let i = 0; i < toolIds.length; i++) {
         await env.DB.prepare('UPDATE tools SET sort_order = ? WHERE id = ? AND space_id = ?').bind(i, toolIds[i], spaceId).run();
@@ -576,14 +660,41 @@ export default {
       return jsonResponse({ message: '排序已更新' });
     }
 
-    // 12. 更新 / 刪除工具 /api/spaces/:id/tools/:toolId
+    // 11.5 復原已刪除工具 /api/spaces/:id/tools/:toolId/restore
+    const restoreToolMatch = path.match(/^\/api\/spaces\/(\d+)\/tools\/(\d+)\/restore$/);
+    if (restoreToolMatch && method === 'POST') {
+      const spaceId = Number(restoreToolMatch[1]);
+      const toolId = Number(restoreToolMatch[2]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role || role === 'viewer') return jsonResponse({ error: '檢視者無權限復原工具' }, 403);
+
+      await env.DB.prepare('UPDATE tools SET deleted_at = NULL, updated_by_user_id = ? WHERE id = ? AND space_id = ?').bind(user.id, toolId, spaceId).run();
+      const restored = await env.DB.prepare('SELECT * FROM tools WHERE id = ?').bind(toolId).first();
+      return jsonResponse({ message: '工具已成功復原！', tool: restored });
+    }
+
+    // 11.6 回收庫清單 /api/spaces/:id/tools/trash
+    const trashMatch = path.match(/^\/api\/spaces\/(\d+)\/tools\/trash$/);
+    if (trashMatch && method === 'GET') {
+      const spaceId = Number(trashMatch[1]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role) return jsonResponse({ error: '無權限存取' }, 403);
+
+      const { results: trash } = await env.DB.prepare(`
+        SELECT * FROM tools WHERE space_id = ? AND deleted_at IS NOT NULL ORDER BY deleted_at DESC
+      `).bind(spaceId).all();
+
+      return jsonResponse({ trash: trash || [] });
+    }
+
+    // 12. 更新 / 軟刪除工具 /api/spaces/:id/tools/:toolId
     const toolOpMatch = path.match(/^\/api\/spaces\/(\d+)\/tools\/(\d+)$/);
     if (toolOpMatch) {
       const spaceId = Number(toolOpMatch[1]);
       const toolId = Number(toolOpMatch[2]);
 
-      const check = await env.DB.prepare('SELECT id FROM spaces WHERE id = ? AND user_id = ?').bind(spaceId, user.id).first();
-      if (!check) return jsonResponse({ error: '無權限操作' }, 403);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role || role === 'viewer') return jsonResponse({ error: '無權限操作' }, 403);
 
       if (method === 'PATCH') {
         const body = await request.json().catch(() => ({}));
@@ -615,6 +726,9 @@ export default {
           bindings.push(body.type);
         }
 
+        updates.push('updated_by_user_id = ?');
+        bindings.push(user.id);
+
         if (updates.length > 0) {
           bindings.push(toolId, spaceId);
           await env.DB.prepare(`UPDATE tools SET ${updates.join(', ')} WHERE id = ? AND space_id = ?`).bind(...bindings).run();
@@ -625,9 +739,129 @@ export default {
       }
 
       if (method === 'DELETE') {
-        await env.DB.prepare('DELETE FROM tools WHERE id = ? AND space_id = ?').bind(toolId, spaceId).run();
-        return jsonResponse({ message: '工具已刪除' });
+        // 軟刪除
+        await env.DB.prepare('UPDATE tools SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND space_id = ?').bind(toolId, spaceId).run();
+        return jsonResponse({ message: '工具已移至回收區，可隨時復原', toolId });
       }
+    }
+
+    // 13. 團隊成員管理 /api/spaces/:id/members
+    const membersMatch = path.match(/^\/api\/spaces\/(\d+)\/members$/);
+    if (membersMatch && method === 'GET') {
+      const spaceId = Number(membersMatch[1]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role) return jsonResponse({ error: '無權限存取' }, 403);
+
+      const space = await env.DB.prepare('SELECT user_id FROM spaces WHERE id = ?').bind(spaceId).first();
+      const owner = await env.DB.prepare(`
+        SELECT id as user_id, username, display_name, 'owner' as role, created_at as joined_at, 1 as is_owner
+        FROM users WHERE id = ?
+      `).bind(space.user_id).first();
+
+      const { results: members } = await env.DB.prepare(`
+        SELECT u.id as user_id, u.username, u.display_name, sm.role, sm.joined_at, 0 as is_owner
+        FROM space_members sm
+        JOIN users u ON sm.user_id = u.id
+        WHERE sm.space_id = ?
+        ORDER BY sm.joined_at ASC
+      `).bind(spaceId).all();
+
+      return jsonResponse({ members: [owner, ...(members || [])].filter(Boolean), current_user_role: role });
+    }
+
+    // 14. 團隊對話訊息 /api/spaces/:id/messages
+    const messagesMatch = path.match(/^\/api\/spaces\/(\d+)\/messages$/);
+    if (messagesMatch) {
+      const spaceId = Number(messagesMatch[1]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role) return jsonResponse({ error: '無權限存取' }, 403);
+
+      if (method === 'GET') {
+        const { results: messages } = await env.DB.prepare(`
+          SELECT m.id, m.space_id, m.user_id, m.content, m.created_at,
+                 u.display_name as sender_name, u.username as sender_username
+          FROM space_messages m
+          JOIN users u ON m.user_id = u.id
+          WHERE m.space_id = ?
+          ORDER BY m.id ASC
+          LIMIT 100
+        `).bind(spaceId).all();
+
+        return jsonResponse({ messages: messages || [], activities: [] });
+      }
+
+      if (method === 'POST') {
+        const body = await request.json().catch(() => ({}));
+        const { content } = body;
+        if (!content || !content.trim()) return jsonResponse({ error: '訊息內容不可為空' }, 400);
+
+        const clean = content.trim().slice(0, 2000);
+        const res = await env.DB.prepare(`
+          INSERT INTO space_messages (space_id, user_id, content) VALUES (?, ?, ?)
+        `).bind(spaceId, user.id, clean).run();
+
+        const newMsg = await env.DB.prepare(`
+          SELECT m.id, m.space_id, m.user_id, m.content, m.created_at,
+                 u.display_name as sender_name, u.username as sender_username
+          FROM space_messages m
+          JOIN users u ON m.user_id = u.id
+          WHERE m.id = ?
+        `).bind(res.meta.last_row_id).first();
+
+        return jsonResponse({ message: newMsg }, 201);
+      }
+    }
+
+    // 15. 代管發布 /api/spaces/:id/hosted
+    const hostedPublishMatch = path.match(/^\/api\/spaces\/(\d+)\/hosted$/);
+    if (hostedPublishMatch) {
+      const spaceId = Number(hostedPublishMatch[1]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role || role === 'viewer') return jsonResponse({ error: '無權限操作' }, 403);
+
+      if (method === 'POST') {
+        const body = await request.json().catch(() => ({}));
+        const { mode = 'single', toolIds, title, customConfig = {} } = body;
+        if (!['single', 'multi'].includes(mode)) return jsonResponse({ error: '模式錯誤' }, 400);
+        if (!Array.isArray(toolIds) || toolIds.length === 0) return jsonResponse({ error: '請指定小工具' }, 400);
+        if (!title || !title.trim()) return jsonResponse({ error: '標題不可為空' }, 400);
+
+        const shareCode = generateHostedCode();
+        const res = await env.DB.prepare(`
+          INSERT INTO hosted_shares (share_code, user_id, space_id, mode, tool_ids, title, custom_config)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `).bind(shareCode, user.id, spaceId, mode, JSON.stringify(toolIds), title.trim(), JSON.stringify(customConfig)).run();
+
+        const share = await env.DB.prepare('SELECT * FROM hosted_shares WHERE id = ?').bind(res.meta.last_row_id).first();
+        return jsonResponse({ share }, 201);
+      }
+
+      if (method === 'GET') {
+        const { results: shares } = await env.DB.prepare(`
+          SELECT * FROM hosted_shares WHERE space_id = ? ORDER BY id DESC
+        `).bind(spaceId).all();
+        return jsonResponse({ shares: shares || [] });
+      }
+    }
+
+    // 16. 同步狀態 /api/spaces/:id/sync-status
+    const syncMatch = path.match(/^\/api\/spaces\/(\d+)\/sync-status$/);
+    if (syncMatch && method === 'GET') {
+      const spaceId = Number(syncMatch[1]);
+      const role = await getWorkerSpaceRole(env, spaceId, user.id);
+      if (!role) return jsonResponse({ error: '無權限存取' }, 403);
+
+      const toolCount = await env.DB.prepare('SELECT COUNT(*) as c FROM tools WHERE space_id = ? AND deleted_at IS NULL').bind(spaceId).first();
+      const trashCount = await env.DB.prepare('SELECT COUNT(*) as c FROM tools WHERE space_id = ? AND deleted_at IS NOT NULL').bind(spaceId).first();
+      const msgCount = await env.DB.prepare('SELECT COUNT(*) as c, MAX(id) as max_id FROM space_messages WHERE space_id = ?').bind(spaceId).first();
+
+      return jsonResponse({
+        active_tools_count: toolCount?.c || 0,
+        trash_tools_count: trashCount?.c || 0,
+        message_count: msgCount?.c || 0,
+        latest_message_id: msgCount?.max_id || 0,
+        current_user_role: role,
+      });
     }
 
       return jsonResponse({ error: 'Not Found' }, 404);

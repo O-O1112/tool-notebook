@@ -24,6 +24,11 @@ import {
   Search,
   Tv,
   Sparkles,
+  Share2,
+  Users,
+  MessageSquare,
+  Shield,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -47,6 +52,11 @@ export default function Navbar({
   onSelectTheme,
   onToggleDarkMode,
   isGuest = false,
+  userRole = 'owner',
+  canEdit = null,
+  onOpenPublishModal,
+  onOpenTeamModal,
+  onOpenTeamChat,
   onOpenCommandPalette,
   onTogglePresentation,
 }) {
@@ -62,6 +72,8 @@ export default function Navbar({
   };
 
   const isOwner = currentSpace?.is_owner === 1 || currentSpace?.user_id === user?.id;
+  const effectiveRole = currentSpace?.user_role || (isOwner ? 'owner' : userRole || 'editor');
+  const effectiveCanEdit = canEdit !== null ? canEdit : (isOwner || effectiveRole === 'editor');
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--card-bg)]/90 backdrop-blur border-b border-[var(--line)] px-4 sm:px-6 lg:px-8 py-2.5">
@@ -196,6 +208,14 @@ export default function Navbar({
                   )}
                 </div>
               )}
+
+              {/* 成員身分徽章 */}
+              {currentSpace && !isGuest && (
+                <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[var(--paper)] text-[var(--ink)] border border-[var(--line)]">
+                  <Shield size={12} className={effectiveRole === 'owner' ? 'text-amber-500' : 'text-blue-500'} />
+                  <span>{effectiveRole === 'owner' ? '擁有者' : effectiveRole === 'editor' ? '協作者' : '檢視者'}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -326,6 +346,45 @@ export default function Navbar({
                 </div>
               )}
 
+              {/* 獨立代管發布中心按鈕 */}
+              {!isGuest && currentSpace && onOpenPublishModal && (
+                <button
+                  type="button"
+                  onClick={onOpenPublishModal}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-indigo-600 hover:text-indigo-700 bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 font-semibold"
+                  title="小工具獨立代管與外部嵌入發布中心"
+                >
+                  <Share2 size={13} className="shrink-0" />
+                  <span className="hidden md:inline">發布代管</span>
+                </button>
+              )}
+
+              {/* 團隊成員管理按鈕 */}
+              {!isGuest && currentSpace && onOpenTeamModal && (
+                <button
+                  type="button"
+                  onClick={onOpenTeamModal}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-emerald-600 hover:text-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 font-semibold"
+                  title="管理團隊成員與角色權限 (RBAC)"
+                >
+                  <Users size={13} className="shrink-0" />
+                  <span className="hidden md:inline">團隊成員</span>
+                </button>
+              )}
+
+              {/* 團隊即時討論抽屜按鈕 */}
+              {!isGuest && currentSpace && onOpenTeamChat && (
+                <button
+                  type="button"
+                  onClick={onOpenTeamChat}
+                  className="notebook-btn-secondary text-xs py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 text-amber-600 hover:text-amber-700 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 font-semibold"
+                  title="開啟團隊討論室與即時操作動態"
+                >
+                  <MessageSquare size={13} className="shrink-0" />
+                  <span className="hidden md:inline">團隊對話</span>
+                </button>
+              )}
+
               {/* 空間設定按鈕 */}
               {!isGuest && currentSpace && onOpenSettings && (
                 <button
@@ -339,7 +398,7 @@ export default function Navbar({
               )}
 
               {/* AI 智慧代寫小工具按鈕 */}
-              {!isGuest && isOwner && onOpenAIModal && (
+              {!isGuest && effectiveCanEdit && onOpenAIModal && (
                 <button
                   type="button"
                   onClick={onOpenAIModal}
@@ -351,8 +410,8 @@ export default function Navbar({
                 </button>
               )}
 
-              {/* 貼上工具按鈕 (僅空間擁有者可新增) */}
-              {!isGuest && isOwner && (
+              {/* 貼上工具按鈕 (擁有者與協作者皆可新增) */}
+              {!isGuest && effectiveCanEdit && (
                 <button
                   onClick={onAddToolClick}
                   className="notebook-btn-primary text-xs py-1.5 px-3 whitespace-nowrap shrink-0"

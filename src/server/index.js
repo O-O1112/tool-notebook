@@ -35,6 +35,12 @@ app.use('/api', apiLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/spaces', spacesRoutes);
 
+// 免登入獨立代管微應用端點捷徑 (/api/hosted/:code)
+app.use('/api/hosted', (req, res, next) => {
+  req.url = '/hosted' + req.url;
+  spacesRoutes(req, res, next);
+});
+
 // 健康檢查
 app.get('/api/health', (req, res) => {
   res.json({

@@ -30,6 +30,9 @@ import {
   Palette,
   Tv,
   Sparkles,
+  Share2,
+  Users,
+  MessageSquare,
 } from 'lucide-react';
 import ToolCard, { CARD_COLORS } from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
@@ -56,9 +59,17 @@ export default function SpaceLayout({
   onDeleteSection,
   availableSpaces = [],
   isOwner = true,
+  userRole = 'owner',
+  canEdit = null,
   isPresentationMode = false,
   onTogglePresentation,
+  onPublishHosted,
+  onOpenPublishModal,
+  onOpenTeamModal,
+  onOpenTeamChat,
+  unreadCount = 0,
 }) {
+  const effectiveCanEdit = canEdit !== null ? canEdit : (isOwner || userRole === 'editor');
   const [activeTabId, setActiveTabId] = useState(tools[0]?.id || null);
   const [focusedTool, setFocusedTool] = useState(null);
   const [expandedToolId, setExpandedToolId] = useState(tools[0]?.id || null);
@@ -388,8 +399,50 @@ export default function SpaceLayout({
                 <span>範本專區</span>
               </button>
 
+              {/* 發布獨立代管微應用按鈕 */}
+              {onOpenPublishModal && (
+                <button
+                  type="button"
+                  onClick={onOpenPublishModal}
+                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700 bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 shrink-0 font-medium"
+                  title="將小工具打包發布為獨立代管網站或外部嵌入網址"
+                >
+                  <Share2 size={13} />
+                  <span>發布代管</span>
+                </button>
+              )}
+
+              {/* 團隊成員協作與權限管理按鈕 */}
+              {onOpenTeamModal && (
+                <button
+                  type="button"
+                  onClick={onOpenTeamModal}
+                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 shrink-0 font-medium"
+                  title="管理團隊成員角色、協作邀請碼與回收庫"
+                >
+                  <Users size={13} />
+                  <span>團隊成員</span>
+                </button>
+              )}
+
+              {/* 團隊討論室抽屜按鈕 */}
+              {onOpenTeamChat && (
+                <button
+                  type="button"
+                  onClick={onOpenTeamChat}
+                  className="notebook-btn-secondary py-1.5 px-3 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 text-amber-600 hover:text-amber-700 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 shrink-0 font-medium relative"
+                  title="開啟團隊討論室與即時協作動態"
+                >
+                  <MessageSquare size={13} />
+                  <span>團隊對話</span>
+                  {unreadCount > 0 && (
+                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 animate-ping absolute -top-0.5 -right-0.5" />
+                  )}
+                </button>
+              )}
+
               {/* AI 智慧代寫按鈕 */}
-              {isOwner && onOpenAIModal && (
+              {effectiveCanEdit && onOpenAIModal && (
                 <button
                   type="button"
                   onClick={onOpenAIModal}
@@ -415,7 +468,7 @@ export default function SpaceLayout({
               )}
 
               {/* 批次操作模式切換按鈕 */}
-              {isOwner && (
+              {effectiveCanEdit && (
                 <button
                   type="button"
                   onClick={() => {
@@ -675,6 +728,9 @@ export default function SpaceLayout({
                 isSelected={selectedToolIds.includes(currentTabTool.id)}
                 onToggleSelect={handleToggleSelectTool}
                 isOwner={isOwner}
+                userRole={userRole}
+                canEdit={effectiveCanEdit}
+                onPublishHosted={onPublishHosted}
                 isPresentationMode={isPresentationMode}
               />
             </div>
@@ -702,11 +758,14 @@ export default function SpaceLayout({
               isBatchMode={isBatchMode}
               isSelected={selectedToolIds.includes(tool.id)}
               onToggleSelect={handleToggleSelectTool}
-              draggable={isOwner && !searchQuery.trim() && !selectedTag && !isBatchMode && !isPresentationMode}
+              draggable={effectiveCanEdit && !searchQuery.trim() && !selectedTag && !isBatchMode && !isPresentationMode}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               isOwner={isOwner}
+              userRole={userRole}
+              canEdit={effectiveCanEdit}
+              onPublishHosted={onPublishHosted}
               isPresentationMode={isPresentationMode}
             />
           ))}
@@ -818,11 +877,14 @@ export default function SpaceLayout({
                       isBatchMode={isBatchMode}
                       isSelected={selectedToolIds.includes(tool.id)}
                       onToggleSelect={handleToggleSelectTool}
-                      draggable={isOwner && !isBatchMode && !isPresentationMode}
+                      draggable={effectiveCanEdit && !isBatchMode && !isPresentationMode}
                       onDragStart={handleDragStart}
                       onDragOver={handleDragOver}
                       onDrop={handleDrop}
                       isOwner={isOwner}
+                      userRole={userRole}
+                      canEdit={effectiveCanEdit}
+                      onPublishHosted={onPublishHosted}
                       isPresentationMode={isPresentationMode}
                     />
                   ))}
@@ -918,11 +980,14 @@ export default function SpaceLayout({
                 isBatchMode={isBatchMode}
                 isSelected={selectedToolIds.includes(tool.id)}
                 onToggleSelect={handleToggleSelectTool}
-                draggable={isOwner && !searchQuery.trim() && !selectedTag && !isBatchMode && !isPresentationMode}
+                draggable={effectiveCanEdit && !searchQuery.trim() && !selectedTag && !isBatchMode && !isPresentationMode}
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 isOwner={isOwner}
+                userRole={userRole}
+                canEdit={effectiveCanEdit}
+                onPublishHosted={onPublishHosted}
                 isPresentationMode={isPresentationMode}
               />
             </div>
