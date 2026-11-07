@@ -16,11 +16,12 @@ import HostedPortalView from './components/HostedPortalView';
 import PublishModal from './components/PublishModal';
 import TeamModal from './components/TeamModal';
 import TeamChatDrawer from './components/TeamChatDrawer';
-import { Tv, Sun, Moon, X, RotateCcw } from 'lucide-react';
+import LandingView from './components/LandingView';
+import { Tv, Sun, Moon, X, RotateCcw, ArrowLeft } from 'lucide-react';
 import { api } from './utils/api';
 
 export default function App() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, login, register } = useAuth();
 
   const [hostedCode, setHostedCode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -29,8 +30,15 @@ export default function App() {
 
   const [currentView, setCurrentView] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return (params.get('space') || params.get('share')) ? 'space' : 'dashboard';
+    if (params.get('space') || params.get('share')) return 'space';
+    const viewParam = params.get('view');
+    if (viewParam === 'intro' || viewParam === 'landing') return 'landing';
+    if (viewParam === 'tools' || viewParam === 'dashboard') return 'dashboard';
+    const token = localStorage.getItem('token');
+    return token ? 'dashboard' : 'landing';
   });
+
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [spaces, setSpaces] = useState([]);
   const [currentSpace, setCurrentSpace] = useState(null);
   const [tools, setTools] = useState([]);
@@ -343,7 +351,12 @@ export default function App() {
           loadSpaceDetail(spaceId);
           setCurrentView('space');
         } else {
-          setCurrentView('dashboard');
+          const viewParam = params.get('view');
+          if (viewParam === 'intro' || viewParam === 'landing') {
+            setCurrentView('landing');
+          } else {
+            setCurrentView('dashboard');
+          }
         }
       }
     };
@@ -365,6 +378,7 @@ export default function App() {
       const url = new URL(window.location);
       url.searchParams.set('space', spaceId);
       url.searchParams.delete('share');
+      url.searchParams.delete('view');
       window.history.pushState({ spaceId }, '', url.toString());
     }
   };
@@ -406,13 +420,44 @@ export default function App() {
     setSettingsModalOpen(true);
   };
 
-  // 返回大廳：切回主頁空間牆並清理網址參數
+  // 返回工具主頁（大廳）：切回主頁空間牆並清理網址參數
   const handleNavigateHome = () => {
     setCurrentView('dashboard');
     const url = new URL(window.location);
     url.searchParams.delete('space');
     url.searchParams.delete('share');
+    url.searchParams.set('view', 'dashboard');
     window.history.pushState({}, '', url.toString());
+  };
+
+  // 前往介紹主頁：展示產品核心特色、三大代管模式與範本
+  const handleNavigateLanding = () => {
+    setCurrentView('landing');
+    const url = new URL(window.location);
+    url.searchParams.delete('space');
+    url.searchParams.delete('share');
+    url.searchParams.set('view', 'landing');
+    window.history.pushState({}, '', url.toString());
+  };
+
+  // 快速免登入體驗 Demo
+  const handleQuickDemo = async () => {
+    try {
+      await login('demo', 'demo1234');
+      handleNavigateHome();
+    } catch {
+      try {
+        await register({
+          username: 'demo',
+          password: 'demo1234',
+          displayName: '體驗訪客',
+        });
+        handleNavigateHome();
+      } catch (err) {
+        console.warn('快速體驗失敗', err);
+        setLoginModalOpen(true);
+      }
+    }
   };
 
   // 切換置頂釘選狀態
@@ -1053,9 +1098,54 @@ export default function App() {
     );
   }
 
-  // 若尚未登入且並非訪客分享直達，顯示小本本風格登入卡片
+  // 若當前為「介紹主頁」，無論是否登入皆可完整瀏覽
+  if (currentView === 'landing') {
+    return (
+      <>
+        <LandingView
+          user={user}
+          onGoToDashboard={() => {
+            if (user) {
+              handleNavigateHome();
+            } else {
+              setLoginModalOpen(true);
+            }
+          }}
+          onQuickDemo={handleQuickDemo}
+          onOpenLoginModal={() => setLoginModalOpen(true)}
+          theme={theme}
+          onToggleDarkMode={handleToggleDarkMode}
+        />
+        {loginModalOpen && (
+          <LoginCard
+            isModal={true}
+            onClose={() => setLoginModalOpen(false)}
+            onSuccess={() => {
+              setLoginModalOpen(false);
+              handleNavigateHome();
+            }}
+          />
+        )}
+      </>
+    );
+  }
+
+  // 若尚未登入且並非訪客分享直達，且試圖訪問工具大廳或空間，顯示小本本風格登入卡片 (帶返回介紹主頁快捷鍵)
   if (!user && !isGuest) {
-    return <LoginCard />;
+    return (
+      <div className="relative min-h-screen">
+        <button
+          type="button"
+          onClick={handleNavigateLanding}
+          className="absolute top-4 left-4 z-20 notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 font-medium shadow-sm"
+          title="返回產品介紹主頁"
+        >
+          <ArrowLeft size={13} />
+          <span>返回介紹主頁</span>
+        </button>
+        <LoginCard onSuccess={handleNavigateHome} />
+      </div>
+    );
   }
 
   return (
@@ -1065,6 +1155,7 @@ export default function App() {
         <Navbar
           currentView={currentView}
           onNavigateHome={handleNavigateHome}
+          onNavigateLanding={handleNavigateLanding}
           spaces={spaces}
           currentSpace={currentSpace}
           onSelectSpace={handleSelectSpace}
@@ -1362,6 +1453,18 @@ export default function App() {
             ✕
           </button>
         </div>
+      )}
+
+      {/* 登入 / 註冊彈窗 */}
+      {loginModalOpen && (
+        <LoginCard
+          isModal={true}
+          onClose={() => setLoginModalOpen(false)}
+          onSuccess={() => {
+            setLoginModalOpen(false);
+            handleNavigateHome();
+          }}
+        />
       )}
     </div>
   );
