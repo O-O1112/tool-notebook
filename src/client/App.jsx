@@ -1079,8 +1079,9 @@ export default function App() {
     );
   }
 
-  // 若當前為「介紹主頁」，無論是否登入皆可完整瀏覽
-  if (currentView === 'landing') {
+  // 若未登入（且非訪客代碼分享直達），或明確處於「介紹主頁」，一律以產品介紹首頁為主要門戶。
+  // 需要登入或註冊時，直接在首頁上方彈出高質感模態視窗，徹底杜絕全頁黑屏登入牆（拒絕本末倒置）。
+  if (currentView === 'landing' || (!user && !isGuest)) {
     return (
       <>
         <LandingView
@@ -1112,24 +1113,6 @@ export default function App() {
           />
         )}
       </>
-    );
-  }
-
-  // 若尚未登入且並非訪客分享直達，且試圖訪問工具大廳或空間，顯示小本本風格登入卡片 (帶返回介紹主頁快捷鍵)
-  if (!user && !isGuest) {
-    return (
-      <div className="relative min-h-screen">
-        <button
-          type="button"
-          onClick={handleNavigateLanding}
-          className="absolute top-4 left-4 z-20 notebook-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 font-medium shadow-sm"
-          title="返回產品介紹主頁"
-        >
-          <ArrowLeft size={13} />
-          <span>返回介紹主頁</span>
-        </button>
-        <LoginCard onSuccess={handleNavigateHome} />
-      </div>
     );
   }
 

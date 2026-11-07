@@ -827,83 +827,8 @@ export default function SpaceDashboard({
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Canva 風格：「你可能想嘗試…」熱門微應用快速啟用推薦條 (僅在最近使用與全部大廳呈現) */}
-              {activeNav === 'recent' && (
-                <div className="p-4 rounded-2xl bg-[var(--card-bg)] border border-[var(--line)] shadow-xs space-y-3 animate-fadeIn">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Sparkles size={16} className="text-[var(--coral)]" />
-                      <h2 className="text-sm font-bold text-[var(--ink)]">你可能想嘗試…</h2>
-                      <span className="hidden sm:inline text-xs text-[var(--muted)]">精選實用微應用，點擊即可試玩或一鍵建立空間</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveNav('templates')}
-                      className="text-xs text-[var(--coral)] hover:underline font-semibold flex items-center gap-1"
-                    >
-                      <span>瀏覽全部 {TOOL_TEMPLATES.length} 款範本</span>
-                      <ArrowRight size={13} />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                    {TOOL_TEMPLATES.slice(0, 5).map((tmpl) => (
-                      <div
-                        key={tmpl.id}
-                        className="p-3 rounded-xl bg-[var(--paper)] border border-[var(--line)] hover:border-[var(--coral)] hover:shadow-xs transition-all flex flex-col justify-between group"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="notebook-badge text-[10px] bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)]">
-                              {tmpl.category || '微應用'}
-                            </span>
-                            <span className="text-[10px] text-[var(--muted)] font-mono">HTML/JS</span>
-                          </div>
-                          <h4 className="text-xs font-bold text-[var(--ink)] group-hover:text-[var(--coral)] transition-colors truncate">
-                            {tmpl.title}
-                          </h4>
-                          <p className="text-[11px] text-[var(--muted)] mt-1 line-clamp-2 leading-relaxed">
-                            {tmpl.description}
-                          </p>
-                        </div>
-                        <div className="mt-3 pt-2 border-t border-[var(--line)]/60 flex items-center justify-between gap-1">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPreviewingTemplate(tmpl);
-                            }}
-                            className="text-[11px] text-[#3b827e] font-semibold hover:underline flex items-center gap-1"
-                            title="沙盒即時試玩"
-                          >
-                            <Play size={11} />
-                            <span>試玩</span>
-                          </button>
-                          {onCreateSpaceFromTemplate && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onCreateSpaceFromTemplate(tmpl);
-                              }}
-                              className="text-[11px] text-[var(--coral)] font-bold hover:underline flex items-center gap-0.5"
-                              title="以此範本快速建立全新手帳空間"
-                            >
-                              <span>以此建空間</span>
-                              <ArrowRight size={11} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {displayedSpaces.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
+          ) : displayedSpaces.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
               {displayedSpaces.map((sp, idx) => {
                 const isFavorite = favoriteSpaceIds.includes(sp.id);
                 const isTrashItem = trashSpaceIds.includes(sp.id);
@@ -1178,9 +1103,7 @@ export default function SpaceDashboard({
             </div>
           )}
         </div>
-      )}
-    </div>
-  </section>
+      </section>
     </div>
 
     {/* 底部精緻手繪風全景天際線：全寬展開、完全貼近頁底 */}
