@@ -51,41 +51,18 @@ export default function LandingView({
       {/* ======================================================== */}
       <header className="sticky top-0 z-40 bg-[var(--card-bg)]/90 backdrop-blur-md border-b border-[var(--line)] px-4 sm:px-6 lg:px-8 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* 左側：品牌名稱與主頁模式切換分段按鈕 */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="brand-mark">
-                <BookOpen size={18} />
-              </div>
-              <div>
-                <span className="font-bold text-base text-[var(--ink)] block leading-tight">
-                  工具小本本
-                </span>
-                <span className="text-[10px] text-[var(--muted)] hidden sm:block">
-                  自訂微應用與嵌入空間
-                </span>
-              </div>
+          {/* 左側：品牌標識與簡述 */}
+          <div className="flex items-center gap-3">
+            <div className="brand-mark">
+              <BookOpen size={18} />
             </div>
-
-            <div className="h-5 w-px bg-[var(--line)] mx-1 hidden sm:block" />
-
-            {/* 介紹主頁 vs 工具主頁 切換分段膠囊 */}
-            <div className="bg-[var(--paper)] p-0.5 rounded-xl flex items-center border border-[var(--line)] text-xs">
-              <button
-                type="button"
-                className="px-3 py-1 rounded-lg bg-[var(--card-bg)] font-bold text-[var(--coral)] shadow-xs transition-all"
-              >
-                介紹主頁
-              </button>
-              <button
-                type="button"
-                onClick={onGoToDashboard}
-                className="px-3 py-1 rounded-lg text-[var(--muted)] hover:text-[var(--ink)] transition-all font-medium flex items-center gap-1"
-                title="切換至小工具管理工作區"
-              >
-                <span>工具主頁</span>
-                <ChevronRight size={12} className="opacity-60" />
-              </button>
+            <div>
+              <span className="font-bold text-base text-[var(--ink)] block leading-tight">
+                工具小本本
+              </span>
+              <span className="text-[10px] text-[var(--muted)] hidden sm:block">
+                自訂微應用與嵌入空間
+              </span>
             </div>
           </div>
 
@@ -142,7 +119,7 @@ export default function LandingView({
                 onClick={onGoToDashboard}
                 className="notebook-btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5 shadow-xs font-semibold"
               >
-                <span>進入工具主頁</span>
+                <span>進入工作空間</span>
                 <ArrowRight size={14} />
               </button>
             ) : (

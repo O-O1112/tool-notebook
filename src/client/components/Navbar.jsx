@@ -85,39 +85,26 @@ export default function Navbar({
         {/* 左側：大廳 vs 空間內導覽 */}
         <div className="flex items-center gap-3">
           {currentView === 'dashboard' ? (
-            /* 工具主頁（大廳模式）：品牌標誌與雙首頁切換分段按鈕 */
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
+            /* 工具主頁（大廳模式）：品牌標誌與空間大廳標記 */
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onNavigateLanding}
+                className="flex items-center gap-2.5 hover:opacity-85 transition-opacity text-left cursor-pointer group"
+                title="點擊前往官方介紹首頁"
+              >
                 <div className="brand-mark">
                   <BookOpen size={18} />
                 </div>
-                <span className="font-bold text-sm text-[var(--ink)] hidden sm:block leading-tight">
-                  工具小本本
-                </span>
-              </div>
-
-              <div className="h-5 w-[1px] bg-[var(--line)] hidden sm:block" />
-
-              {/* 雙首頁切換分段膠囊 */}
-              <div className="bg-[var(--paper)] p-0.5 rounded-xl flex items-center border border-[var(--line)] text-xs">
-                {onNavigateLanding && (
-                  <button
-                    type="button"
-                    onClick={onNavigateLanding}
-                    className="px-2.5 py-1 rounded-lg text-[var(--muted)] hover:text-[var(--ink)] transition-colors font-medium"
-                    title="切換至產品介紹與微應用範本展示首頁"
-                  >
-                    介紹主頁
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="px-2.5 py-1 rounded-lg bg-[var(--card-bg)] font-bold text-[var(--coral)] shadow-xs transition-colors"
-                  title="目前位於工具主頁（空間大廳）"
-                >
-                  工具主頁
-                </button>
-              </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-[var(--ink)] block leading-tight group-hover:text-[var(--coral)] transition-colors">
+                    工具小本本
+                  </span>
+                  <span className="notebook-badge bg-[var(--coral-light)] text-[var(--coral)] border-[var(--coral-border)] text-[10px] py-0.5 px-2">
+                    空間大廳
+                  </span>
+                </div>
+              </button>
             </div>
           ) : (
             /* 空間內部模式：返回大廳按鈕與空間切換下拉選單 */
