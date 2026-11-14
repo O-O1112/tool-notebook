@@ -5,6 +5,7 @@ import {
   Kanban,
   Layers,
   FoldVertical,
+  LayoutDashboard,
   Columns,
   Sun,
   Moon,
@@ -139,6 +140,14 @@ export default function CommandPalette({
       hint: '上方標籤列切換單一工具',
       icon: <Layers size={16} className="text-sky-500" />,
       perform: () => onSetLayout?.('tabs'),
+    },
+    {
+      id: 'action-layout-canvas',
+      group: '版型切換',
+      title: '切換為 自由書桌 (Canvas)',
+      hint: '28px 方格紙自由拖曳與縮放拼貼書桌',
+      icon: <LayoutDashboard size={16} className="text-[var(--coral)]" />,
+      perform: () => onSetLayout?.('canvas'),
     },
     {
       id: 'action-layout-collapsed',

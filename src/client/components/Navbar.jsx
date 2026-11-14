@@ -18,6 +18,7 @@ import {
   Moon,
   Columns3,
   Kanban,
+  LayoutDashboard,
   QrCode,
   Eye,
   ArrowLeft,
@@ -236,8 +237,19 @@ export default function Navbar({
           {currentView === 'space' ? (
             /* 空間內部右側：佈局切換、搜尋、團隊與發布整合選單、更多功能、新增工具、外觀模式 */
             <>
-              {/* 1. 佈局切換器 (貨架分欄 | 瀑布流 | 網格 | 分頁 | 折起專注) */}
+              {/* 1. 佈局切換器 (自由書桌 | 貨架分欄 | 瀑布流 | 網格 | 分頁 | 折起專注) */}
               <div className="bg-[var(--paper)] p-0.5 rounded-xl flex items-center border border-[var(--line)] shrink-0">
+                <button
+                  onClick={() => onToggleLayout('canvas')}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    layout === 'canvas'
+                      ? 'bg-[var(--card-bg)] text-[var(--coral)] shadow-xs font-semibold'
+                      : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                  }`}
+                  title="自由書桌拼貼畫布模式"
+                >
+                  <LayoutDashboard size={15} />
+                </button>
                 <button
                   onClick={() => onToggleLayout('shelf')}
                   className={`p-1.5 rounded-lg transition-colors ${

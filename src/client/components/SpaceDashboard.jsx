@@ -10,6 +10,7 @@ import {
   LayoutGrid,
   Layers,
   ListCollapse,
+  LayoutDashboard,
   QrCode,
   Copy,
   Check,
@@ -212,6 +213,8 @@ export default function SpaceDashboard({
 
   const getLayoutInfo = (layout) => {
     switch (layout) {
+      case 'canvas':
+        return { label: '自由書桌', icon: <LayoutDashboard size={12} className="text-[#e17b62] shrink-0" /> };
       case 'shelf':
         return { label: '貨架分欄', icon: <Kanban size={12} className="text-[#e17b62] shrink-0" /> };
       case 'wall':

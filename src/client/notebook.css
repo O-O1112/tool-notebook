@@ -786,3 +786,60 @@ html, body, #root {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ========================================================
+   自由書桌拼貼畫布 (Free-Desk Canvas) 專屬互動樣式
+   ======================================================== */
+.canvas-desk-dock {
+  background: color-mix(in srgb, var(--card-bg, #ffffff) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.canvas-resize-edge-r {
+  position: absolute;
+  top: 44px;
+  right: -4px;
+  bottom: 16px;
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 35;
+}
+
+.canvas-resize-edge-b {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -4px;
+  height: 8px;
+  cursor: ns-resize;
+  z-index: 35;
+}
+
+.canvas-resize-corner {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 18px;
+  height: 18px;
+  cursor: nwse-resize;
+  z-index: 36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-resize-corner-grip {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  border-bottom-right-radius: 2px;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.canvas-resize-corner:hover .canvas-resize-corner-grip {
+  opacity: 1;
+  border-color: var(--coral);
+}

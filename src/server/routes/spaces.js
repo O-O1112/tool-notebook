@@ -190,7 +190,7 @@ router.post('/', (req, res) => {
     }
 
     const cleanDesc = (typeof description === 'string' ? description.trim() : '').slice(0, 1000);
-    const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+    const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed', 'canvas'];
     const safeLayout = validLayouts.includes(layout) ? layout : 'grid';
 
     let inviteCode = generateInviteCode();
@@ -369,7 +369,7 @@ router.patch('/:id', (req, res) => {
     }
 
     if (layout !== undefined) {
-      const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+      const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed', 'canvas'];
       if (!validLayouts.includes(layout)) {
         return res.status(400).json({ error: '無效的排版格式' });
       }

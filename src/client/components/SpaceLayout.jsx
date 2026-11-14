@@ -36,10 +36,12 @@ import {
 } from 'lucide-react';
 import ToolCard, { CARD_COLORS } from './ToolCard';
 import SandboxedFrame from './SandboxedFrame';
+import FreeCanvasBoard from './FreeCanvasBoard';
 import { parseToolInput, openSandboxedPopout } from '../utils/codeParser';
 import { ToolsEmptyIllustration, SearchEmptyIllustration, EmptyShelfBasketDoodle } from './Illustrations';
 
 export default function SpaceLayout({
+  spaceId = 'default',
   tools = [],
   layout,
   onDeleteTool,
@@ -87,6 +89,7 @@ export default function SpaceLayout({
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all' | 'html' | 'iframe'
   const [selectedTag, setSelectedTag] = useState(null); // null 表示全部
+  const [showCanvasFilterBar, setShowCanvasFilterBar] = useState(false);
 
   // 批次操作狀態 (Batch Selection)
   const [isBatchMode, setIsBatchMode] = useState(false);
@@ -318,11 +321,15 @@ export default function SpaceLayout({
 
   // 當前分頁選定工具
   const currentTabTool = sortedAndFilteredTools.find((t) => t.id === activeTabId) || sortedAndFilteredTools[0] || tools[0];
+  const shouldShowFilterBar =
+    layout !== 'canvas' ||
+    showCanvasFilterBar ||
+    Boolean(searchQuery.trim() || selectedTag || filterType !== 'all' || isBatchMode);
 
   return (
     <div className="w-full flex-1 flex flex-col space-y-4 animate-fadeIn">
-      {/* 頂部搜尋、標籤與過濾篩選工具列 (簡報模式下隱藏以維持純淨無干擾展示) */}
-      {!isPresentationMode && (
+      {/* 頂部搜尋、標籤與過濾篩選工具列 (簡報模式與自由書桌預設狀態下隱藏以維持純淨無干擾展示) */}
+      {!isPresentationMode && shouldShowFilterBar && (
         <div className="flex flex-col gap-2.5 bg-[var(--card-bg)] px-4 py-3 rounded-2xl border border-[var(--line)] shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-3">
             {/* 搜尋框 */}
@@ -474,6 +481,35 @@ export default function SpaceLayout({
             </button>
           )}
         </div>
+      )}
+
+      {/* 模式 0：自由書桌拼貼畫布 (Free-Desk Canvas Mode) */}
+      {layout === 'canvas' && sortedAndFilteredTools.length > 0 && (
+        <FreeCanvasBoard
+          spaceId={spaceId}
+          tools={sortedAndFilteredTools}
+          allToolsCount={tools.length}
+          effectiveCanEdit={effectiveCanEdit}
+          isPresentationMode={isPresentationMode}
+          isBatchMode={isBatchMode}
+          selectedToolIds={selectedToolIds}
+          onToggleSelectTool={(id) => {
+            setSelectedToolIds((prev) =>
+              prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+            );
+          }}
+          onFocusTool={(tool) => setFocusedTool(tool)}
+          onEditTool={onEditTool}
+          onDeleteTool={onDeleteTool}
+          onTogglePin={onTogglePin}
+          onChangeColor={onChangeColor}
+          onDuplicateTool={onDuplicateTool}
+          onCloneToolToSpace={(t) => setCloningTool(t)}
+          onPublishHosted={onPublishHosted}
+          onOpenAddModal={onOpenAddModal}
+          showFilterBar={shouldShowFilterBar}
+          onToggleFilterBar={() => setShowCanvasFilterBar((prev) => !prev)}
+        />
       )}
 
       {/* 模式 1：折起專注模式 (Collapsed / Focus Accordion Mode) */}

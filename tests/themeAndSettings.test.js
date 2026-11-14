@@ -47,10 +47,11 @@ test('theme: 深色模式切換與先前日間紙質風格還原邏輯', () => {
   assert.equal(currentTheme, 'minimal', '應精確還原至 minimal 素白風格');
 });
 
-test('settings: 設定區支援之 5 款排版模式鍵值與有效性', () => {
-  const supportedLayouts = ['shelf', 'wall', 'grid', 'tabs', 'collapsed'];
+test('settings: 設定區支援之 6 款排版模式鍵值與有效性', () => {
+  const supportedLayouts = ['canvas', 'shelf', 'wall', 'grid', 'tabs', 'collapsed'];
   
-  assert.equal(supportedLayouts.length, 5);
+  assert.equal(supportedLayouts.length, 6);
+  assert.ok(supportedLayouts.includes('canvas'), '應支援自由書桌拼貼畫布');
   assert.ok(supportedLayouts.includes('shelf'), '應支援貨架分欄');
   assert.ok(supportedLayouts.includes('wall'), '應支援緊湊瀑布流');
   assert.ok(supportedLayouts.includes('grid'), '應支援網格並排');

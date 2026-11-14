@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, FolderPlus, Columns3, Kanban, LayoutGrid, Layers, ListCollapse, ArrowRight } from 'lucide-react';
+import { X, FolderPlus, Columns3, Kanban, LayoutGrid, Layers, ListCollapse, LayoutDashboard, ArrowRight } from 'lucide-react';
 import { DraftingNotebookDoodle } from './Illustrations';
 
 const LAYOUT_OPTIONS = [
+  { key: 'canvas', label: '自由書桌', desc: '方格紙自由拖曳與調尺寸', icon: LayoutDashboard },
   { key: 'shelf', label: '貨架分欄', desc: '看板分欄分類', icon: Kanban },
   { key: 'wall', label: '緊湊瀑布流', desc: '無縫高矮自適應', icon: Columns3 },
   { key: 'grid', label: '網格並排', desc: '支援拖曳重排與自由縮放', icon: LayoutGrid },

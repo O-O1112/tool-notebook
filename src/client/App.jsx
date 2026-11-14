@@ -1220,6 +1220,7 @@ export default function App() {
           </div>
         ) : (
           <SpaceLayout
+            spaceId={currentSpace?.id || 'default'}
             tools={tools}
             layout={layout}
             onDeleteTool={handleDeleteTool}

@@ -492,7 +492,7 @@ export default {
       const cleanName = name.trim();
       if (cleanName.length > 100) return jsonResponse({ error: '空間名稱不可超過 100 個字元' }, 400);
       const cleanDesc = (typeof description === 'string' ? description.trim() : '').slice(0, 1000);
-      const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+      const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed', 'canvas'];
       const safeLayout = validLayouts.includes(layout) ? layout : 'grid';
 
       const code = generateInviteCode();
@@ -580,7 +580,7 @@ export default {
           await env.DB.prepare('UPDATE spaces SET description = ? WHERE id = ?').bind(cleanDesc, spaceId).run();
         }
         if (layout !== undefined) {
-          const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed'];
+          const validLayouts = ['grid', 'shelf', 'wall', 'tabs', 'collapsed', 'canvas'];
           if (!validLayouts.includes(layout)) return jsonResponse({ error: '無效的排版格式' }, 400);
           await env.DB.prepare('UPDATE spaces SET layout = ? WHERE id = ?').bind(layout, spaceId).run();
         }
